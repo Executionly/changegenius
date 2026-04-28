@@ -11,6 +11,7 @@ import {
 } from "@/lib/assessment/questions";
 import { BarChart } from "@/components/results/BarChart";
 import { RadarChart } from "@/components/results/RadarChart";
+import { EnergyProfile } from "@/lib/assessment/scoring";
 
 interface ResultsData {
   assessmentId: string;
@@ -22,6 +23,7 @@ interface ResultsData {
     primary_role: Role;
     secondary_role: Role;
     role_pair_title: string;
+    energy_profile: EnergyProfile;
     primary_energy: Energy;
     top_adapts_stages: AdaptsStage[];
     bottom_adapts_stages: AdaptsStage[];
@@ -360,7 +362,7 @@ export default function ResultsPage() {
                   Primary Energy
                 </div>
                 <div style={{ fontSize: 28, fontWeight: 900, color: "white" }}>
-                  {derived.primary_energy}
+                  {derived.energy_profile.dominant}
                 </div>
               </div>
             </div>
@@ -588,7 +590,7 @@ export default function ResultsPage() {
             <span
               style={{ fontSize: 13, fontWeight: 700, color: "var(--navy)" }}
             >
-              {derived.primary_energy} —{" "}
+              {derived.energy_profile.dominant} —{" "}
             </span>
             <span style={{ fontSize: 13, color: "var(--text-2)" }}>
               {narrative.energy_summary}

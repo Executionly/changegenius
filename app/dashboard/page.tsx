@@ -315,7 +315,7 @@ export default function DashboardPage() {
                 Unlock your assessment to access all features
               </div>
               <div style={{ fontSize: 13, color: "rgba(255,255,255,.7)" }}>
-                60 questions · 8–10 minutes · Instant results · Lifetime access
+                72 questions · 8–10 minutes · Instant results · Lifetime access
               </div>
             </div>
             <Link
@@ -362,7 +362,7 @@ export default function DashboardPage() {
                 Start your assessment — you&apos;re all set
               </div>
               <div style={{ fontSize: 13, color: "rgba(255,255,255,.7)" }}>
-                60 questions · 8–10 minutes · Results appear instantly
+                72 questions · 8–10 minutes · Results appear instantly
               </div>
             </div>
             <Link

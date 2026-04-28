@@ -189,7 +189,7 @@ export default function AssessmentPage() {
             }}
           >
             {[
-              ["📋", "60 Questions"],
+              ["📋", "72 questions"],
               ["⏱️", "8–10 Minutes"],
               ["🔒", "Private results"],
               ["📥", "Download & share"],

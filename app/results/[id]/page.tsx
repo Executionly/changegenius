@@ -238,7 +238,7 @@ export default async function ResultsPageById({ params }: PageProps) {
                   Primary Energy
                 </div>
                 <div style={{ fontSize: 28, fontWeight: 900, color: "white" }}>
-                  {derived.primary_energy}
+                  {derived.energy_profile.dominant}
                 </div>
               </div>
             </div>
@@ -466,7 +466,7 @@ export default async function ResultsPageById({ params }: PageProps) {
             <span
               style={{ fontSize: 13, fontWeight: 700, color: "var(--navy)" }}
             >
-              {derived.primary_energy} —{" "}
+              {derived.energy_profile.dominant} —{" "}
             </span>
             <span style={{ fontSize: 13, color: "var(--text-2)" }}>
               {narrative.energy_summary}

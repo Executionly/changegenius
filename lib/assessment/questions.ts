@@ -1,13 +1,16 @@
 /**
- * Change Genius™ — Question Bank v1
- * 60 questions across 6 roles (10 each)
- * Maps to: role scores, ADAPTS stage scores, energy scores
+ * Change Genius™ — Question Bank v2
  *
- * Response scale: 1=Strongly Disagree, 2=Disagree, 3=Neutral, 4=Agree, 5=Strongly Agree
- * reverse: true means score is inverted (6 - value) before use
+ * 72 questions across 6 ADAPTS stages (12 each)
+ * Each stage has: 3 Preference + 4 Behavior + 3 Pressure + 2 Reverse
+ *
+ * Role and Energy are derived from question mappings.
+ * Response scale: 1=Strongly Disagree … 5=Strongly Agree
+ * reverse: true → score = 6 - value before use
  */
 
 export type Role = 'Innovator' | 'Achiever' | 'Organizer' | 'Unifier' | 'Builder' | 'Refiner'
+
 export type AdaptsStage =
   | 'Alert the System'
   | 'Diagnose the Gaps'
@@ -15,338 +18,535 @@ export type AdaptsStage =
   | 'Participate Through Dialogue'
   | 'Transform Through Alignment'
   | 'Scale and Sustain'
+
 export type Energy = 'Spark' | 'Build' | 'Polish' | 'Bond'
 
+export type ItemType = 'preference' | 'behavior' | 'pressure' | 'reverse'
+
 export interface Question {
-  id: string           // e.g. "INNOVATOR_1"
+  id: string
   text: string
   role: Role
   stage: AdaptsStage
   energy: Energy
-  reverse: boolean     // if true, score = 6 - value
-  order: number        // global display order 1–60
+  item_type: ItemType
+  reverse: boolean   // always true when item_type === 'reverse'
+  order: number
 }
 
 export const QUESTIONS: Question[] = [
-  // ── INNOVATOR (10 questions) ──────────────────────────────
+
+  // ══════════════════════════════════════════════════════════
+  // STAGE 1: ALERT THE SYSTEM (12 items)
+  // ══════════════════════════════════════════════════════════
+
+  // Preference (3)
   {
-    id: 'INNOVATOR_1', order: 1,
-    text: 'When challenges emerge, I quickly begin exploring new ideas that could address them.',
-    role: 'Innovator', stage: 'Alert the System', energy: 'Spark', reverse: false,
+    id: 'ALERT_P1', order: 1,
+    text: 'I naturally pay attention to early signals, patterns, and subtle changes in my environment, even before others begin to notice them.',
+    role: 'Innovator', stage: 'Alert the System', energy: 'Spark',
+    item_type: 'preference', reverse: false,
   },
   {
-    id: 'INNOVATOR_2', order: 2,
-    text: 'I often recognize opportunities for improvement before others notice them.',
-    role: 'Innovator', stage: 'Alert the System', energy: 'Spark', reverse: false,
+    id: 'ALERT_P2', order: 2,
+    text: 'I enjoy thinking ahead about what could shift in the future and how those changes might affect outcomes.',
+    role: 'Innovator', stage: 'Alert the System', energy: 'Spark',
+    item_type: 'preference', reverse: false,
   },
   {
-    id: 'INNOVATOR_3', order: 3,
-    text: 'When a system stops producing results, I naturally look for different approaches.',
-    role: 'Innovator', stage: 'Diagnose the Gaps', energy: 'Spark', reverse: false,
-  },
-  {
-    id: 'INNOVATOR_4', order: 4,
-    text: 'I prefer exploring possibilities before committing to one solution.',
-    role: 'Innovator', stage: 'Diagnose the Gaps', energy: 'Spark', reverse: false,
-  },
-  {
-    id: 'INNOVATOR_5', order: 5,
-    text: 'I encourage teams to challenge assumptions about how things currently work.',
-    role: 'Innovator', stage: 'Alert the System', energy: 'Spark', reverse: false,
-  },
-  {
-    id: 'INNOVATOR_6', order: 6,
-    text: 'I feel energized when imagining future possibilities.',
-    role: 'Innovator', stage: 'Alert the System', energy: 'Spark', reverse: false,
-  },
-  {
-    id: 'INNOVATOR_7', order: 7,
-    text: 'I frequently connect ideas from different areas to generate new solutions.',
-    role: 'Innovator', stage: 'Diagnose the Gaps', energy: 'Spark', reverse: false,
-  },
-  {
-    id: 'INNOVATOR_8', order: 8,
-    text: 'I become impatient when conversations about change focus too much on risks.',
-    role: 'Innovator', stage: 'Access Readiness', energy: 'Spark', reverse: true, // reverse scored
-  },
-  {
-    id: 'INNOVATOR_9', order: 9,
-    text: 'I actively look for patterns that indicate future disruption or opportunity.',
-    role: 'Innovator', stage: 'Alert the System', energy: 'Spark', reverse: false,
-  },
-  {
-    id: 'INNOVATOR_10', order: 10,
-    text: 'I prefer creating new approaches rather than improving existing systems.',
-    role: 'Innovator', stage: 'Alert the System', energy: 'Spark', reverse: false,
+    id: 'ALERT_P3', order: 3,
+    text: 'I find it energizing to observe trends, behaviors, and signals that may indicate upcoming opportunities or risks.',
+    role: 'Innovator', stage: 'Alert the System', energy: 'Spark',
+    item_type: 'preference', reverse: false,
   },
 
-  // ── ACHIEVER (10 questions) ───────────────────────────────
+  // Behavior (4)
   {
-    id: 'ACHIEVER_1', order: 11,
-    text: 'When goals are defined, I naturally push the team to begin executing.',
-    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build', reverse: false,
+    id: 'ALERT_B1', order: 4,
+    text: 'I consistently monitor my environment for emerging patterns that could impact decisions, performance, or direction.',
+    role: 'Innovator', stage: 'Alert the System', energy: 'Spark',
+    item_type: 'behavior', reverse: false,
   },
   {
-    id: 'ACHIEVER_2', order: 12,
-    text: 'I feel responsible for ensuring initiatives move forward.',
-    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build', reverse: false,
+    id: 'ALERT_B2', order: 5,
+    text: 'I speak up when I notice early warning signs, even when others are not yet convinced there is an issue.',
+    role: 'Innovator', stage: 'Alert the System', energy: 'Spark',
+    item_type: 'behavior', reverse: false,
   },
   {
-    id: 'ACHIEVER_3', order: 13,
-    text: 'I often take initiative when progress slows.',
-    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build', reverse: false,
+    id: 'ALERT_B3', order: 6,
+    text: 'I connect information from different sources to identify possible future developments or disruptions.',
+    role: 'Innovator', stage: 'Alert the System', energy: 'Spark',
+    item_type: 'behavior', reverse: false,
   },
   {
-    id: 'ACHIEVER_4', order: 14,
-    text: 'I prefer action over prolonged analysis.',
-    role: 'Achiever', stage: 'Diagnose the Gaps', energy: 'Build', reverse: true, // reverse scored
-  },
-  {
-    id: 'ACHIEVER_5', order: 15,
-    text: 'I measure success by the results that are achieved.',
-    role: 'Achiever', stage: 'Scale and Sustain', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'ACHIEVER_6', order: 16,
-    text: 'When teams hesitate, I encourage them to move forward.',
-    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'ACHIEVER_7', order: 17,
-    text: 'I focus on turning plans into tangible progress.',
-    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'ACHIEVER_8', order: 18,
-    text: 'I often set ambitious targets for initiatives.',
-    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'ACHIEVER_9', order: 19,
-    text: 'I track progress closely during major initiatives.',
-    role: 'Achiever', stage: 'Scale and Sustain', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'ACHIEVER_10', order: 20,
-    text: 'I believe momentum is essential for successful change.',
-    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build', reverse: false,
+    id: 'ALERT_B4', order: 7,
+    text: 'I regularly question current assumptions to ensure we are not overlooking important signals.',
+    role: 'Innovator', stage: 'Alert the System', energy: 'Spark',
+    item_type: 'behavior', reverse: false,
   },
 
-  // ── ORGANIZER (10 questions) ──────────────────────────────
+  // Pressure (3)
   {
-    id: 'ORGANIZER_1', order: 21,
-    text: 'Before initiatives begin, I analyze potential obstacles.',
-    role: 'Organizer', stage: 'Access Readiness', energy: 'Build', reverse: false,
+    id: 'ALERT_PR1', order: 8,
+    text: 'When situations become uncertain or high-pressure, I remain attentive to early indicators that others may miss.',
+    role: 'Innovator', stage: 'Alert the System', energy: 'Spark',
+    item_type: 'pressure', reverse: false,
   },
   {
-    id: 'ORGANIZER_2', order: 22,
-    text: 'I naturally create plans to coordinate complex work.',
-    role: 'Organizer', stage: 'Access Readiness', energy: 'Build', reverse: false,
+    id: 'ALERT_PR2', order: 9,
+    text: 'Under pressure, I continue to scan for risks and opportunities rather than focusing only on immediate tasks.',
+    role: 'Innovator', stage: 'Alert the System', energy: 'Spark',
+    item_type: 'pressure', reverse: false,
   },
   {
-    id: 'ORGANIZER_3', order: 23,
-    text: 'I think carefully about resources required for change.',
-    role: 'Organizer', stage: 'Access Readiness', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'ORGANIZER_4', order: 24,
-    text: 'I often identify gaps between strategy and execution.',
-    role: 'Organizer', stage: 'Diagnose the Gaps', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'ORGANIZER_5', order: 25,
-    text: 'I prefer clearly structured processes.',
-    role: 'Organizer', stage: 'Access Readiness', energy: 'Polish', reverse: false,
-  },
-  {
-    id: 'ORGANIZER_6', order: 26,
-    text: 'I enjoy organizing initiatives so teams can work effectively.',
-    role: 'Organizer', stage: 'Access Readiness', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'ORGANIZER_7', order: 27,
-    text: 'I often create frameworks that help others execute.',
-    role: 'Organizer', stage: 'Access Readiness', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'ORGANIZER_8', order: 28,
-    text: 'I feel uncomfortable when initiatives lack structure.',
-    role: 'Organizer', stage: 'Access Readiness', energy: 'Polish', reverse: false,
-  },
-  {
-    id: 'ORGANIZER_9', order: 29,
-    text: 'I frequently ask how ideas will be implemented.',
-    role: 'Organizer', stage: 'Diagnose the Gaps', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'ORGANIZER_10', order: 30,
-    text: 'I prefer structured planning before major decisions.',
-    role: 'Organizer', stage: 'Access Readiness', energy: 'Build', reverse: false,
+    id: 'ALERT_PR3', order: 10,
+    text: 'In fast-changing situations, I maintain awareness of both visible and hidden signals that could affect outcomes.',
+    role: 'Innovator', stage: 'Alert the System', energy: 'Spark',
+    item_type: 'pressure', reverse: false,
   },
 
-  // ── UNIFIER (10 questions) ────────────────────────────────
+  // Reverse (2)
   {
-    id: 'UNIFIER_1', order: 31,
-    text: 'I encourage people to express concerns during change.',
-    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond', reverse: false,
+    id: 'ALERT_R1', order: 11,
+    text: 'I usually wait until a problem becomes obvious before I begin to pay attention to it.',
+    role: 'Innovator', stage: 'Alert the System', energy: 'Spark',
+    item_type: 'reverse', reverse: true,
   },
   {
-    id: 'UNIFIER_2', order: 32,
-    text: 'I try to understand how decisions affect different stakeholders.',
-    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond', reverse: false,
-  },
-  {
-    id: 'UNIFIER_3', order: 33,
-    text: 'I help teams stay connected when tensions arise.',
-    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond', reverse: false,
-  },
-  {
-    id: 'UNIFIER_4', order: 34,
-    text: 'I listen carefully before forming conclusions.',
-    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond', reverse: false,
-  },
-  {
-    id: 'UNIFIER_5', order: 35,
-    text: 'I notice emotional reactions during change.',
-    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond', reverse: false,
-  },
-  {
-    id: 'UNIFIER_6', order: 36,
-    text: 'I try to ensure everyone feels heard.',
-    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond', reverse: false,
-  },
-  {
-    id: 'UNIFIER_7', order: 37,
-    text: 'I value collaboration over individual control.',
-    role: 'Unifier', stage: 'Transform Through Alignment', energy: 'Bond', reverse: false,
-  },
-  {
-    id: 'UNIFIER_8', order: 38,
-    text: 'I help teams resolve disagreements constructively.',
-    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond', reverse: false,
-  },
-  {
-    id: 'UNIFIER_9', order: 39,
-    text: 'I prioritize maintaining trust during change.',
-    role: 'Unifier', stage: 'Transform Through Alignment', energy: 'Bond', reverse: false,
-  },
-  {
-    id: 'UNIFIER_10', order: 40,
-    text: 'I believe dialogue is essential before action.',
-    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond', reverse: false,
+    id: 'ALERT_R2', order: 12,
+    text: 'I tend to focus only on what is directly in front of me rather than thinking about what may change in the future.',
+    role: 'Innovator', stage: 'Alert the System', energy: 'Spark',
+    item_type: 'reverse', reverse: true,
   },
 
-  // ── BUILDER (10 questions) ────────────────────────────────
+  // ══════════════════════════════════════════════════════════
+  // STAGE 2: DIAGNOSE THE GAPS (12 items)
+  // ══════════════════════════════════════════════════════════
+
+  // Preference (3)
   {
-    id: 'BUILDER_1', order: 41,
-    text: 'I focus on turning strategic ideas into practical actions.',
-    role: 'Builder', stage: 'Transform Through Alignment', energy: 'Build', reverse: false,
+    id: 'DIAG_P1', order: 13,
+    text: 'I am naturally inclined to analyze situations deeply in order to understand the root causes behind problems or outcomes.',
+    role: 'Refiner', stage: 'Diagnose the Gaps', energy: 'Polish',
+    item_type: 'preference', reverse: false,
   },
   {
-    id: 'BUILDER_2', order: 42,
-    text: 'I ensure teams understand how their work contributes to larger goals.',
-    role: 'Builder', stage: 'Transform Through Alignment', energy: 'Build', reverse: false,
+    id: 'DIAG_P2', order: 14,
+    text: 'I enjoy breaking down complex issues into smaller components so that they can be clearly understood.',
+    role: 'Refiner', stage: 'Diagnose the Gaps', energy: 'Polish',
+    item_type: 'preference', reverse: false,
   },
   {
-    id: 'BUILDER_3', order: 43,
-    text: 'I connect decisions to implementation steps.',
-    role: 'Builder', stage: 'Access Readiness', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'BUILDER_4', order: 44,
-    text: 'I work to align resources with priorities.',
-    role: 'Builder', stage: 'Transform Through Alignment', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'BUILDER_5', order: 45,
-    text: 'I prefer translating ideas into operational plans.',
-    role: 'Builder', stage: 'Access Readiness', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'BUILDER_6', order: 46,
-    text: 'I help teams maintain focus on strategic objectives.',
-    role: 'Builder', stage: 'Transform Through Alignment', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'BUILDER_7', order: 47,
-    text: 'I ensure initiatives stay aligned with goals.',
-    role: 'Builder', stage: 'Transform Through Alignment', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'BUILDER_8', order: 48,
-    text: 'I connect strategy discussions with practical execution.',
-    role: 'Builder', stage: 'Transform Through Alignment', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'BUILDER_9', order: 49,
-    text: 'I ensure actions match organizational priorities.',
-    role: 'Builder', stage: 'Transform Through Alignment', energy: 'Build', reverse: false,
-  },
-  {
-    id: 'BUILDER_10', order: 50,
-    text: 'I monitor whether change initiatives remain aligned.',
-    role: 'Builder', stage: 'Scale and Sustain', energy: 'Build', reverse: false,
+    id: 'DIAG_P3', order: 15,
+    text: 'I prefer to gain clarity and insight before taking action, even if it requires additional time and effort.',
+    role: 'Refiner', stage: 'Diagnose the Gaps', energy: 'Polish',
+    item_type: 'preference', reverse: false,
   },
 
-  // ── REFINER (10 questions) ────────────────────────────────
+  // Behavior (4)
   {
-    id: 'REFINER_1', order: 51,
-    text: 'I look for ways to improve systems after implementation.',
-    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish', reverse: false,
+    id: 'DIAG_B1', order: 16,
+    text: 'I ask thoughtful and probing questions to uncover what is really happening beneath the surface of a situation.',
+    role: 'Refiner', stage: 'Diagnose the Gaps', energy: 'Polish',
+    item_type: 'behavior', reverse: false,
   },
   {
-    id: 'REFINER_2', order: 52,
-    text: 'I analyze what worked and what did not.',
-    role: 'Refiner', stage: 'Diagnose the Gaps', energy: 'Polish', reverse: false,
+    id: 'DIAG_B2', order: 17,
+    text: 'I examine patterns, data, and evidence to ensure that conclusions are based on accurate understanding.',
+    role: 'Refiner', stage: 'Diagnose the Gaps', energy: 'Polish',
+    item_type: 'behavior', reverse: false,
   },
   {
-    id: 'REFINER_3', order: 53,
-    text: 'I focus on improving processes continuously.',
-    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish', reverse: false,
+    id: 'DIAG_B3', order: 18,
+    text: 'I challenge assumptions when they appear incomplete, unclear, or unsupported by evidence.',
+    role: 'Refiner', stage: 'Diagnose the Gaps', energy: 'Polish',
+    item_type: 'behavior', reverse: false,
   },
   {
-    id: 'REFINER_4', order: 54,
-    text: 'I document lessons from change initiatives.',
-    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish', reverse: false,
+    id: 'DIAG_B4', order: 19,
+    text: 'I take time to verify information before making recommendations or decisions.',
+    role: 'Refiner', stage: 'Diagnose the Gaps', energy: 'Polish',
+    item_type: 'behavior', reverse: false,
+  },
+
+  // Pressure (3)
+  {
+    id: 'DIAG_PR1', order: 20,
+    text: 'When under pressure, I remain committed to understanding the problem fully rather than rushing into action.',
+    role: 'Refiner', stage: 'Diagnose the Gaps', energy: 'Polish',
+    item_type: 'pressure', reverse: false,
   },
   {
-    id: 'REFINER_5', order: 55,
-    text: 'I prefer refining systems rather than starting from scratch.',
-    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish', reverse: false,
+    id: 'DIAG_PR2', order: 21,
+    text: 'In high-stakes situations, I continue to ask clarifying questions to avoid making incorrect assumptions.',
+    role: 'Refiner', stage: 'Diagnose the Gaps', energy: 'Polish',
+    item_type: 'pressure', reverse: false,
   },
   {
-    id: 'REFINER_6', order: 56,
-    text: 'I help teams learn from past initiatives.',
-    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish', reverse: false,
+    id: 'DIAG_PR3', order: 22,
+    text: 'Even when urgency increases, I maintain focus on identifying the real issue instead of reacting quickly.',
+    role: 'Refiner', stage: 'Diagnose the Gaps', energy: 'Polish',
+    item_type: 'pressure', reverse: false,
+  },
+
+  // Reverse (2)
+  {
+    id: 'DIAG_R1', order: 23,
+    text: 'I often take action before I fully understand the underlying cause of a problem.',
+    role: 'Refiner', stage: 'Diagnose the Gaps', energy: 'Polish',
+    item_type: 'reverse', reverse: true,
   },
   {
-    id: 'REFINER_7', order: 57,
-    text: 'I believe improvement should be ongoing.',
-    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish', reverse: false,
+    id: 'DIAG_R2', order: 24,
+    text: 'I rely more on instinct or quick judgment than careful analysis when making decisions.',
+    role: 'Refiner', stage: 'Diagnose the Gaps', energy: 'Polish',
+    item_type: 'reverse', reverse: true,
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // STAGE 3: ACCESS READINESS (12 items)
+  // ══════════════════════════════════════════════════════════
+
+  // Preference (3)
+  {
+    id: 'READY_P1', order: 25,
+    text: 'I naturally focus on ensuring that people, systems, and resources are prepared before execution begins.',
+    role: 'Organizer', stage: 'Access Readiness', energy: 'Build',
+    item_type: 'preference', reverse: false,
   },
   {
-    id: 'REFINER_8', order: 58,
-    text: 'I review outcomes to strengthen future efforts.',
-    role: 'Refiner', stage: 'Diagnose the Gaps', energy: 'Polish', reverse: false,
+    id: 'READY_P2', order: 26,
+    text: 'I believe that proper preparation significantly increases the likelihood of successful outcomes.',
+    role: 'Organizer', stage: 'Access Readiness', energy: 'Build',
+    item_type: 'preference', reverse: false,
   },
   {
-    id: 'REFINER_9', order: 59,
-    text: 'I focus on making systems more reliable.',
-    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish', reverse: false,
+    id: 'READY_P3', order: 27,
+    text: 'I enjoy organizing people, processes, and tools so that execution can happen smoothly.',
+    role: 'Organizer', stage: 'Access Readiness', energy: 'Build',
+    item_type: 'preference', reverse: false,
+  },
+
+  // Behavior (4)
+  {
+    id: 'READY_B1', order: 28,
+    text: 'I ensure that individuals clearly understand their roles and responsibilities before starting any initiative.',
+    role: 'Organizer', stage: 'Access Readiness', energy: 'Build',
+    item_type: 'behavior', reverse: false,
   },
   {
-    id: 'REFINER_10', order: 60,
-    text: 'I encourage teams to reflect on what they learned.',
-    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish', reverse: false,
+    id: 'READY_B2', order: 29,
+    text: 'I identify gaps in skills, resources, or systems that could prevent successful execution.',
+    role: 'Organizer', stage: 'Access Readiness', energy: 'Build',
+    item_type: 'behavior', reverse: false,
+  },
+  {
+    id: 'READY_B3', order: 30,
+    text: 'I create structure, plans, and frameworks to support effective implementation.',
+    role: 'Organizer', stage: 'Access Readiness', energy: 'Build',
+    item_type: 'behavior', reverse: false,
+  },
+  {
+    id: 'READY_B4', order: 31,
+    text: 'I evaluate whether conditions are suitable before committing to action.',
+    role: 'Organizer', stage: 'Access Readiness', energy: 'Build',
+    item_type: 'behavior', reverse: false,
+  },
+
+  // Pressure (3)
+  {
+    id: 'READY_PR1', order: 32,
+    text: 'Under pressure, I still prioritize preparation rather than rushing into execution prematurely.',
+    role: 'Organizer', stage: 'Access Readiness', energy: 'Build',
+    item_type: 'pressure', reverse: false,
+  },
+  {
+    id: 'READY_PR2', order: 33,
+    text: 'When timelines are tight, I focus on ensuring that key elements are in place before proceeding.',
+    role: 'Organizer', stage: 'Access Readiness', energy: 'Build',
+    item_type: 'pressure', reverse: false,
+  },
+  {
+    id: 'READY_PR3', order: 34,
+    text: 'Even in urgent situations, I assess readiness to avoid unnecessary failure.',
+    role: 'Organizer', stage: 'Access Readiness', energy: 'Build',
+    item_type: 'pressure', reverse: false,
+  },
+
+  // Reverse (2)
+  {
+    id: 'READY_R1', order: 35,
+    text: 'I believe it is better to start quickly and figure things out later rather than spend time preparing.',
+    role: 'Organizer', stage: 'Access Readiness', energy: 'Build',
+    item_type: 'reverse', reverse: true,
+  },
+  {
+    id: 'READY_R2', order: 36,
+    text: 'I often move into action without ensuring that the necessary structures are in place.',
+    role: 'Organizer', stage: 'Access Readiness', energy: 'Build',
+    item_type: 'reverse', reverse: true,
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // STAGE 4: PARTICIPATE THROUGH DIALOGUE (12 items)
+  // ══════════════════════════════════════════════════════════
+
+  // Preference (3)
+  {
+    id: 'DIAL_P1', order: 37,
+    text: 'I naturally focus on ensuring that people are aligned, engaged, and working toward a shared direction.',
+    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond',
+    item_type: 'preference', reverse: false,
+  },
+  {
+    id: 'DIAL_P2', order: 38,
+    text: 'I value clarity, trust, and mutual understanding within teams and organizations.',
+    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond',
+    item_type: 'preference', reverse: false,
+  },
+  {
+    id: 'DIAL_P3', order: 39,
+    text: 'I am drawn to facilitating conversations that bring people together around common goals.',
+    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond',
+    item_type: 'preference', reverse: false,
+  },
+
+  // Behavior (4)
+  {
+    id: 'DIAL_B1', order: 40,
+    text: 'I actively ensure that expectations, roles, and objectives are clearly communicated to everyone involved.',
+    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond',
+    item_type: 'behavior', reverse: false,
+  },
+  {
+    id: 'DIAL_B2', order: 41,
+    text: 'I address misunderstandings or misalignment before they become larger issues.',
+    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond',
+    item_type: 'behavior', reverse: false,
+  },
+  {
+    id: 'DIAL_B3', order: 42,
+    text: 'I create opportunities for dialogue so that people can contribute and feel included.',
+    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond',
+    item_type: 'behavior', reverse: false,
+  },
+  {
+    id: 'DIAL_B4', order: 43,
+    text: 'I ensure that decisions are understood and supported by the people responsible for execution.',
+    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond',
+    item_type: 'behavior', reverse: false,
+  },
+
+  // Pressure (3)
+  {
+    id: 'DIAL_PR1', order: 44,
+    text: 'Under pressure, I prioritize alignment and communication rather than forcing quick decisions without clarity.',
+    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond',
+    item_type: 'pressure', reverse: false,
+  },
+  {
+    id: 'DIAL_PR2', order: 45,
+    text: 'In tense situations, I address conflict directly to maintain trust and cohesion.',
+    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond',
+    item_type: 'pressure', reverse: false,
+  },
+  {
+    id: 'DIAL_PR3', order: 46,
+    text: 'When challenges arise, I ensure that people remain connected and focused on shared outcomes.',
+    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond',
+    item_type: 'pressure', reverse: false,
+  },
+
+  // Reverse (2)
+  {
+    id: 'DIAL_R1', order: 47,
+    text: 'I avoid difficult conversations, even when misalignment is affecting results.',
+    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond',
+    item_type: 'reverse', reverse: true,
+  },
+  {
+    id: 'DIAL_R2', order: 48,
+    text: 'I assume that people understand expectations without verifying alignment.',
+    role: 'Unifier', stage: 'Participate Through Dialogue', energy: 'Bond',
+    item_type: 'reverse', reverse: true,
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // STAGE 5: TRANSFORM THROUGH ALIGNMENT (12 items)
+  // ══════════════════════════════════════════════════════════
+
+  // Preference (3)
+  {
+    id: 'TRANS_P1', order: 49,
+    text: 'I am naturally energized by turning ideas, plans, and strategies into tangible results.',
+    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build',
+    item_type: 'preference', reverse: false,
+  },
+  {
+    id: 'TRANS_P2', order: 50,
+    text: 'I enjoy driving progress and ensuring that work moves forward consistently.',
+    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build',
+    item_type: 'preference', reverse: false,
+  },
+  {
+    id: 'TRANS_P3', order: 51,
+    text: 'I focus on achieving outcomes and delivering measurable impact.',
+    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build',
+    item_type: 'preference', reverse: false,
+  },
+
+  // Behavior (4)
+  {
+    id: 'TRANS_B1', order: 52,
+    text: 'I take ownership of moving initiatives from planning into execution.',
+    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build',
+    item_type: 'behavior', reverse: false,
+  },
+  {
+    id: 'TRANS_B2', order: 53,
+    text: 'I maintain momentum and ensure that progress continues despite obstacles.',
+    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build',
+    item_type: 'behavior', reverse: false,
+  },
+  {
+    id: 'TRANS_B3', order: 54,
+    text: 'I hold myself and others accountable for delivering results.',
+    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build',
+    item_type: 'behavior', reverse: false,
+  },
+  {
+    id: 'TRANS_B4', order: 55,
+    text: 'I track progress and adjust actions to ensure goals are achieved.',
+    role: 'Builder', stage: 'Transform Through Alignment', energy: 'Build',
+    item_type: 'behavior', reverse: false,
+  },
+
+  // Pressure (3)
+  {
+    id: 'TRANS_PR1', order: 56,
+    text: 'Under pressure, I increase focus and effort to ensure that results are delivered.',
+    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build',
+    item_type: 'pressure', reverse: false,
+  },
+  {
+    id: 'TRANS_PR2', order: 57,
+    text: 'In demanding situations, I remain committed to execution rather than withdrawing or delaying.',
+    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build',
+    item_type: 'pressure', reverse: false,
+  },
+  {
+    id: 'TRANS_PR3', order: 58,
+    text: 'When challenges arise, I adapt quickly to keep progress moving forward.',
+    role: 'Builder', stage: 'Transform Through Alignment', energy: 'Build',
+    item_type: 'pressure', reverse: false,
+  },
+
+  // Reverse (2)
+  {
+    id: 'TRANS_R1', order: 59,
+    text: 'I often struggle to follow through on plans once execution becomes difficult.',
+    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build',
+    item_type: 'reverse', reverse: true,
+  },
+  {
+    id: 'TRANS_R2', order: 60,
+    text: 'I lose momentum when obstacles or resistance appear during implementation.',
+    role: 'Achiever', stage: 'Transform Through Alignment', energy: 'Build',
+    item_type: 'reverse', reverse: true,
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // STAGE 6: SCALE AND SUSTAIN (12 items)
+  // ══════════════════════════════════════════════════════════
+
+  // Preference (3)
+  {
+    id: 'SUST_P1', order: 61,
+    text: 'I naturally focus on maintaining systems, processes, and results over the long term.',
+    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish',
+    item_type: 'preference', reverse: false,
+  },
+  {
+    id: 'SUST_P2', order: 62,
+    text: 'I value consistency, discipline, and long-term impact over short-term success.',
+    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish',
+    item_type: 'preference', reverse: false,
+  },
+  {
+    id: 'SUST_P3', order: 63,
+    text: 'I enjoy ensuring that what is built continues to function effectively over time.',
+    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish',
+    item_type: 'preference', reverse: false,
+  },
+
+  // Behavior (4)
+  {
+    id: 'SUST_B1', order: 64,
+    text: 'I monitor performance to ensure that systems continue to deliver expected results.',
+    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish',
+    item_type: 'behavior', reverse: false,
+  },
+  {
+    id: 'SUST_B2', order: 65,
+    text: 'I reinforce habits, standards, and processes that support sustainability.',
+    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish',
+    item_type: 'behavior', reverse: false,
+  },
+  {
+    id: 'SUST_B3', order: 66,
+    text: 'I identify risks that could weaken long-term stability.',
+    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish',
+    item_type: 'behavior', reverse: false,
+  },
+  {
+    id: 'SUST_B4', order: 67,
+    text: 'I maintain discipline to ensure consistency over time.',
+    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish',
+    item_type: 'behavior', reverse: false,
+  },
+
+  // Pressure (3)
+  {
+    id: 'SUST_PR1', order: 68,
+    text: 'Under pressure, I protect long-term outcomes rather than sacrificing them for short-term gains.',
+    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish',
+    item_type: 'pressure', reverse: false,
+  },
+  {
+    id: 'SUST_PR2', order: 69,
+    text: 'In difficult situations, I remain committed to maintaining systems and structures.',
+    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish',
+    item_type: 'pressure', reverse: false,
+  },
+  {
+    id: 'SUST_PR3', order: 70,
+    text: 'When faced with trade-offs, I prioritize sustainability and long-term value.',
+    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish',
+    item_type: 'pressure', reverse: false,
+  },
+
+  // Reverse (2)
+  {
+    id: 'SUST_R1', order: 71,
+    text: 'I tend to lose interest once something has been successfully launched.',
+    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish',
+    item_type: 'reverse', reverse: true,
+  },
+  {
+    id: 'SUST_R2', order: 72,
+    text: 'I focus more on starting new initiatives than maintaining existing ones.',
+    role: 'Refiner', stage: 'Scale and Sustain', energy: 'Polish',
+    item_type: 'reverse', reverse: true,
   },
 ]
 
-// Sorted by order for consistent display
 export const ORDERED_QUESTIONS = [...QUESTIONS].sort((a, b) => a.order - b.order)
 
-export const TOTAL_QUESTIONS = QUESTIONS.length // 60
+export const TOTAL_QUESTIONS = QUESTIONS.length // 72
 
 export const ROLES: Role[] = ['Innovator', 'Achiever', 'Organizer', 'Unifier', 'Builder', 'Refiner']
+
 export const STAGES: AdaptsStage[] = [
   'Alert the System',
   'Diagnose the Gaps',
@@ -355,4 +555,13 @@ export const STAGES: AdaptsStage[] = [
   'Transform Through Alignment',
   'Scale and Sustain',
 ]
+
 export const ENERGIES: Energy[] = ['Spark', 'Build', 'Polish', 'Bond']
+
+/** Items per stage broken down by type — useful for weighted scoring */
+export const STAGE_ITEM_COUNTS = {
+  preference: 3,
+  behavior:   4,
+  pressure:   3,
+  reverse:    2,
+} as const
