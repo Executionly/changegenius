@@ -982,7 +982,7 @@ export default function HomePage() {
                   fill="#1D1D7E"
                 />
               </g>
-              <g class="adapts-piece" data-stage="alert">
+              <g className="adapts-piece" data-stage="alert">
                 <path
                   d="M56.6051 110.001H50.9801L61.2216 80.9101H67.7273L77.983 110.001H72.358L64.5881 86.876H64.3608L56.6051 110.001ZM56.7898 98.5947H72.1307V102.828H56.7898V98.5947Z"
                   fill="white"

@@ -47,7 +47,9 @@ export default function AuthPage() {
       confirm_password: confirmPassword,
     });
     if (!parsed.success) {
-      setSignupError(parsed.error.errors[0].message);
+      const firstIssue = parsed.error.issues[0];
+      const errorMessage = firstIssue?.message || "Please check your input";
+      setSignupError(errorMessage);
       return;
     }
     setSignupLoading(true);
