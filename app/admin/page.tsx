@@ -224,7 +224,7 @@ export default function AdminPage() {
           <div className="card" style={{ padding:36 }}>
             <div style={{ fontSize:11, fontWeight:700, color:'var(--blue)', textTransform:'uppercase', letterSpacing:'1.5px', marginBottom:16 }}>Question Bank</div>
             <p style={{ fontSize:15, color:'var(--text-2)', marginBottom:24 }}>
-              <strong style={{ color:'var(--navy)' }}>60 questions</strong> across 6 roles (10 each). Questions are defined in <code style={{ background:'var(--off)', padding:'2px 6px', borderRadius:4, fontSize:13 }}>lib/assessment/questions.ts</code> and are version-controlled. To update questions, edit that file and redeploy.
+              <strong style={{ color:'var(--navy)' }}>72 questions</strong> across 6 roles (10 each). Questions are defined in <code style={{ background:'var(--off)', padding:'2px 6px', borderRadius:4, fontSize:13 }}>lib/assessment/questions.ts</code> and are version-controlled. To update questions, edit that file and redeploy.
             </p>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12 }}>
               {['Innovator','Achiever','Organizer','Unifier','Builder','Refiner'].map(role => (

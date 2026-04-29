@@ -3,8 +3,9 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { buildIndividualReportHTML, generatePDF } from '@/lib/pdf/generator'
 import { buildNarrative } from '@/lib/assessment/narratives'
-import type { Role, AdaptsStage, Energy } from '@/lib/assessment/questions'
-import type { ScoreResult } from '@/lib/assessment/scoring'
+import { type Role, type AdaptsStage, type Energy, STAGES } from '@/lib/assessment/questions'
+import type { ScoreResult, StageDetail } from '@/lib/assessment/scoring'
+import { getStageBand } from '@/lib/assessment/scoring'
 
 export async function GET(req: NextRequest) {
   const cookieStore = await cookies()
@@ -48,12 +49,25 @@ export async function GET(req: NextRequest) {
     .eq('id', session.user.id)
     .single()
 
-  const scores: ScoreResult = {
-    role_scores:   scoresRow.role_scores  as Record<Role, number>,
-    stage_scores:  scoresRow.stage_scores as Record<AdaptsStage, number>,
-    energy_scores: scoresRow.energy_scores as Record<Energy, number>,
-    derived:       scoresRow.derived      as ScoreResult['derived'],
-  }
+  const stage_scores = scoresRow.stage_scores as Record<AdaptsStage, number>
+
+    const scores: ScoreResult = {
+      role_scores:   scoresRow.role_scores   as Record<Role, number>,
+      stage_scores,
+      energy_scores: scoresRow.energy_scores as Record<Energy, number>,
+      derived: scoresRow.derived       as ScoreResult['derived'],
+      // Reconstruct stage_detail from stored scores (stability/integrity/risk not stored,
+      // so default to neutral values — full detail only available at calculation time)
+      stage_detail: Object.fromEntries(
+        STAGES.map(s => [s, {
+          score:      stage_scores[s],
+          band:       getStageBand(stage_scores[s]),
+          stability:  50,
+          integrity:  50,
+          risk:       Math.round((100 - stage_scores[s]) * 0.5),
+        }])
+      ) as Record<AdaptsStage, StageDetail>,
+    }
 
   const narrative = buildNarrative(scores.derived)
 

@@ -3,116 +3,403 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
 
+import { generateTeamFeeds } from '@/lib/generate-team-feeds'
+
 const schema = z.object({
-  teamId:         z.string().uuid(),
-  weekNumber:     z.number().int().min(1),
-  dialogueScore:  z.number().int().min(1).max(5),
+  teamId: z.string().uuid(),
+  weekNumber: z.number().int().min(1),
+
+  dialogueScore: z.number().int().min(1).max(5),
   alignmentScore: z.number().int().min(1).max(5),
   executionScore: z.number().int().min(1).max(5),
 })
 
-export async function POST(req: NextRequest) {
+function avg(arr: number[]) {
+  if (!arr.length) return 0
+  return arr.reduce((a, b) => a + b, 0) / arr.length
+}
+
+async function createSupabase() {
   const cookieStore = await cookies()
-  const supabase = createServerClient(
+
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll: () => cookieStore.getAll(),
-        setAll: (s) => s.forEach(({ name, value, options }) => cookieStore.set(name, value, options)),
+        setAll: (cookiesToSet) => {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options)
+          })
+        },
       },
     }
   )
+}
 
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function POST(req: NextRequest) {
+  try {
+    const supabase = await createSupabase()
 
-  const body = await req.json()
-  const parsed = schema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
-  const { teamId, weekNumber, dialogueScore, alignmentScore, executionScore } = parsed.data
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
 
-  // Verify membership
-  const { data: member } = await supabase
-    .from('team_members')
-    .select('id')
-    .eq('team_id', teamId)
-    .eq('user_id', session.user.id)
-    .single()
+    const body = await req.json()
 
-  if (!member) return NextResponse.json({ error: 'Not a team member' }, { status: 403 })
+    const parsed = schema.safeParse(body)
 
-  // Upsert pulse entry
-  const { error } = await supabase.from('pulse_entries').upsert({
-    team_id:         teamId,
-    user_id:         session.user.id,
-    week_number:     weekNumber,
-    dialogue_score:  dialogueScore,
-    alignment_score: alignmentScore,
-    execution_score: executionScore,
-  }, { onConflict: 'team_id,user_id,week_number' })
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid input' },
+        { status: 400 }
+      )
+    }
 
-  if (error) {
-    console.error('[pulse]', error)
-    return NextResponse.json({ error: 'Failed to save pulse' }, { status: 500 })
+    const {
+      teamId,
+      weekNumber,
+      dialogueScore,
+      alignmentScore,
+      executionScore,
+    } = parsed.data
+
+    // Verify membership
+    const { data: member } = await supabase
+      .from('team_members')
+      .select('id')
+      .eq('team_id', teamId)
+      .eq('user_id', session.user.id)
+      .single()
+
+    if (!member) {
+      return NextResponse.json(
+        { error: 'Not a team member' },
+        { status: 403 }
+      )
+    }
+
+    // Save pulse entry
+    const { error } = await supabase
+      .from('pulse_entries')
+      .upsert(
+        {
+          team_id: teamId,
+          user_id: session.user.id,
+          week_number: weekNumber,
+
+          dialogue_score: dialogueScore,
+          alignment_score: alignmentScore,
+          execution_score: executionScore,
+        },
+        {
+          onConflict: 'team_id,user_id,week_number',
+        }
+      )
+
+    if (error) {
+      console.error(error)
+
+      return NextResponse.json(
+        { error: 'Failed to save pulse' },
+        { status: 500 }
+      )
+    }
+
+    // Get all entries for current week
+    const { data: currentEntries } = await supabase
+      .from('pulse_entries')
+      .select(
+        `
+        dialogue_score,
+        alignment_score,
+        execution_score
+      `
+      )
+      .eq('team_id', teamId)
+      .eq('week_number', weekNumber)
+
+    const dialogueAvg = avg(
+      currentEntries?.map((x) => x.dialogue_score) || []
+    )
+
+    const alignmentAvg = avg(
+      currentEntries?.map((x) => x.alignment_score) || []
+    )
+
+    const executionAvg = avg(
+      currentEntries?.map((x) => x.execution_score) || []
+    )
+
+    const momentum = Math.round(
+      ((dialogueAvg + alignmentAvg + executionAvg) / 15) * 100
+    )
+
+    // Previous week
+    const previousWeek = weekNumber - 1
+
+    const { data: previousEntries } = await supabase
+      .from('pulse_entries')
+      .select(
+        `
+        dialogue_score,
+        alignment_score,
+        execution_score
+      `
+      )
+      .eq('team_id', teamId)
+      .eq('week_number', previousWeek)
+
+    const previousDialogue = Math.round(
+      avg(
+        previousEntries?.map((x) => x.dialogue_score) || []
+      ) * 20
+    )
+
+    const previousAlignment = Math.round(
+      avg(
+        previousEntries?.map((x) => x.alignment_score) || []
+      ) * 20
+    )
+
+    const previousExecution = Math.round(
+      avg(
+        previousEntries?.map((x) => x.execution_score) || []
+      ) * 20
+    )
+
+    const previousMomentum = Math.round(
+      (
+        (
+          avg(
+            previousEntries?.map(
+              (x) => x.dialogue_score
+            ) || []
+          ) +
+          avg(
+            previousEntries?.map(
+              (x) => x.alignment_score
+            ) || []
+          ) +
+          avg(
+            previousEntries?.map(
+              (x) => x.execution_score
+            ) || []
+          )
+        ) / 15
+      ) * 100
+    )
+
+    // Prevent duplicate AI feeds
+    const { data: existingFeed } = await supabase
+      .from('team_ai_feeds')
+      .select('id')
+      .eq('team_id', teamId)
+      .eq('week_number', weekNumber)
+      .limit(1)
+
+    let feeds = []
+
+    if (!existingFeed?.length) {
+      feeds = await generateTeamFeeds({
+        dialogue: Math.round(dialogueAvg * 20),
+        alignment: Math.round(alignmentAvg * 20),
+        execution: Math.round(executionAvg * 20),
+        momentum,
+
+        previousDialogue,
+        previousAlignment,
+        previousExecution,
+        previousMomentum,
+
+        weekNumber,
+      })
+
+      if (feeds.length) {
+        await supabase.from('team_ai_feeds').insert(
+          feeds.map((feed: any) => ({
+            team_id: teamId,
+            week_number: weekNumber,
+
+            type: feed.type,
+            title: feed.title,
+            content: feed.content,
+            cta: feed.cta,
+            tone: feed.tone,
+
+            metadata: {
+              priority: feed.priority,
+            },
+          }))
+        )
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      weekNumber,
+      momentum,
+    })
+  } catch (error) {
+    console.error(error)
+
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
   }
-
-  // Compute momentum score (average of 3 dimensions, scaled to 0-100)
-  const momentum = Math.round(((dialogueScore + alignmentScore + executionScore) / 15) * 100)
-
-  return NextResponse.json({ saved: true, weekNumber, momentum })
 }
 
 export async function GET(req: NextRequest) {
-  const teamId = req.nextUrl.searchParams.get('teamId')
-  if (!teamId) return NextResponse.json({ error: 'Missing teamId' }, { status: 400 })
+  try {
+    const teamId =
+      req.nextUrl.searchParams.get('teamId')
 
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (s) => s.forEach(({ name, value, options }) => cookieStore.set(name, value, options)),
-      },
+    if (!teamId) {
+      return NextResponse.json(
+        { error: 'Missing teamId' },
+        { status: 400 }
+      )
     }
-  )
 
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const supabase = await createSupabase()
 
-  const { data: entries } = await supabase
-    .from('pulse_entries')
-    .select('week_number, dialogue_score, alignment_score, execution_score, user_id')
-    .eq('team_id', teamId)
-    .order('week_number', { ascending: true })
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
-  // Group by week — compute team averages
-  const byWeek: Record<number, { d: number[]; a: number[]; e: number[] }> = {}
-  for (const entry of entries ?? []) {
-    if (!byWeek[entry.week_number]) byWeek[entry.week_number] = { d: [], a: [], e: [] }
-    byWeek[entry.week_number].d.push(entry.dialogue_score)
-    byWeek[entry.week_number].a.push(entry.alignment_score)
-    byWeek[entry.week_number].e.push(entry.execution_score)
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    // Verify membership
+    const { data: member } = await supabase
+      .from('team_members')
+      .select('id')
+      .eq('team_id', teamId)
+      .eq('user_id', session.user.id)
+      .single()
+
+    if (!member) {
+      return NextResponse.json(
+        { error: 'Not a team member' },
+        { status: 403 }
+      )
+    }
+
+    // Latest pulse submitted by current user
+    const { data: latestPulse } = await supabase
+      .from('pulse_entries')
+      .select('*')
+      .eq('team_id', teamId)
+      .eq('user_id', session.user.id)
+      .order('week_number', {
+        ascending: false,
+      })
+      .limit(1)
+      .maybeSingle()
+
+    // Weekly analytics
+    const { data: entries } = await supabase
+      .from('pulse_entries')
+      .select(
+        `
+        week_number,
+        dialogue_score,
+        alignment_score,
+        execution_score
+      `
+      )
+      .eq('team_id', teamId)
+      .order('week_number', {
+        ascending: true,
+      })
+
+    const grouped: Record<
+      number,
+      {
+        d: number[]
+        a: number[]
+        e: number[]
+      }
+    > = {}
+
+    for (const entry of entries || []) {
+      if (!grouped[entry.week_number]) {
+        grouped[entry.week_number] = {
+          d: [],
+          a: [],
+          e: [],
+        }
+      }
+
+      grouped[entry.week_number].d.push(
+        entry.dialogue_score
+      )
+
+      grouped[entry.week_number].a.push(
+        entry.alignment_score
+      )
+
+      grouped[entry.week_number].e.push(
+        entry.execution_score
+      )
+    }
+
+    const weeks = Object.entries(grouped).map(
+      ([week, scores]) => {
+        const d = avg(scores.d)
+        const a = avg(scores.a)
+        const e = avg(scores.e)
+
+        return {
+          week: Number(week),
+
+          dialogue: Math.round(d * 20),
+          alignment: Math.round(a * 20),
+          execution: Math.round(e * 20),
+
+          momentum: Math.round(
+            ((d + a + e) / 15) * 100
+          ),
+
+          respondents: scores.d.length,
+        }
+      }
+    )
+
+    // AI feeds
+    const { data: feeds } = await supabase
+      .from('team_ai_feeds')
+      .select('*')
+      .eq('team_id', teamId)
+      .order('created_at', {
+        ascending: false,
+      })
+
+    return NextResponse.json({
+      success: true,
+      latestPulse,
+      analytics: weeks,
+      feeds,
+    })
+  } catch (error) {
+    console.error(error)
+
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
   }
-
-  const weeks = Object.entries(byWeek).map(([wk, scores]) => {
-    const avg = (arr: number[]) => arr.reduce((s, v) => s + v, 0) / arr.length
-    const d = avg(scores.d)
-    const a = avg(scores.a)
-    const e = avg(scores.e)
-    const momentum = Math.round(((d + a + e) / 15) * 100)
-    return {
-      week:      parseInt(wk),
-      dialogue:  Math.round(d * 20),   // scale 1-5 → 20-100
-      alignment: Math.round(a * 20),
-      execution: Math.round(e * 20),
-      momentum,
-      respondents: scores.d.length,
-    }
-  })
-
-  return NextResponse.json({ teamId, weeks })
 }

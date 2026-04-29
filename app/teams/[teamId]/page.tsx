@@ -1,8 +1,9 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
 
 interface Member {
   userId: string;
@@ -11,7 +12,7 @@ interface Member {
   role: string | null;
 }
 
-interface Team {
+interface TeamDetail {
   id: string;
   name: string;
   organization: string | null;
@@ -23,232 +24,318 @@ interface Team {
   unlocked: boolean;
   fullUnlocked: boolean;
   members: Member[];
-  diagnostic: any;
+  diagnostic: {
+    riskScore: number;
+    riskLevel: string;
+    frictionPatterns: string[];
+  } | null;
 }
 
 export default function TeamDetailPage() {
-  const params = useParams();
-  const teamId = params.teamId as string;
+  const { teamId } = useParams() as { teamId: string };
   const { isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [team, setTeam] = useState<Team | null>(null);
+  const [team, setTeam] = useState<TeamDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
-  const [purchasing, setPurchasing] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviting, setInviting] = useState(false);
+  const [inviteMessage, setInviteMessage] = useState("");
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) router.push("/login");
-  }, [authLoading, isAuthenticated, router]);
-
-  useEffect(() => {
-    if (!teamId || !isAuthenticated) return;
-    fetch(`/api/teams/report?teamId=${teamId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setTeam(data);
+    if (!isAuthenticated) return;
+    async function loadTeam() {
+      try {
+        const res = await fetch(`/api/teams/report?teamId=${teamId}`);
+        if (!res.ok) {
+          if (res.status === 404) router.push("/teams");
+          return;
+        }
+        const data = await res.json();
+        // Flatten the response
+        const flattened: TeamDetail = {
+          id: data.team?.id,
+          name: data.team?.name || "Unnamed Team",
+          organization: data.team?.organization || null,
+          inviteCode: data.team?.inviteCode,
+          inviteLink: data.team?.inviteLink,
+          isOwner: data.team?.isOwner || false,
+          totalMembers: data.totalMembers ?? 0,
+          completedCount: data.completedCount ?? 0,
+          unlocked: data.unlocked ?? false,
+          fullUnlocked: data.fullUnlocked ?? false,
+          members: data.members || [],
+          diagnostic: data.diagnostic || null,
+        };
+        setTeam(flattened);
+      } catch (err) {
+        console.error(err);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [teamId, isAuthenticated]);
+      }
+    }
+    loadTeam();
+  }, [teamId, isAuthenticated, router]);
 
   const copyInviteLink = () => {
     if (team?.inviteLink) {
       navigator.clipboard.writeText(team.inviteLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      alert("Invite link copied!");
     }
   };
 
-  const purchaseTeamReport = async () => {
-    setPurchasing(true);
-    const res = await fetch("/api/team-report/purchase", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ teamId }),
-    });
-    const data = await res.json();
-    if (data.url) window.location.href = data.url;
-    setPurchasing(false);
+  const sendInvite = async () => {
+    if (!team) return;
+    const emails = inviteEmail
+      .split(/[\s,;]+/)
+      .filter((e) => e.trim() && e.includes("@"));
+    if (emails.length === 0) {
+      alert("Please enter at least one valid email address.");
+      return;
+    }
+
+    setInviting(true);
+    setInviteMessage("");
+    try {
+      const res = await fetch("/api/teams/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ teamId: team.id, emails }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setInviteMessage(`Invited ${emails.length} member(s).`);
+        setInviteEmail("");
+        setTimeout(() => setInviteMessage(""), 3000);
+      } else {
+        setInviteMessage(data.error || "Failed to send invites");
+      }
+    } catch (err) {
+      setInviteMessage("Network error");
+    } finally {
+      setInviting(false);
+    }
   };
 
-  if (loading || authLoading)
-    return <div style={{ padding: 40 }}>Loading...</div>;
-  if (!team) return <div style={{ padding: 40 }}>Team not found</div>;
+  if (authLoading || loading) {
+    return <DashboardLayout title="Team Details">Loading...</DashboardLayout>;
+  }
+
+  if (!team) {
+    return (
+      <DashboardLayout title="Team Details">
+        <div className="card" style={{ textAlign: "center", padding: 48 }}>
+          <p>Team not found.</p>
+          <button
+            onClick={() => router.push("/teams")}
+            className="btn btn-primary"
+            style={{ marginTop: 16 }}
+          >
+            Back to Teams
+          </button>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const neededToUnlock = 3 - team.completedCount;
+  const unlockMessage =
+    neededToUnlock > 0
+      ? `Need ${neededToUnlock} more completed member${neededToUnlock !== 1 ? "s" : ""} to unlock team insights.`
+      : "Team insights unlocked!";
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--sage)", padding: 24 }}>
-      <div style={{ maxWidth: 800, margin: "0 auto" }}>
-        <Link
-          href="/teams"
-          style={{ color: "var(--blue)", textDecoration: "none" }}
-        >
-          ← Back to Teams
-        </Link>
-        <h1 style={{ fontSize: 32, fontWeight: 800, marginTop: 16 }}>
-          {team.name}
-        </h1>
-        {team.organization && (
-          <p style={{ color: "var(--text-3)" }}>{team.organization}</p>
-        )}
-
-        {team.isOwner && (
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              padding: 24,
-              marginTop: 24,
-            }}
-          >
-            <h3>Invite Team Members</h3>
-            <p style={{ marginBottom: 12 }}>
-              Share this link – anyone who clicks will be added to your team (no
-              payment required).
-            </p>
+    <DashboardLayout title={`Team: ${team.name}`}>
+      <div className="card">
+        <div className="card-header">
+          <div>
+            <h2 className="card-title" style={{ fontSize: 20 }}>
+              {team.name}
+            </h2>
+            {team.organization && (
+              <div style={{ color: "var(--muted)" }}>{team.organization}</div>
+            )}
+          </div>
+          <div className="badge badge-gray">
+            {team.completedCount}/{team.totalMembers} completed
+          </div>
+        </div>
+        <div className="card-body">
+          {/* Invite link */}
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontWeight: 600, marginBottom: 8 }}>Invite link</div>
             <div
               style={{
+                background: "var(--surface)",
+                padding: "8px 12px",
+                borderRadius: 8,
                 display: "flex",
-                gap: 10,
+                justifyContent: "space-between",
                 alignItems: "center",
-                flexWrap: "wrap",
               }}
             >
-              <code
-                style={{
-                  background: "var(--off)",
-                  padding: "8px 12px",
-                  borderRadius: 8,
-                  wordBreak: "break-all",
-                  flex: 1,
-                }}
-              >
+              <code style={{ fontSize: 12, overflow: "auto" }}>
                 {team.inviteLink}
               </code>
-              <button
-                onClick={copyInviteLink}
-                style={{
-                  background: "var(--blue)",
-                  color: "white",
-                  border: "none",
-                  padding: "8px 16px",
-                  borderRadius: 100,
-                  cursor: "pointer",
-                }}
-              >
-                {copied ? "Copied!" : "Copy Link"}
+              <button onClick={copyInviteLink} className="btn btn-ghost btn-sm">
+                Copy
               </button>
             </div>
-            <p style={{ fontSize: 12, color: "var(--text-4)", marginTop: 12 }}>
-              Invite code: <strong>{team.inviteCode}</strong>
-            </p>
           </div>
-        )}
 
-        <div
-          style={{
-            background: "white",
-            borderRadius: 16,
-            padding: 24,
-            marginTop: 24,
-          }}
-        >
-          <h3>Members ({team.totalMembers})</h3>
-          <div style={{ marginTop: 12 }}>
-            {team.members.map((m) => (
-              <div
-                key={m.userId}
+          {/* Invite by email */}
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontWeight: 600, marginBottom: 8 }}>
+              Invite by email
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                type="text"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                placeholder="email@example.com, another@example.com"
+                autoComplete="off"
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "8px 0",
-                  borderBottom: "1px solid var(--border)",
+                  flex: 1,
+                  padding: "8px 12px",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  fontSize: 13,
+                }}
+              />
+              <button
+                onClick={sendInvite}
+                disabled={inviting}
+                className="btn btn-primary btn-sm"
+              >
+                {inviting ? "Sending..." : "Send invites"}
+              </button>
+            </div>
+            {inviteMessage && (
+              <div
+                style={{
+                  fontSize: 12,
+                  marginTop: 6,
+                  color: inviteMessage.includes("Failed")
+                    ? "var(--red)"
+                    : "var(--green)",
                 }}
               >
-                <span>{m.fullName}</span>
-                <span
-                  style={{
-                    color:
-                      m.status === "completed" ? "#16a34a" : "var(--text-4)",
-                  }}
-                >
-                  {m.status === "completed"
-                    ? "✓ Completed"
-                    : m.status === "joined"
-                      ? "Joined"
-                      : "Invited"}
-                </span>
+                {inviteMessage}
               </div>
-            ))}
+            )}
           </div>
-          <p style={{ marginTop: 16, fontSize: 13 }}>
-            {team.completedCount}/{team.totalMembers} completed assessment
-          </p>
-        </div>
 
-        {team.fullUnlocked && team.diagnostic ? (
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              padding: 24,
-              marginTop: 24,
-            }}
-          >
-            <h3>Team Diagnostic Report</h3>
-            <p>
-              Risk Score: {team.diagnostic.riskScore} (
-              {team.diagnostic.riskLevel})
-            </p>
-            <pre style={{ fontSize: 12, overflow: "auto", maxHeight: 300 }}>
-              {JSON.stringify(team.diagnostic, null, 2)}
-            </pre>
-          </div>
-        ) : team.unlocked ? (
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              padding: 24,
-              marginTop: 24,
-              textAlign: "center",
-            }}
-          >
-            <h3>Unlock Full Team Report</h3>
-            <p>
-              Your team has {team.completedCount} completed members. Upgrade to
-              see friction patterns, change pods, and 90-day plan.
-            </p>
-            <button
-              onClick={purchaseTeamReport}
-              disabled={purchasing}
+          {/* Members list */}
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontWeight: 600, marginBottom: 12 }}>
+              Members ({team.totalMembers})
+            </div>
+            <div
               style={{
-                background: "var(--blue)",
-                color: "white",
-                padding: "10px 24px",
-                borderRadius: 100,
-                border: "none",
-                cursor: "pointer",
+                border: "1px solid var(--border)",
+                borderRadius: 8,
+                overflow: "hidden",
               }}
             >
-              {purchasing ? "Redirecting..." : "Upgrade – $99"}
-            </button>
+              <table style={{ width: "100%" }}>
+                <thead style={{ background: "var(--surface)" }}>
+                  <tr>
+                    <th style={{ padding: "10px 12px", textAlign: "left" }}>
+                      Name
+                    </th>
+                    <th style={{ padding: "10px 12px", textAlign: "left" }}>
+                      Status
+                    </th>
+                    <th style={{ padding: "10px 12px", textAlign: "left" }}>
+                      Role
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {team.members.map((member) => (
+                    <tr key={member.userId}>
+                      <td
+                        style={{
+                          padding: "8px 12px",
+                          borderTop: "1px solid var(--border)",
+                        }}
+                      >
+                        {member.fullName}
+                      </td>
+                      <td
+                        style={{
+                          padding: "8px 12px",
+                          borderTop: "1px solid var(--border)",
+                        }}
+                      >
+                        <span
+                          className={`badge ${member.status === "completed" ? "badge-green" : "badge-gray"}`}
+                        >
+                          {member.status}
+                        </span>
+                      </td>
+                      <td
+                        style={{
+                          padding: "8px 12px",
+                          borderTop: "1px solid var(--border)",
+                        }}
+                      >
+                        {member.role || "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        ) : (
-          <div
-            style={{
-              background: "#fef2f2",
-              borderRadius: 16,
-              padding: 24,
-              marginTop: 24,
-            }}
-          >
-            <p>
-              Need {3 - team.completedCount} more completed members to unlock
-              basic team insights.
-            </p>
-          </div>
-        )}
+
+          {/* Diagnostic / Unlock message */}
+          {team.diagnostic && team.unlocked ? (
+            <div
+              style={{
+                padding: 16,
+                background: "var(--surface)",
+                borderRadius: 8,
+              }}
+            >
+              <div style={{ fontWeight: 600, marginBottom: 12 }}>
+                Team Risk Score: {team.diagnostic.riskScore} (
+                {team.diagnostic.riskLevel})
+              </div>
+              {team.diagnostic.frictionPatterns &&
+                team.diagnostic.frictionPatterns.length > 0 && (
+                  <>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        color: "var(--amber)",
+                        marginBottom: 8,
+                      }}
+                    >
+                      Friction Patterns:
+                    </div>
+                    <ul style={{ marginLeft: 20, fontSize: 13 }}>
+                      {team.diagnostic.frictionPatterns.map((pattern, idx) => (
+                        <li key={idx}>{pattern}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+            </div>
+          ) : (
+            <div
+              style={{
+                padding: 16,
+                background: "var(--surface)",
+                borderRadius: 8,
+                textAlign: "center",
+              }}
+            >
+              <p>{unlockMessage}</p>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

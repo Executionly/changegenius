@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
       change_genius_role: derived.primary_role,
       change_genius_role_2: derived.secondary_role,
       role_pair_title: derived.role_pair_title,
-      primary_energy: derived.primary_energy,
+      primary_energy: derived.energy_profile.dominant,
       top_adapts_stages: derived.top_adapts_stages,
       bottom_adapts_stages: derived.bottom_adapts_stages,
       onboarded: true,

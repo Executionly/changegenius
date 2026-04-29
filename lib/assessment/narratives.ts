@@ -1,11 +1,12 @@
 // lib/assessment/narratives.ts
 import type { Role, AdaptsStage, Energy } from "./questions";
+import { EnergyProfile } from "./scoring";
 
 export interface NarrativeInput {
   primary_role: Role;
   secondary_role: Role;
   role_pair_title: string;
-  primary_energy: Energy;
+  energy_profile: EnergyProfile;
   top_adapts_stages: AdaptsStage[];
   bottom_adapts_stages: AdaptsStage[];
 }
@@ -792,14 +793,14 @@ export function buildNarrative(input: NarrativeInput): Narrative {
   const {
     primary_role,
     secondary_role,
+    energy_profile,
     role_pair_title,
-    primary_energy,
     top_adapts_stages,
     bottom_adapts_stages,
   } = input;
 
   const role = ROLE_CONTENT[primary_role];
-  const energy = ENERGY_CONTENT[primary_energy];
+  const energy = ENERGY_CONTENT[energy_profile.dominant]
   const pairingKey = getPairingKey(primary_role, secondary_role);
   const pairing = PAIRING_CONTENT[pairingKey] || {
     name: role_pair_title,
