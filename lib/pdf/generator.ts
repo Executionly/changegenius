@@ -359,8 +359,8 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
     <!-- Role scores visual -->
     <h3 style="margin-bottom:16px">YOUR FULL ROLE PROFILE</h3>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
-      ${Object.entries(role_scores)
-        .sort(([,a],[,b]) => b-a)
+      ${Object.entries(role_scores as Record<string, number>)
+        .sort(([, a], [, b]) => (b as number) - (a as number))
         .map(([role, score]) => {
           const isTop = role === primary_role
           const isSecond = role === secondary_role
@@ -442,8 +442,8 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
     <!-- Energy bar chart -->
     <h3 style="margin-bottom:14px">ENERGY SCORE BREAKDOWN</h3>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
-      ${Object.entries(energy_scores)
-        .sort(([,a],[,b]) => b-a)
+      ${Object.entries(role_scores as Record<string, number>)
+        .sort(([, a], [, b]) => (b as number) - (a as number))
         .map(([e, score]) => {
           const color = e === energy_profile.dominant ? C.purple
                       : e === energy_profile.secondary ? C.gold
@@ -702,7 +702,7 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
     </div>
   `))
 
-  // ── Page 2: Stage coverage 
+  // ── Page 2: Stage coverage ─────────────────────────────────
   pages.push(page(`
     <div class="label" style="color:${C.purple};margin-bottom:6px">
       TEAM RESULTS
@@ -776,7 +776,7 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
     </div>
   `, 1))
 
-  // ── Page 3: Role + energy map 
+  // ── Page 3: Role + energy map ──────────────────────────────
   pages.push(page(`
     <div class="label" style="color:${C.purple};margin-bottom:6px">
       TEAM RESULTS
