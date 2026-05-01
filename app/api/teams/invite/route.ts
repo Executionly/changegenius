@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
+import { sendTeamInviteEmail } from '@/lib/email'
 
 const schema = z.object({
   teamId: z.string().uuid(),
@@ -40,51 +41,100 @@ export async function POST(req: NextRequest) {
 
   if (!team) return NextResponse.json({ error: 'Team not found or not owner' }, { status: 404 })
 
+  // Get inviter's profile for email
+  const { data: inviterProfile } = await supabase
+    .from('profiles')
+    .select('name, email')
+    .eq('id', session.user.id)
+    .single()
+
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-  const results: { email: string; status: 'sent' | 'already_member' | 'error' }[] = []
+  const results: { email: string; status: 'sent' | 'already_member' | 'error'; error?: string }[] = []
 
   for (const email of emails) {
-    // Check if already a member
-    const { data: existingMember } = await supabase
-      .from('team_members')
-      .select('id')
-      .eq('team_id', teamId)
-      .eq('user_id', (await supabase.from('profiles').select('id').eq('email', email).single()).data?.id ?? '')
-      .single()
+    try {
+      // Check if user exists and is already a member
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', email)
+        .single()
 
-    if (existingMember) {
-      results.push({ email, status: 'already_member' })
-      continue
-    }
+      if (userProfile) {
+        const { data: existingMember } = await supabase
+          .from('team_members')
+          .select('id')
+          .eq('team_id', teamId)
+          .eq('user_id', userProfile.id)
+          .single()
 
-    // Create invite record
-    const { data: invite, error } = await supabase
-      .from('invites')
-      .insert({
-        team_id:         teamId,
-        inviter_user_id: session.user.id,
-        email,
+        if (existingMember) {
+          results.push({ email, status: 'already_member' })
+          continue
+        }
+      }
+
+      // Create invite record
+      const { data: invite, error: inviteError } = await supabase
+        .from('invites')
+        .insert({
+          team_id: teamId,
+          inviter_user_id: session.user.id,
+          email,
+        })
+        .select('token')
+        .single()
+
+      if (inviteError || !invite) {
+        console.error('[Invite] Database error:', inviteError)
+        results.push({ 
+          email, 
+          status: 'error', 
+          error: 'Failed to create invite record' 
+        })
+        continue
+      }
+
+      // Send email
+      const inviteLink = `${appUrl}/join-team?token=${invite.token}`
+      const emailResult = await sendTeamInviteEmail({
+        to: email,
+        invitedByName: inviterProfile?.name || inviterProfile?.email || 'Someone',
+        invitedByEmail: inviterProfile?.email || session.user.email!,
+        teamName: team.name,
+        inviteLink,
       })
-      .select('token')
-      .single()
 
-    if (error || !invite) {
-      results.push({ email, status: 'error' })
-      continue
+      if (!emailResult.success) {
+        // Delete the invite record if email failed
+        await supabase
+          .from('invites')
+          .delete()
+          .eq('token', invite.token)
+
+        results.push({ 
+          email, 
+          status: 'error', 
+          error: emailResult.error || 'Failed to send email' 
+        })
+        continue
+      }
+
+      results.push({ email, status: 'sent' })
+
+    } catch (error) {
+      console.error(`[Invite] Unexpected error for ${email}:`, error)
+      results.push({ 
+        email, 
+        status: 'error', 
+        error: 'Unexpected error occurred' 
+      })
     }
-
-    // In production: send email via Resend/SendGrid here
-    // For now: log the invite link (replace with email service)
-    const inviteLink = `${appUrl}/teams/join?token=${invite.token}`
-    console.log(`[teams/invite] Invite for ${email}: ${inviteLink}`)
-    // TODO: await sendInviteEmail({ to: email, fromName: session.user.email, teamName: team.name, inviteLink })
-
-    results.push({ email, status: 'sent' })
   }
 
   return NextResponse.json({
     inviteCode: team.invite_code,
-    inviteLink: `${appUrl}/teams/join?code=${team.invite_code}`,
+    inviteLink: `${appUrl}/join-team?code=${team.invite_code}`,
     results,
   })
 }

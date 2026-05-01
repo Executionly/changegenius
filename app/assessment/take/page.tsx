@@ -15,7 +15,7 @@ const LABELS = [
 ];
 
 function AssessmentTakePageContent() {
-  const { isAuthenticated, profile, loading: authLoading } = useAuth();
+  const { isAuthenticated, profile, loading: authLoading, user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const isRetake = searchParams.get("retake") === "true";
@@ -39,7 +39,7 @@ function AssessmentTakePageContent() {
   // Auth + payment guard
   useEffect(() => {
     if (authLoading) return;
-    if (!isAuthenticated) {
+    if (!user) {
       router.push("/login?returnUrl=/assessment/take");
       return;
     }
@@ -47,7 +47,7 @@ function AssessmentTakePageContent() {
       router.push("/payment?plan=individual");
       return;
     }
-  }, [authLoading, isAuthenticated, profile, router]);
+  }, [authLoading, user, profile, router]);
 
   // Start or resume assessment
   useEffect(() => {

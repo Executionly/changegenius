@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, signUp, signInWithGoogle } from "@/lib/auth";
 import { signUpSchema } from "@/lib/schemas";
 
 export default function AuthPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
+  const params = useSearchParams()
+  const returnUrl = params.get('returnUrl')
+  const [activeTab, setActiveTab] = useState<"signin" | "signup">(returnUrl ? "signup" : "signin");
 
   // Sign In
   const [signinEmail, setSigninEmail] = useState("");
@@ -24,6 +26,8 @@ export default function AuthPage() {
 
   const [googleLoading, setGoogleLoading] = useState(false);
 
+  
+
   async function handleSignin(e: React.FormEvent) {
     e.preventDefault();
     setSigninError("");
@@ -34,7 +38,11 @@ export default function AuthPage() {
       setSigninLoading(false);
       return;
     }
-    router.push("/dashboard");
+    if(returnUrl){
+      router.replace(returnUrl)
+    }else{
+      router.push("/dashboard");
+    }
   }
 
   async function handleSignup(e: React.FormEvent) {
@@ -63,7 +71,11 @@ export default function AuthPage() {
       setSignupLoading(false);
       return;
     }
-    router.push("/payment?plan=individual&welcome=1");
+    if(returnUrl){
+      router.replace(returnUrl)
+    }else{
+      router.replace("/payment?plan=individual&welcome=1");
+    }
   }
 
   async function handleGoogle() {
