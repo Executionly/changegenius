@@ -4,6 +4,15 @@ import { cookies } from 'next/headers'
 import { computeTeamDiagnostic, type MemberScore } from '@/lib/assessment/team-diagnostic'
 import type { Role, AdaptsStage, Energy } from '@/lib/assessment/questions'
 
+interface IMemberScore {
+  userId:      string
+  fullName:    string | null
+  primaryRole?: Role | null
+  secondaryRole?: Role | null
+  stageScores?: Record<AdaptsStage, number> | null
+  energyScores?: Record<Energy, number> | null
+}
+
 export async function GET(req: NextRequest) {
   const teamId = req.nextUrl.searchParams.get('teamId')
   if (!teamId) return NextResponse.json({ error: 'Missing teamId' }, { status: 400 })
@@ -51,16 +60,20 @@ export async function GET(req: NextRequest) {
       profiles(full_name, email, change_genius_role, change_genius_role_2)
     `)
     .eq('team_id', teamId)
-
-  const completedMembers = (members ?? []).filter(m => m.status === 'completed')
+console.log("members", members)
+  const completedMembers = (members ?? []).filter(m => m.status === 'completed' || m.status === 'joined')
 
   // Fetch scores for completed members
-  const memberScores: MemberScore[] = []
-  for (const member of completedMembers) {
-    const profile = member.profiles as any
-    if (!profile?.change_genius_role || !profile?.change_genius_role_2) continue
+  const memberScores: IMemberScore[] = []
 
-    // Get their latest assessment scores
+  for (const member of members ?? []) {
+    const profile = member.profiles as any
+
+    // Default empty scores
+    let stageScores: Record<AdaptsStage, number> | null = null
+    let energyScores: Record<Energy, number> | null = null
+
+    // Try to fetch assessment
     const { data: assessment } = await supabase
       .from('assessments')
       .select('id')
@@ -70,23 +83,26 @@ export async function GET(req: NextRequest) {
       .limit(1)
       .single()
 
-    if (!assessment) continue
+    if (assessment) {
+      const { data: scores } = await supabase
+        .from('scores')
+        .select('stage_scores, energy_scores')
+        .eq('assessment_id', assessment.id)
+        .single()
 
-    const { data: scores } = await supabase
-      .from('scores')
-      .select('stage_scores, energy_scores')
-      .eq('assessment_id', assessment.id)
-      .single()
-
-    if (!scores) continue
+      if (scores) {
+        stageScores = scores.stage_scores as Record<AdaptsStage, number>
+        energyScores = scores.energy_scores as Record<Energy, number>
+      }
+    }
 
     memberScores.push({
-      userId:       member.user_id,
-      fullName:     profile.full_name ?? profile.email ?? 'Member',
-      primaryRole:  profile.change_genius_role as Role,
-      secondaryRole: profile.change_genius_role_2 as Role,
-      stageScores:  scores.stage_scores as Record<AdaptsStage, number>,
-      energyScores: scores.energy_scores as Record<Energy, number>,
+      userId: member.user_id,
+      fullName: profile?.full_name ?? profile?.email ?? 'Member',
+      primaryRole: (profile?.change_genius_role ?? null) as Role | null,
+      secondaryRole: (profile?.change_genius_role_2 ?? null) as Role | null,
+      stageScores,
+      energyScores,
     })
   }
 
@@ -102,7 +118,7 @@ export async function GET(req: NextRequest) {
   const fullUnlocked = completedCount >= FULL_THRESHOLD
 
   // Only run diagnostic if enough members
-  const diagnostic = unlocked ? computeTeamDiagnostic(memberScores) : null
+  const diagnostic = unlocked ? computeTeamDiagnostic(memberScores as unknown as MemberScore[]) : null
 
   // Save/update team report if full unlock
   if (fullUnlocked && diagnostic) {

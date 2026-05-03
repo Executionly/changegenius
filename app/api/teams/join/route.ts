@@ -46,9 +46,9 @@ export async function POST(req: NextRequest) {
       // Build the redirect URL with the original invite token/code
       const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
       const redirectParams = new URLSearchParams();
-      if (token) redirectParams.set('token', token);
-      if (code) redirectParams.set('code', code);
-      const emailRedirectTo = `${appUrl}/teams/join?${redirectParams.toString()}`;
+      if (token) redirectParams.set('team-token', token);
+      redirectParams.set('type', "team");
+      const emailRedirectTo = `${appUrl}/auth/callback?${redirectParams.toString()}`;
 
       // Sign up the user WITH email confirmation but redirect back to team join
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -155,8 +155,7 @@ export async function POST(req: NextRequest) {
   const { error: memberError } = await supabase.from("team_members").insert({
     team_id: teamId,
     user_id: userId,
-    status: "joined",
-    role: "member",
+    status: "joined"
   });
 
   if (memberError) {

@@ -43,8 +43,6 @@ function JoinInner() {
         ...registrationData,
       };
 
-      console.log('Sending join request:', payload);
-
       const res = await fetch("/api/teams/join", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -72,7 +70,6 @@ function JoinInner() {
       setStatus("done");
       
       if (data.registered) {
-        setStatus("verification")
         setMessage("Account created and joined team successfully!");
       } else {
         setMessage(
@@ -93,7 +90,6 @@ function JoinInner() {
   }, [token, code, status]);
 
   useEffect(() => {
-    console.log('Auth state:', { authLoading, isAuthenticated, token, code }); 
     
     if (authLoading) return;
     
@@ -105,7 +101,6 @@ function JoinInner() {
 
     if (!isAuthenticated) {
       setShowRegistration(true);
-      setStatus("idle");
       return;
     }
 
