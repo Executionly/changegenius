@@ -52,15 +52,15 @@ export async function GET(req: NextRequest) {
 
   const { data: profile } = await supabase
   .from("profiles")
-  .select("id")
+  .select("id, onboarded")
   .eq("id", user.id)
   .maybeSingle()
 
-  const isNewUser = !profile
+  const isNewUser = !profile || !profile?.onboarded
   // Determine redirect destination
   let dest = '/dashboard'
 
-  if (type === 'signup' || (type === 'oauth' && isNewUser)) dest = '/payment?plan=individual&welcome=1'
+  if (type === 'signup' || isNewUser) dest = '/payment?plan=individual&welcome=1'
   if (type === 'recovery') dest = '/auth/reset-password'
   if (type === 'team') dest = `/join-team?token=${teamToken}`
 
