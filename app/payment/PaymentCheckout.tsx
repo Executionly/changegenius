@@ -771,10 +771,7 @@ export default function PaymentCheckout() {
                 style={{
                   width: "100%",
                   padding: "14px",
-                  background:
-                    processing || (isTeam && !teamName)
-                      ? "rgba(26,107,250,.5)"
-                      : "var(--blue)",
+                  background:"rgba(26,107,250,.5)",
                   color: "white",
                   border: "none",
                   borderRadius: "100px",

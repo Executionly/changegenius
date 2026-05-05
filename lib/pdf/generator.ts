@@ -1039,10 +1039,16 @@ export async function generatePDF(html: string): Promise<Buffer> {
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     })
   } else {
-    const chromium = (await import('@sparticuz/chromium')).default
+    const chromium = (await import('@sparticuz/chromium-min')).default
+    console.log("Executable path:", await chromium.executablePath())
     const puppeteer = (await import('puppeteer-core')).default
     browser = await puppeteer.launch({
-      args: chromium.args,
+      args: [
+        ...chromium.args,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+      ] as any,
       executablePath: await chromium.executablePath(),
       headless: true,
     })
