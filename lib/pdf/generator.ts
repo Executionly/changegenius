@@ -1039,9 +1039,11 @@ export async function generatePDF(html: string): Promise<Buffer> {
     })
   } else {
     console.log('[pdf] importing @sparticuz/chromium...')
-    const chromium = (await import('@sparticuz/chromium')).default
+    const chromium = (await import('@sparticuz/chromium-min')).default
+    const executablePath = await chromium.executablePath(
+      'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
+    )
     console.log('[pdf] chromium imported, getting executablePath...')
-    const executablePath = await chromium.executablePath()
     console.log('[pdf] executablePath:', executablePath)
     const puppeteer = (await import('puppeteer-core')).default
 
@@ -1053,7 +1055,7 @@ export async function generatePDF(html: string): Promise<Buffer> {
         '--disable-dev-shm-usage',
         '--single-process',
       ],
-      executablePath: await chromium.executablePath(),
+      executablePath,
       headless: true,
     })
   }
