@@ -140,7 +140,7 @@ export default function PaymentCheckout() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--sage)" }}>
       {/* Nav */}
-      <div style={{ background: "var(--navy)" }}>
+      <div style={{ background: "var(--blue)" }}>
         <div
           style={{
             maxWidth: 1160,
@@ -196,7 +196,7 @@ export default function PaymentCheckout() {
             style={{
               fontSize: "clamp(26px,4vw,40px)",
               fontWeight: 800,
-              color: "var(--navy)",
+              color: "var(--blue)",
               letterSpacing: "-1px",
               marginBottom: 8,
             }}
@@ -648,7 +648,7 @@ export default function PaymentCheckout() {
                     border: "1px solid #c7d2fe",
                     borderRadius: 7,
                     fontSize: 12,
-                    color: "var(--navy)",
+                    color: "var(--blue)",
                   }}
                 >
                   ✓ Recommended for international users — pay in USD with any
@@ -662,7 +662,7 @@ export default function PaymentCheckout() {
           <div style={{ position: "sticky", top: 80 }}>
             <div
               style={{
-                background: "var(--navy)",
+                background: "var(--blue)",
                 borderRadius: "var(--radius)",
                 padding: "28px 28px 24px",
               }}
