@@ -1029,7 +1029,6 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
 
 export async function generatePDF(html: string): Promise<Buffer> {
   const isDev = process.env.NODE_ENV === 'development'
-
   let browser: any
 
   if (isDev) {
@@ -1039,28 +1038,29 @@ export async function generatePDF(html: string): Promise<Buffer> {
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     })
   } else {
-    const chromium = (await import('@sparticuz/chromium-min')).default
-    console.log("Executable path:", await chromium.executablePath())
+    const chromium = (await import('@sparticuz/chromium')).default
     const puppeteer = (await import('puppeteer-core')).default
+
     browser = await puppeteer.launch({
       args: [
         ...chromium.args,
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
-      ] as any,
+        '--single-process',
+      ],
       executablePath: await chromium.executablePath(),
       headless: true,
     })
   }
 
   try {
-    const browserPage = await browser.newPage()
-    await browserPage.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 })
-    const pdf = await browserPage.pdf({
-      format:            'A4',
-      printBackground:   true,
-      margin:            { top: '0', right: '0', bottom: '0', left: '0' },
+    const page = await browser.newPage()
+    await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 })
+    const pdf = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: { top: '0', right: '0', bottom: '0', left: '0' },
       preferCSSPageSize: false,
     })
     return Buffer.from(pdf)

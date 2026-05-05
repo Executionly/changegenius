@@ -1,0 +1,12 @@
+{
+    "functions": {
+        "app/api/pdf/individual/route.ts": {
+            "memory": 1024,
+            "maxDuration": 60
+        },
+        "app/api/pdf/team/route.ts": {
+            "memory": 1024,
+            "maxDuration": 60
+        }
+    }
+}
