@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   serverExternalPackages: [
     '@sparticuz/chromium-min',
-    'puppeteer-core',
+    'playwright-core',
   ],
 };
 
