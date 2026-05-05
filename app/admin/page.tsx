@@ -61,7 +61,7 @@ export default function AdminPage() {
     <div style={{ minHeight:'100vh', background:'var(--sage)', display:'flex', alignItems:'center', justifyContent:'center' }}>
       <div style={{ background:'white', borderRadius:'var(--radius)', padding:'48px 44px', maxWidth:400, width:'100%', boxShadow:'0 4px 24px rgba(10,37,64,.08)' }}>
         <div style={{ fontSize:11, fontWeight:700, color:'var(--blue)', textTransform:'uppercase', letterSpacing:'1.5px', marginBottom:16 }}>Admin Access</div>
-        <h1 style={{ fontSize:26, fontWeight:800, color:'var(--navy)', marginBottom:24 }}>changegenius™ Admin</h1>
+        <h1 style={{ fontSize:26, fontWeight:800, color:'var(--navy)', marginBottom:24 }}>ChangeGenius™ Admin</h1>
         {error && <div style={{ background:'#fef2f2', border:'1px solid #fecaca', borderRadius:8, padding:'10px 14px', fontSize:13, color:'#dc2626', marginBottom:16 }}>{error}</div>}
         <input type="password" value={token} onChange={e => setToken(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && login()}
@@ -89,7 +89,7 @@ export default function AdminPage() {
       <div style={{ background:'var(--navy)' }}>
         <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px', height:56, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div style={{ display:'flex', alignItems:'center', gap:24 }}>
-            <span style={{ fontSize:16, fontWeight:800, color:'white' }}>changegenius™ <span style={{ color:'rgba(255,255,255,.45)', fontSize:12 }}>admin</span></span>
+            <span style={{ fontSize:16, fontWeight:800, color:'white' }}>ChangeGenius™ <span style={{ color:'rgba(255,255,255,.45)', fontSize:12 }}>admin</span></span>
             {TABS.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)}
                 style={{ fontSize:13, fontWeight: tab === t.id ? 700 : 400, color: tab === t.id ? 'white' : 'rgba(255,255,255,.55)', background:'none', border:'none', cursor:'pointer', fontFamily:'Inter,sans-serif', padding:'4px 0', borderBottom: tab === t.id ? '2px solid var(--blue)' : '2px solid transparent' }}>

@@ -22,7 +22,7 @@ export default function ForgotPasswordPage() {
         <div className="auth-card">
           <div className="auth-header">
             <Link href="/" className="auth-logo">
-              changegenius™
+              ChangeGenius™
             </Link>
             <h1>Check your email</h1>
             <p>
@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
       <div className="auth-card">
         <div className="auth-header">
           <Link href="/" className="auth-logo">
-            changegenius™
+            ChangeGenius™
           </Link>
           <h1>Reset password</h1>
           <p>Enter your email and we'll send a reset link.</p>

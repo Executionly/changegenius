@@ -7,6 +7,9 @@ import { type Role, type AdaptsStage, type Energy, STAGES } from '@/lib/assessme
 import type { ScoreResult, StageDetail } from '@/lib/assessment/scoring'
 import { getStageBand } from '@/lib/assessment/scoring'
 
+export const maxDuration = 60 // PDF generation can be slow
+export const runtime = 'nodejs' // not 'edge'
+
 export async function GET(req: NextRequest) {
   const cookieStore = await cookies()
   const supabase = createServerClient(

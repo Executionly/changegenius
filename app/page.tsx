@@ -307,7 +307,7 @@ export default function HomePage() {
             <span
               style={{ fontSize: 20, fontWeight: 800, color: "var(--blue)" }}
             >
-              changegenius™
+              ChangeGenius™
             </span>
             <button
               onClick={() => setMobOpen(false)}
@@ -461,7 +461,7 @@ export default function HomePage() {
               <path d="[PASTE YOUR LOGO MARK PATH HERE]" fill="#0101ee" />
             </svg>
             <span className="nav-brand">
-              changegenius<sup>™</sup>
+              ChangeGenius<sup>™</sup>
             </span>
           </Link>
           <ul className="nav-links">
@@ -475,7 +475,7 @@ export default function HomePage() {
               <Link href="#adapts">Framework</Link>
             </li>
             <li>
-              <Link href="#pricing">For Teams · Pricing</Link>
+              <Link href="#pricing">Pricing</Link>
             </li>
           </ul>
           <div className="nav-actions">
@@ -484,13 +484,16 @@ export default function HomePage() {
                 Dashboard
               </Link>
             ) : (
-              <Link href="/login" className="btn-dashboard">
-                Login
-              </Link>
+              <>
+                <Link href="/login" className="btn-dashboard">
+                  Login
+                </Link>
+                <Link href="/signup" className="btn-started">
+                  Get started
+                </Link>
+              </>
             )}
-            <Link href="/signup" className="btn-started">
-              Get started
-            </Link>
+            
           </div>
           <button className="hnav-burger" onClick={() => setMobOpen(true)}>
             <span></span>
@@ -1571,7 +1574,7 @@ export default function HomePage() {
           <h2 className="cta-title">
             Understand your gifts,
             <br />
-            your frustrations & your team.
+            your frustrations & your team's natural productivity energy.
           </h2>
           <p className="cta-subhead">Join the movement today!</p>
           <button className="cta-button" onClick={handleStart}>

@@ -121,7 +121,7 @@ function page(content: string, pageNum?: number, sectionLabel = 'CHANGE GENIUS�
     ${pageNum !== undefined ? `
     <div class="footer">
       <span style="font-weight:600;color:${C.purple}">${sectionLabel}</span>
-      <span>changegenius.com</span>
+      <span>changegeniusai.com</span>
       <span>Page ${pageNum}</span>
     </div>` : ''}
   </div>`
@@ -584,7 +584,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
 
     <div style="margin-top:40px;text-align:center;padding:32px;background:${C.navy};border-radius:12px;color:white">
       <div style="font-size:24px;font-weight:800;margin-bottom:8px">Ready to see how your team functions together?</div>
-      <p style="color:rgba(255,255,255,0.75);margin-bottom:0">Visit changegenius.com to build your Team Change Map™</p>
+      <p style="color:rgba(255,255,255,0.75);margin-bottom:0">Visit changegeniusai.com to build your Team Change Map™</p>
     </div>
   `, 10))
 
@@ -697,7 +697,7 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
       </div>
 
       <p style="font-size:12px;color:${C.gray};text-align:center">
-        Prepared for team development and organisational insight · changegenius.com
+        Prepared for team development and organisational insight · changegeniusai.com
       </p>
     </div>
   `))
@@ -993,31 +993,68 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
 }
 
 // ── Puppeteer PDF renderer
+// export async function generatePDF(html: string): Promise<Buffer> {
+//   // Dynamic import so the server doesn't crash if Chromium isn't installed
+//   const puppeteer = await import('puppeteer').catch(() => null)
+//     ?? await import('puppeteer-core').catch(() => null)
+
+//   if (!puppeteer) throw new Error('Puppeteer not available')
+
+//   const browser = await (puppeteer as any).launch({
+//     headless: true,
+//     args: [
+//       '--no-sandbox',
+//       '--disable-setuid-sandbox',
+//       '--disable-dev-shm-usage',
+//       '--disable-gpu',
+//       '--font-render-hinting=none',
+//     ],
+//   })
+
+//   try {
+//     const browserPage = await browser.newPage()
+//     await browserPage.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 })
+//     const pdf = await browserPage.pdf({
+//       format:           'A4',
+//       printBackground:  true,
+//       margin:           { top: '0', right: '0', bottom: '0', left: '0' },
+//       preferCSSPageSize: false,
+//     })
+//     return Buffer.from(pdf)
+//   } finally {
+//     await browser.close()
+//   }
+// }
+
+
 export async function generatePDF(html: string): Promise<Buffer> {
-  // Dynamic import so the server doesn't crash if Chromium isn't installed
-  const puppeteer = await import('puppeteer').catch(() => null)
-    ?? await import('puppeteer-core').catch(() => null)
+  const isDev = process.env.NODE_ENV === 'development'
 
-  if (!puppeteer) throw new Error('Puppeteer not available')
+  let browser: any
 
-  const browser = await (puppeteer as any).launch({
-    headless: true,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-gpu',
-      '--font-render-hinting=none',
-    ],
-  })
+  if (isDev) {
+    const puppeteer = await import('puppeteer')
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    })
+  } else {
+    const chromium = (await import('@sparticuz/chromium')).default
+    const puppeteer = (await import('puppeteer-core')).default
+    browser = await puppeteer.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: true,
+    })
+  }
 
   try {
     const browserPage = await browser.newPage()
     await browserPage.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 })
     const pdf = await browserPage.pdf({
-      format:           'A4',
-      printBackground:  true,
-      margin:           { top: '0', right: '0', bottom: '0', left: '0' },
+      format:            'A4',
+      printBackground:   true,
+      margin:            { top: '0', right: '0', bottom: '0', left: '0' },
       preferCSSPageSize: false,
     })
     return Buffer.from(pdf)

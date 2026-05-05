@@ -20,7 +20,7 @@ export default function AuthShell({
       <div className="auth-card">
         <div className="auth-header">
           <Link href="/" className="auth-logo">
-            changegenius™
+            ChangeGenius™
           </Link>
           <h1>{title}</h1>
           <p>{subtitle}</p>

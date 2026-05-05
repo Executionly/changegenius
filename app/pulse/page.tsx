@@ -46,6 +46,8 @@ export default function PulsePage() {
   const [dialogue, setDialogue] = useState(0);
   const [alignment, setAlignment] = useState(0);
   const [execution, setExecution] = useState(0);
+  const [alreadySubmitted, setAlreadySubmitted] = useState(false);
+
 
   // Fetch teams owned by user
   useEffect(() => {
@@ -67,9 +69,10 @@ export default function PulsePage() {
     setLoadingData(true);
     fetch(`/api/pulse?teamId=${selectedTeam}`)
       .then((r) => r.json())
-      .then((d: { weeks?: WeekData[]; feeds?: FeedItem[] }) => {
-        setWeeks(d.weeks ?? []);
+      .then((d: { analytics?: WeekData[]; feeds?: FeedItem[],latestPulse?: { week_number: number } }) => {
+        setWeeks(d.analytics ?? []);
         setFeeds(d.feeds ?? []);
+        setAlreadySubmitted(d.latestPulse?.week_number === CURRENT_WEEK);
         setLoadingData(false);
       })
       .catch(() => setLoadingData(false));
@@ -95,8 +98,9 @@ export default function PulsePage() {
       const updated = await fetch(`/api/pulse?teamId=${selectedTeam}`).then(
         (r) => r.json(),
       );
-      setWeeks(updated.weeks ?? []);
+      setWeeks(updated.analytics ?? []);
       setFeeds(updated.feeds ?? []);
+      setAlreadySubmitted(updated.latestPulse?.week_number === CURRENT_WEEK);
       setTimeout(() => setSubmitted(false), 3000);
     }
     setSubmitting(false);
@@ -259,7 +263,16 @@ export default function PulsePage() {
                 </div>
               )}
 
-              {submitted ? (
+              {alreadySubmitted ? (
+                <div style={{ textAlign: "center", padding: "32px 0" }}>
+                  <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
+                  <h3 style={{ fontSize: 20, fontWeight: 800 }}>Already submitted</h3>
+                  <p style={{ color: "var(--text-3)" }}>
+                    You've checked in for week {CURRENT_WEEK}.<br />
+                    Come back next week to submit again.
+                  </p>
+                </div>
+              ) : submitted ? (
                 <div style={{ textAlign: "center", padding: "32px 0" }}>
                   <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
                   <h3 style={{ fontSize: 20, fontWeight: 800 }}>

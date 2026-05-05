@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
-
+import { createClient } from '@supabase/supabase-js'
 import { generateTeamFeeds } from '@/lib/generate-team-feeds'
 
 const schema = z.object({
@@ -37,6 +37,12 @@ async function createSupabase() {
     }
   )
 }
+
+
+const adminSupabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function POST(req: NextRequest) {
   try {
@@ -88,6 +94,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Save pulse entry
+    const toScore = (v: number): 20 | 60 | 100 => {
+      if (v <= 1) return 20
+      if (v <= 3) return 60
+      return 100
+    }
+
     const { error } = await supabase
       .from('pulse_entries')
       .upsert(
@@ -95,14 +107,11 @@ export async function POST(req: NextRequest) {
           team_id: teamId,
           user_id: session.user.id,
           week_number: weekNumber,
-
-          dialogue_score: dialogueScore,
-          alignment_score: alignmentScore,
-          execution_score: executionScore,
+          dialogue_score:  toScore(dialogueScore),
+          alignment_score: toScore(alignmentScore),
+          execution_score: toScore(executionScore),
         },
-        {
-          onConflict: 'team_id,user_id,week_number',
-        }
+        { onConflict: 'team_id,user_id,week_number' }
       )
 
     if (error) {
@@ -214,32 +223,29 @@ export async function POST(req: NextRequest) {
         alignment: Math.round(alignmentAvg * 20),
         execution: Math.round(executionAvg * 20),
         momentum,
-
         previousDialogue,
         previousAlignment,
         previousExecution,
         previousMomentum,
-
         weekNumber,
       })
 
+      console.log('[pulse] generated feeds:', feeds)
+
       if (feeds.length) {
-        await supabase.from('team_ai_feeds').insert(
+        const { error: feedError } = await adminSupabase.from('team_ai_feeds').insert(
           feeds.map((feed: any) => ({
             team_id: teamId,
             week_number: weekNumber,
-
             type: feed.type,
             title: feed.title,
             content: feed.content,
             cta: feed.cta,
             tone: feed.tone,
-
-            metadata: {
-              priority: feed.priority,
-            },
+            metadata: { priority: feed.priority },
           }))
         )
+        console.log('[pulse] feed insert error:', feedError)
       }
     }
 
@@ -380,13 +386,11 @@ export async function GET(req: NextRequest) {
     )
 
     // AI feeds
-    const { data: feeds } = await supabase
-      .from('team_ai_feeds')
-      .select('*')
-      .eq('team_id', teamId)
-      .order('created_at', {
-        ascending: false,
-      })
+    const { data: feeds } = await adminSupabase
+    .from('team_ai_feeds')
+    .select('*')
+    .eq('team_id', teamId)
+    .order('created_at', { ascending: false })
 
     return NextResponse.json({
       success: true,

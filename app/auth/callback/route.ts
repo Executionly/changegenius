@@ -8,14 +8,15 @@ export async function GET(req: NextRequest) {
   const type = searchParams.get('type') // 'signup' | 'oauth' | 'recovery'
   const error = searchParams.get('error')
   const errorDesc = searchParams.get('error_description')
+  const teamToken = searchParams.get('team-token')
 
   if (error) {
     console.error('[Auth callback]', error, errorDesc)
-    return NextResponse.redirect(`${origin}/login?error=oauth_error`)
+    return NextResponse.redirect(`${origin}/auth?error=oauth_error`)
   }
 
   if (!code) {
-    return NextResponse.redirect(`${origin}/login?error=no_code`)
+    return NextResponse.redirect(`${origin}/auth?error=no_code`)
   }
 
   const cookieStore = await cookies()
@@ -38,13 +39,24 @@ export async function GET(req: NextRequest) {
 
   if (exchangeError) {
     console.error('[Auth callback] Exchange failed:', exchangeError.message)
-    return NextResponse.redirect(`${origin}/login?error=callback_failed`)
+    return NextResponse.redirect(`${origin}/auth?error=callback_failed`)
   }
 
+  const {
+    data: { user }
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.redirect(`${origin}/auth?error=no_user`)
+  }
+
+  const isNewUser = user.created_at === user.last_sign_in_at
   // Determine redirect destination
   let dest = '/dashboard'
-  if (type === 'signup') dest = '/payment?plan=individual&welcome=1'
+
+  if (type === 'signup' || (type === 'oauth' && isNewUser)) dest = '/payment?plan=individual&welcome=1'
   if (type === 'recovery') dest = '/auth/reset-password'
+  if (type === 'team') dest = `/join-team?token=${teamToken}`
 
   const response = NextResponse.redirect(`${origin}${dest}`)
   // Security headers

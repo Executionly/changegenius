@@ -1,16 +1,20 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 export default function AssessmentSelectPage() {
   const router = useRouter();
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
 
   if (loading) return <div>Loading...</div>;
-  if (!isAuthenticated) {
-    router.push("/login?returnUrl=/assessment/select");
-    return null;
-  }
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/login?returnUrl=/assessment/take");
+      return;
+    }
+  }, [loading, user, router]);
 
   return (
     <div

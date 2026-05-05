@@ -24,36 +24,35 @@ export async function GET(req: NextRequest) {
   if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Fetch completed assessments with their scores using a proper join
   const { data: assessments, error } = await supabase
-    .from("assessments")
-    .select(
-      `
-      id,
-      completed_at,
-      scores (
-        derived
-      )
-    `,
-    )
-    .eq("user_id", session.user.id)
-    .eq("status", "completed")
-    .order("completed_at", { ascending: false });
+  .from("assessments")
+  .select("id, completed_at")
+  .eq("user_id", session.user.id)
+  .eq("status", "completed")
+  .order("completed_at", { ascending: false });
 
   if (error) {
-    console.error("[history] error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch history" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch history" }, { status: 500 });
   }
 
-  // Transform the data: scores is an array, take first element
-  const formatted = (assessments ?? []).map((a) => ({
-    id: a.id,
-    completed_at: a.completed_at,
-    derived: (a.scores as any)?.[0]?.derived || {},
-  }));
+  const formatted = await Promise.all(
+    (assessments ?? []).map(async (a) => {
+      const { data: score } = await supabase
+        .from("scores")
+        .select("role_scores, stage_scores, energy_scores, derived")
+        .eq("assessment_id", a.id)
+        .single();
+
+      return {
+        id: a.id,
+        completed_at: a.completed_at,
+        role_scores:   score?.role_scores   ?? {},
+        stage_scores:  score?.stage_scores  ?? {},
+        energy_scores: score?.energy_scores ?? {},
+        derived:       score?.derived       ?? {},
+      };
+    })
+  );
 
   return NextResponse.json({ assessments: formatted });
 }
