@@ -252,7 +252,7 @@ function AssessmentTakePageContent() {
         flexDirection: "column",
       }}
     >
-      <div style={{ background: "var(--navy)", flexShrink: 0 }}>
+      <div style={{ background: "var(--blue)", flexShrink: 0 }}>
         <div
           style={{
             maxWidth: 800,
