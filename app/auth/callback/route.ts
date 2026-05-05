@@ -50,7 +50,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${origin}/auth?error=no_user`)
   }
 
-  const isNewUser = user.created_at === user.last_sign_in_at
+  const { data: profile } = await supabase
+  .from("profiles")
+  .select("id")
+  .eq("id", user.id)
+  .maybeSingle()
+
+  const isNewUser = !profile
   // Determine redirect destination
   let dest = '/dashboard'
 
