@@ -1,3 +1,4 @@
+
 import { notFound } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -5,6 +6,7 @@ import Link from "next/link";
 import { buildNarrative } from "@/lib/assessment/narratives";
 import { BarChart } from "@/components/results/BarChart";
 import { RadarChart } from "@/components/results/RadarChart";
+import { DownloadPDFButton } from "./DownloadPDFButton";
 
 const ROLE_COLORS: Record<string, string> = {
   Innovator: "#0a2540",
@@ -74,9 +76,37 @@ export default async function ResultsPageById({ params }: PageProps) {
     year: "numeric",
   });
 
+  const handleDownloadPDF = async () => {
+    try {
+      const res = await fetch("/api/pdf/individual");
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("PDF route error:", res.status, text);
+        return;
+      }
+
+      const contentType = res.headers.get("content-type") ?? "";
+      if (!contentType.includes("application/pdf")) {
+        const text = await res.text();
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "change-genius-report.pdf";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("PDF download failed:", err);
+    }
+  };
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--sage)" }}>
-      <div style={{ background: "var(--navy)", padding: "0 24px" }}>
+      <div style={{ background: "var(--blue)", padding: "0 24px" }}>
         <div
           style={{
             maxWidth: 1160,
@@ -96,7 +126,7 @@ export default async function ResultsPageById({ params }: PageProps) {
               textDecoration: "none",
             }}
           >
-            changegenius™
+            ChangeGenius™
           </Link>
           <div style={{ display: "flex", gap: 20 }}>
             <Link
@@ -625,7 +655,7 @@ export default async function ResultsPageById({ params }: PageProps) {
         {/* 30-DAY PLAN */}
         <div
           style={{
-            background: "var(--navy)",
+            background: "var(--blue)",
             borderRadius: "var(--radius)",
             padding: 40,
           }}
@@ -703,6 +733,8 @@ export default async function ResultsPageById({ params }: PageProps) {
         <div
           style={{
             display: "grid",
+            marginTop: 32,
+            marginBottom: 64,
             gridTemplateColumns: "1fr 1fr 1fr",
             gap: 14,
           }}
@@ -736,34 +768,7 @@ export default async function ResultsPageById({ params }: PageProps) {
               LinkedIn.
             </div>
           </Link>
-          <a
-            href={`/api/pdf/individual?aid=${assessment.id}`}
-            style={{
-              background: "white",
-              borderRadius: "var(--radius)",
-              border: "1px solid var(--border)",
-              padding: "28px 24px",
-              textDecoration: "none",
-              display: "block",
-            }}
-          >
-            <div style={{ fontSize: 28, marginBottom: 12 }}>📄</div>
-            <div
-              style={{
-                fontSize: 15,
-                fontWeight: 700,
-                color: "var(--navy)",
-                marginBottom: 6,
-              }}
-            >
-              Download PDF
-            </div>
-            <div
-              style={{ fontSize: 13, color: "var(--text-3)", lineHeight: 1.5 }}
-            >
-              Download your full individual report as a professional PDF.
-            </div>
-          </a>
+          <DownloadPDFButton/>
           <Link
             href="/teams"
             style={{
@@ -797,6 +802,7 @@ export default async function ResultsPageById({ params }: PageProps) {
           </Link>
         </div>
       </div>
+
     </div>
   );
 }

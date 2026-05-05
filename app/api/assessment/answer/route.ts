@@ -7,7 +7,7 @@ const schema = z.object({
   assessmentId: z.string().uuid(),
   questionId: z.string().min(1),
   value: z.number().int().min(1).max(5),
-  questionIndex: z.number().int().min(0).max(59),
+  questionIndex: z.number().int().min(0).max(72),
 });
 
 export async function POST(req: NextRequest) {

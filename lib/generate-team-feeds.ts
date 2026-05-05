@@ -59,19 +59,19 @@ export async function generateTeamFeeds(input: Input) {
     - operational insight
     - positive highlights if applicable
 
-    Return ONLY valid JSON array.
-
-    Format:
-    [
+   Return ONLY a valid JSON object in this exact format:
     {
-        "type": "trend | insight | warning | coaching | celebration | burnout | leadership | mood",
-        "title": "string",
-        "content": "string",
-        "cta": "string or null",
-        "tone": "positive | neutral | warning",
-        "priority": 1
+      "feeds": [
+        {
+          "type": "trend | insight | warning | coaching | celebration | burnout | leadership | mood",
+          "title": "string",
+          "content": "string",
+          "cta": "string or null",
+          "tone": "positive | neutral | warning",
+          "priority": 1
+        }
+      ]
     }
-    ]
     `
 
     const response = await openai.chat.completions.create({

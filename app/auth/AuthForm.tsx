@@ -94,7 +94,7 @@ export default function AuthForm() {
           <div className="auth-card-new">
             <div className="logo">
               <div className="logo-icon"></div>
-              <span>changegenius™</span>
+              <span>ChangeGenius™</span>
             </div>
             <h2>
               {activeTab === "signin" ? "Welcome Back" : "Create Account"}

@@ -36,7 +36,7 @@ export default function ResetPasswordPage() {
       <div className="auth-card">
         <div className="auth-header">
           <Link href="/" className="auth-logo">
-            changegenius™
+            ChangeGenius™
           </Link>
           <h1>Set new password</h1>
           <p>Choose a strong password for your account.</p>

@@ -171,7 +171,7 @@ function JoinInner() {
             <div className="auth-card-new">
               <div className="logo">
                 <div className="logo-icon"></div>
-                <span>changegenius™</span>
+                <span>ChangeGenius™</span>
               </div>
               <h2>Join Team</h2>
               <p className="subtitle">

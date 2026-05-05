@@ -194,7 +194,7 @@ function ShareCardInner() {
               textDecoration: "none",
             }}
           >
-            changegenius™
+            ChangeGenius™
           </Link>
           <Link
             href="/results"

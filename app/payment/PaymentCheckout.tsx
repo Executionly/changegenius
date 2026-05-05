@@ -162,7 +162,7 @@ export default function PaymentCheckout() {
               letterSpacing: "-0.4px",
             }}
           >
-            changegenius™
+            ChangeGenius™
           </Link>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: 13, color: "rgba(255,255,255,.35)" }}>

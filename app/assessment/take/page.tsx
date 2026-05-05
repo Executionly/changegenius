@@ -32,7 +32,7 @@ function AssessmentTakePageContent() {
   const question = ORDERED_QUESTIONS[currentIndex];
   const progress = Math.round((currentIndex / TOTAL_QUESTIONS) * 100);
   const answered = Object.keys(answers).length;
-  const currentAnswer = answers[question?.id ?? ""] ?? null;
+  const currentAnswer = question ? (answers[question.id] ?? null) : null;
   const isLast = currentIndex === TOTAL_QUESTIONS - 1;
   const allAnswered = answered === TOTAL_QUESTIONS;
 
@@ -40,7 +40,7 @@ function AssessmentTakePageContent() {
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
-      router.push("/login?returnUrl=/assessment/take");
+      router.push("/auth?returnUrl=/assessment/take");
       return;
     }
     if (profile && !profile.has_paid) {
@@ -112,10 +112,11 @@ function AssessmentTakePageContent() {
   );
 
   function selectAnswer(value: number) {
-    if (!question) return;
-    setAnswers((prev) => ({ ...prev, [question.id]: value }));
-    void saveAnswer(question.id, value, currentIndex);
-  }
+  if (!question) return;
+  const qId = question.id;
+  setAnswers((prev) => ({ ...prev, [qId]: value }));
+  void saveAnswer(qId, value, currentIndex);
+}
 
   function goNext() {
     if (currentAnswer == null) return;
@@ -157,7 +158,7 @@ function AssessmentTakePageContent() {
         throw new Error(d.error ?? "Submission failed");
       }
       setLoadingState("done");
-      router.push("/results");
+      window.location.href = '/results'
     } catch (err) {
       setError(
         err instanceof Error
@@ -267,11 +268,11 @@ function AssessmentTakePageContent() {
             style={{
               fontSize: 15,
               fontWeight: 800,
-              color: "white",
+              color: "blue",
               letterSpacing: "-0.3px",
             }}
           >
-            changegenius™
+            ChangeGenius™
           </span>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {saveStatus === "saving" && (
@@ -504,18 +505,9 @@ function AssessmentTakePageContent() {
             </div>
           )}
 
-          <div
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <button onClick={goBack} disabled={currentIndex === 0} 
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: 12,
-            }}
-          >
-            <button
-              onClick={goBack}
-              disabled={currentIndex === 0}
-              style={{
                 padding: "11px 22px",
                 borderRadius: "100px",
                 border: "1.5px solid var(--border)",
@@ -526,10 +518,7 @@ function AssessmentTakePageContent() {
                 cursor: currentIndex === 0 ? "not-allowed" : "pointer",
                 opacity: currentIndex === 0 ? 0.5 : 1,
                 fontFamily: "Inter,sans-serif",
-              }}
-            >
-              ← Back
-            </button>
+            }}>← Back</button>
 
             <div
               style={{
@@ -570,12 +559,10 @@ function AssessmentTakePageContent() {
                 );
               })}
             </div>
-
+            
             {isLast ? (
-              <button
-                onClick={handleSubmit}
-                disabled={!allAnswered}
-                style={{
+              <button onClick={handleSubmit} disabled={!allAnswered}
+              style={{
                   padding: "11px 28px",
                   borderRadius: "100px",
                   border: "none",
@@ -585,33 +572,28 @@ function AssessmentTakePageContent() {
                   fontWeight: 700,
                   cursor: allAnswered ? "pointer" : "not-allowed",
                   fontFamily: "Inter,sans-serif",
-                }}
-              >
-                {allAnswered
-                  ? "Submit & See Results →"
-                  : `${TOTAL_QUESTIONS - answered} remaining`}
+                }}>
+                {allAnswered ? "Submit & See Results →" : `${TOTAL_QUESTIONS - answered} remaining`}
               </button>
             ) : (
-              <button
-                onClick={goNext}
-                disabled={currentAnswer == null}
-                style={{
+              <button onClick={goNext} disabled={currentAnswer === null}
+              style={{
                   padding: "11px 28px",
                   borderRadius: "100px",
                   border: "none",
-                  background:
-                    currentAnswer != null ? "var(--navy)" : "var(--border)",
-                  color: currentAnswer != null ? "white" : "var(--text-4)",
+                  background: currentAnswer === null ? "var(--border)" : "var(--blue)",
+                  color: currentAnswer === null ? "var(--text-4)" : "white",
                   fontSize: 14,
                   fontWeight: 700,
                   cursor: currentAnswer != null ? "pointer" : "not-allowed",
                   fontFamily: "Inter,sans-serif",
                 }}
-              >
+                >
                 Next →
               </button>
             )}
           </div>
+
 
           {currentAnswer == null && (
             <p

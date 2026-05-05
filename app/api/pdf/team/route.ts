@@ -5,6 +5,9 @@ import { buildTeamReportHTML, generatePDF } from '@/lib/pdf/generator'
 import { computeTeamDiagnostic, type MemberScore } from '@/lib/assessment/team-diagnostic'
 import type { Role, AdaptsStage, Energy } from '@/lib/assessment/questions'
 
+export const maxDuration = 60 // PDF generation can be slow
+export const runtime = 'nodejs' // not 'edge'
+
 export async function GET(req: NextRequest) {
   const teamId = req.nextUrl.searchParams.get('teamId')
   if (!teamId) return NextResponse.json({ error: 'Missing teamId' }, { status: 400 })
@@ -41,8 +44,8 @@ export async function GET(req: NextRequest) {
     .eq('team_id', teamId)
     .eq('status', 'completed')
 
-  if (!members || members.length < 5) {
-    return NextResponse.json({ error: 'Full report requires 5 completed members' }, { status: 403 })
+  if (!members || members.length < 3) {
+    return NextResponse.json({ error: 'Full report requires 3 completed members' }, { status: 403 })
   }
 
   const memberScores: MemberScore[] = []
