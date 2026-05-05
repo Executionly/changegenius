@@ -23,7 +23,7 @@ export default function AuthForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [signupError, setSignupError] = useState("");
   const [signupLoading, setSignupLoading] = useState(false);
-
+  const [message, setMessage] = useState("");
   const [googleLoading, setGoogleLoading] = useState(false);
 
   
@@ -48,6 +48,7 @@ export default function AuthForm() {
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
     setSignupError("");
+    setMessage("")
     const parsed = signUpSchema.safeParse({
       full_name: fullName,
       email: signupEmail,
@@ -74,7 +75,7 @@ export default function AuthForm() {
     if(returnUrl){
       router.replace(returnUrl)
     }else{
-      router.replace("/payment?plan=individual&welcome=1");
+      setMessage("Account created! Please check your email to confirm your account.")
     }
   }
 
@@ -186,6 +187,13 @@ export default function AuthForm() {
                   />
                 </div>
                 {signupError && <div className="error-msg">{signupError}</div>}
+                {message && <div style={{
+                  marginTop: '2px',
+                  marginBottom: '2px',
+                  color:'green',
+                  fontSize: '14px',
+                  
+                }}>{message}</div>}
                 <button type="submit" className="btn" disabled={signupLoading}>
                   {signupLoading ? "Creating account…" : "Create Account"}
                 </button>
