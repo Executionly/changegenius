@@ -84,7 +84,7 @@ const energyCards = [
     ],
   },
   {
-    title: "Build",
+    title: "Drive",
     tagline: "You drive results.",
     desc: "You convert ideas into action, push initiatives forward, and keep teams moving. Build energy is essential when momentum needs to be created.",
     chips: [
@@ -121,7 +121,7 @@ const energyCards = [
 const testimonials = [
   {
     quote:
-      "The ADAPTS framework gave us a shared language across 12 countries. We reduced change friction by 40% in six months.",
+      "The ADAPTS model gave us a shared language across 12 countries. We reduced change friction by 40% in six months.",
     name: "Marie Dupont",
     role: "Head of Org Development",
     avatar: "https://randomuser.me/api/portraits/women/68.jpg",
@@ -493,7 +493,6 @@ export default function HomePage() {
                 </Link>
               </>
             )}
-            
           </div>
           <button className="hnav-burger" onClick={() => setMobOpen(true)}>
             <span></span>
@@ -875,9 +874,9 @@ export default function HomePage() {
       <section className="model-section" id="adapts">
         <div className="model-intro">
           <div className="model-framework-header">
-            <h3 className="framework-title">The ADAPTS Framework</h3>
+            <h3 className="framework-title">The ADAPTS Model</h3>
             <p className="framework-subtitle">
-              Six stages of organizational change
+              Six stages of substainable change
             </p>
             <p className="framework-description">
               Every transformation moves through six distinct stages.
@@ -894,7 +893,11 @@ export default function HomePage() {
         <div className="model-container">
           <div className="model-svg-wrapper">
             {/* PASTE YOUR ADAPTS DIAGRAM SVG HERE (the clickable pieces) */}
-            <svg width="789" height="319" viewBox="0 0 789 319" fill="none">
+            <svg
+              viewBox="0 0 789 319"
+              fill="none"
+              style={{ width: "100%", height: "auto", maxWidth: "100%" }}
+            >
               {/* Replace with your SVG groups. Each clickable piece should have a class "adapts-piece" and a data-stage attribute */}
               <g
                 className="adapts-piece"
@@ -1075,6 +1078,86 @@ export default function HomePage() {
             <div className="model-insight">
               {stageDetails[activeStage].insight}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========== PROMISE SECTION ========== */}
+      <section className="promise-section">
+        <div className="promise-container">
+          <div className="promise-header">
+            <span className="promise-badge">Our Promise</span>
+            <h2 className="promise-title">
+              From Insight to <span className="highlight">Execution</span>
+            </h2>
+            <p className="promise-subtitle">
+              A leadership and team intelligence platform that helps you
+              understand how you naturally think, where your energy creates
+              results, and how to turn ideas into real execution.
+            </p>
+          </div>
+
+          <div className="promise-grid">
+            {/* Card 1 - For Leaders */}
+            <div className="promise-card">
+              <div className="promise-icon">🎯</div>
+              <h3>For Leaders & Teams</h3>
+              <p>
+                Take the assessment to gain clarity, improve alignment, and
+                drive consistent results. Understand your natural change genius
+                and build teams that execute.
+              </p>
+              <ul className="promise-list">
+                <li>✓ Discover your natural thinking patterns</li>
+                <li>✓ Identify where your energy creates results</li>
+                <li>✓ Turn ideas into real execution</li>
+                <li>✓ Improve team alignment & communication</li>
+              </ul>
+            </div>
+
+            {/* Card 2 - For Experts & Creators */}
+            <div className="promise-card highlight-card">
+              <div className="promise-icon">⚡</div>
+              <h3>For Experts, Creators & Professionals</h3>
+              <p>
+                Move from knowledge to results. Discover a clearer message, a
+                faster path from value to income, stronger offers, and sharper
+                positioning.
+              </p>
+              <ul className="promise-list">
+                <li>✓ Clearer message & sharper positioning</li>
+                <li>✓ Faster path from value to income</li>
+                <li>✓ Content-to-client system</li>
+                <li>✓ Execution structure that converts</li>
+              </ul>
+              <div className="promise-tag">
+                For Coaches, Consultants & Creators
+              </div>
+            </div>
+
+            {/* Card 3 - For Business Growth */}
+            <div className="promise-card">
+              <div className="promise-icon">📈</div>
+              <h3>For Business Growth</h3>
+              <p>
+                Help your expertise or business convert better and grow with
+                clarity. Stop guessing and start executing with a proven
+                framework.
+              </p>
+              <ul className="promise-list">
+                <li>✓ Convert better with clarity</li>
+                <li>✓ Scale your expertise</li>
+                <li>✓ Build sustainable systems</li>
+                <li>✓ Grow with confidence</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* CTA Button */}
+          <div className="promise-cta">
+            <Link href="/assessment" className="btn-primary promise-btn">
+              Take the Assessment → <span>$24 one-time</span>
+            </Link>
           </div>
         </div>
       </section>
