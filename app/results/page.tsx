@@ -29,7 +29,7 @@ export default function ResultsRoute() {
   const onboarded = profile?.onboarded ?? false;
 
   return (
-    <DashboardLayout title="Results">
+    <DashboardLayout title="Last Report Overview">
       <ResultsPage hasPaid={hasPaid} onboarded={onboarded} results={results} />
     </DashboardLayout>
   );

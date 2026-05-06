@@ -6,12 +6,12 @@ import { EnergyProfile } from "@/lib/assessment/scoring";
 import Link from "next/link";
 
 interface RoleScores {
-  Builder: number;
-  Refiner: number;
+  Activator: number;
+  Stabilizer: number;
   Unifier: number;
-  Achiever: number;
-  Innovator: number;
-  Organizer: number;
+  Driver: number;
+  Spotter: number;
+  Preparer: number;
 }
 
 interface StageScores {
@@ -25,9 +25,9 @@ interface StageScores {
 
 interface EnergyScores {
   Bond: number;
-  Build: number;
+  Drive: number;
   Spark: number;
-  Polish: number;
+  Shape: number;
 }
 
 // interface EnergyProfile {
@@ -85,7 +85,7 @@ const formatDate = (dateStr: string) => {
 const STAGE_TO_LETTER: Record<string, string> = {
   "Alert the System": "A",
   "Diagnose the Gaps": "D",
-  "Access Readiness": "A2", 
+  "Access Readiness": "A2",
   "Participate Through Dialogue": "P",
   "Transform Through Alignment": "T",
   "Scale and Sustain": "S",
@@ -114,14 +114,14 @@ const ADAPTS_LABELS: Record<string, string> = {
 const stageColour = (
   stage: string,
   topStages: string[],
-  bottomStages: string[]
+  bottomStages: string[],
 ) => {
   if (topStages.includes(stage)) return "#12A74C";
   if (bottomStages.includes(stage)) return "#EF4444";
   return "#6B7280";
 };
 
-// ─── ADAPTS SVG wired to real top/bottom stages 
+// ─── ADAPTS SVG wired to real top/bottom stages
 const ADAPTS_SVG = ({
   topStages,
   bottomStages,
@@ -129,15 +129,14 @@ const ADAPTS_SVG = ({
   topStages: string[];
   bottomStages: string[];
 }) => {
-  const fill = (stage: string) =>
-    stageColour(stage, topStages, bottomStages);
+  const fill = (stage: string) => stageColour(stage, topStages, bottomStages);
 
-  const blockA1 = fill("Alert the System"); 
-  const blockD  = fill("Diagnose the Gaps");
+  const blockA1 = fill("Alert the System");
+  const blockD = fill("Diagnose the Gaps");
   const blockA2 = fill("Access Readiness");
-  const blockP  = fill("Participate Through Dialogue");
-  const blockT  = fill("Transform Through Alignment");
-  const blockS  = fill("Scale and Sustain");
+  const blockP = fill("Participate Through Dialogue");
+  const blockT = fill("Transform Through Alignment");
+  const blockS = fill("Scale and Sustain");
 
   return (
     <svg
@@ -209,17 +208,35 @@ const ADAPTS_SVG = ({
       />
 
       {/* Letter overlays – always white */}
-      <path d="M57.0909 113H43.4545L58.8182 66.4545H76.0909L91.4545 113H77.8182L67.6364 79.2727H67.2727L57.0909 113ZM54.5455 94.6364H80.1818V104.091H54.5455V94.6364Z" fill="white" />
-      <path d="M190.909 250H173V203.455H190.727C195.515 203.455 199.652 204.386 203.136 206.25C206.636 208.098 209.333 210.765 211.227 214.25C213.136 217.72 214.091 221.879 214.091 226.727C214.091 231.576 213.144 235.742 211.25 239.227C209.356 242.697 206.674 245.364 203.205 247.227C199.735 249.076 195.636 250 190.909 250ZM185.636 239.273H190.455C192.758 239.273 194.72 238.902 196.341 238.159C197.977 237.417 199.22 236.136 200.068 234.318C200.932 232.5 201.364 229.97 201.364 226.727C201.364 223.485 200.924 220.955 200.045 219.136C199.182 217.318 197.909 216.038 196.227 215.295C194.561 214.553 192.515 214.182 190.091 214.182H185.636V239.273Z" fill="white" />
-      <path d="M554.727 91.6364V81.4545H595.182V91.6364H581.182V128H568.727V91.6364H554.727Z" fill="white" />
-      <path d="M704.091 207C703.97 205.485 703.402 204.303 702.386 203.455C701.386 202.606 699.864 202.182 697.818 202.182C696.515 202.182 695.447 202.341 694.614 202.659C693.795 202.962 693.189 203.379 692.795 203.909C692.402 204.439 692.197 205.045 692.182 205.727C692.152 206.288 692.25 206.795 692.477 207.25C692.72 207.689 693.098 208.091 693.614 208.455C694.129 208.803 694.788 209.121 695.591 209.409C696.394 209.697 697.348 209.955 698.455 210.182L702.273 211C704.848 211.545 707.053 212.265 708.886 213.159C710.72 214.053 712.22 215.106 713.386 216.318C714.553 217.515 715.409 218.864 715.955 220.364C716.515 221.864 716.803 223.5 716.818 225.273C716.803 228.333 716.038 230.924 714.523 233.045C713.008 235.167 710.841 236.78 708.023 237.886C705.22 238.992 701.848 239.545 697.909 239.545C693.864 239.545 690.333 238.947 687.318 237.75C684.318 236.553 681.985 234.712 680.318 232.227C678.667 229.727 677.833 226.53 677.818 222.636H689.818C689.894 224.061 690.25 225.258 690.886 226.227C691.523 227.197 692.417 227.932 693.568 228.432C694.735 228.932 696.121 229.182 697.727 229.182C699.076 229.182 700.205 229.015 701.114 228.682C702.023 228.348 702.712 227.886 703.182 227.295C703.652 226.705 703.894 226.03 703.909 225.273C703.894 224.561 703.659 223.939 703.205 223.409C702.765 222.864 702.038 222.379 701.023 221.955C700.008 221.515 698.636 221.106 696.909 220.727L692.273 219.727C688.152 218.833 684.902 217.341 682.523 215.25C680.159 213.144 678.985 210.273 679 206.636C678.985 203.682 679.773 201.098 681.364 198.886C682.97 196.659 685.189 194.924 688.023 193.682C690.871 192.439 694.136 191.818 697.818 191.818C701.576 191.818 704.826 192.447 707.568 193.705C710.311 194.962 712.424 196.735 713.909 199.023C715.409 201.295 716.167 203.955 716.182 207H704.091Z" fill="white" />
-      <path d="M431 239V192.455H451.091C454.545 192.455 457.568 193.136 460.159 194.5C462.75 195.864 464.765 197.78 466.205 200.25C467.644 202.72 468.364 205.606 468.364 208.909C468.364 212.242 467.621 215.129 466.136 217.568C464.667 220.008 462.598 221.886 459.932 223.205C457.28 224.523 454.182 225.182 450.636 225.182H438.636V215.364H448.091C449.576 215.364 450.841 215.106 451.886 214.591C452.947 214.061 453.758 213.311 454.318 212.341C454.894 211.371 455.182 210.227 455.182 208.909C455.182 207.576 454.894 206.439 454.318 205.5C453.758 204.545 452.947 203.818 451.886 203.318C450.841 202.803 449.576 202.545 448.091 202.545H443.636V239H431Z" fill="white" />
-      <path d="M307.091 127H293.455L308.818 80.4545H326.091L341.455 127H327.818L317.636 93.2727H317.273L307.091 127ZM304.545 108.636H330.182V118.091H304.545V108.636Z" fill="white" />
+      <path
+        d="M57.0909 113H43.4545L58.8182 66.4545H76.0909L91.4545 113H77.8182L67.6364 79.2727H67.2727L57.0909 113ZM54.5455 94.6364H80.1818V104.091H54.5455V94.6364Z"
+        fill="white"
+      />
+      <path
+        d="M190.909 250H173V203.455H190.727C195.515 203.455 199.652 204.386 203.136 206.25C206.636 208.098 209.333 210.765 211.227 214.25C213.136 217.72 214.091 221.879 214.091 226.727C214.091 231.576 213.144 235.742 211.25 239.227C209.356 242.697 206.674 245.364 203.205 247.227C199.735 249.076 195.636 250 190.909 250ZM185.636 239.273H190.455C192.758 239.273 194.72 238.902 196.341 238.159C197.977 237.417 199.22 236.136 200.068 234.318C200.932 232.5 201.364 229.97 201.364 226.727C201.364 223.485 200.924 220.955 200.045 219.136C199.182 217.318 197.909 216.038 196.227 215.295C194.561 214.553 192.515 214.182 190.091 214.182H185.636V239.273Z"
+        fill="white"
+      />
+      <path
+        d="M554.727 91.6364V81.4545H595.182V91.6364H581.182V128H568.727V91.6364H554.727Z"
+        fill="white"
+      />
+      <path
+        d="M704.091 207C703.97 205.485 703.402 204.303 702.386 203.455C701.386 202.606 699.864 202.182 697.818 202.182C696.515 202.182 695.447 202.341 694.614 202.659C693.795 202.962 693.189 203.379 692.795 203.909C692.402 204.439 692.197 205.045 692.182 205.727C692.152 206.288 692.25 206.795 692.477 207.25C692.72 207.689 693.098 208.091 693.614 208.455C694.129 208.803 694.788 209.121 695.591 209.409C696.394 209.697 697.348 209.955 698.455 210.182L702.273 211C704.848 211.545 707.053 212.265 708.886 213.159C710.72 214.053 712.22 215.106 713.386 216.318C714.553 217.515 715.409 218.864 715.955 220.364C716.515 221.864 716.803 223.5 716.818 225.273C716.803 228.333 716.038 230.924 714.523 233.045C713.008 235.167 710.841 236.78 708.023 237.886C705.22 238.992 701.848 239.545 697.909 239.545C693.864 239.545 690.333 238.947 687.318 237.75C684.318 236.553 681.985 234.712 680.318 232.227C678.667 229.727 677.833 226.53 677.818 222.636H689.818C689.894 224.061 690.25 225.258 690.886 226.227C691.523 227.197 692.417 227.932 693.568 228.432C694.735 228.932 696.121 229.182 697.727 229.182C699.076 229.182 700.205 229.015 701.114 228.682C702.023 228.348 702.712 227.886 703.182 227.295C703.652 226.705 703.894 226.03 703.909 225.273C703.894 224.561 703.659 223.939 703.205 223.409C702.765 222.864 702.038 222.379 701.023 221.955C700.008 221.515 698.636 221.106 696.909 220.727L692.273 219.727C688.152 218.833 684.902 217.341 682.523 215.25C680.159 213.144 678.985 210.273 679 206.636C678.985 203.682 679.773 201.098 681.364 198.886C682.97 196.659 685.189 194.924 688.023 193.682C690.871 192.439 694.136 191.818 697.818 191.818C701.576 191.818 704.826 192.447 707.568 193.705C710.311 194.962 712.424 196.735 713.909 199.023C715.409 201.295 716.167 203.955 716.182 207H704.091Z"
+        fill="white"
+      />
+      <path
+        d="M431 239V192.455H451.091C454.545 192.455 457.568 193.136 460.159 194.5C462.75 195.864 464.765 197.78 466.205 200.25C467.644 202.72 468.364 205.606 468.364 208.909C468.364 212.242 467.621 215.129 466.136 217.568C464.667 220.008 462.598 221.886 459.932 223.205C457.28 224.523 454.182 225.182 450.636 225.182H438.636V215.364H448.091C449.576 215.364 450.841 215.106 451.886 214.591C452.947 214.061 453.758 213.311 454.318 212.341C454.894 211.371 455.182 210.227 455.182 208.909C455.182 207.576 454.894 206.439 454.318 205.5C453.758 204.545 452.947 203.818 451.886 203.318C450.841 202.803 449.576 202.545 448.091 202.545H443.636V239H431Z"
+        fill="white"
+      />
+      <path
+        d="M307.091 127H293.455L308.818 80.4545H326.091L341.455 127H327.818L317.636 93.2727H317.273L307.091 127ZM304.545 108.636H330.182V118.091H304.545V108.636Z"
+        fill="white"
+      />
     </svg>
   );
 };
 
-// ─── Stage score bar 
+// ─── Stage score bar
 const StageBar = ({
   stage,
   score,
@@ -382,10 +399,7 @@ export default function ResultsPage({
             {primary} · {secondary}
           </div>
           <div className="stat-sub">
-            <span
-              className="stat-dot"
-              style={{ background: "var(--green)" }}
-            />
+            <span className="stat-dot" style={{ background: "var(--green)" }} />
             Your natural gifts
           </div>
         </div>
@@ -395,10 +409,7 @@ export default function ResultsPage({
             {pairingTitle}
           </div>
           <div className="stat-sub">
-            <span
-              className="stat-dot"
-              style={{ background: "var(--brand)" }}
-            />
+            <span className="stat-dot" style={{ background: "var(--brand)" }} />
             {primary?.[0]}
             {secondary?.[0]} | {secondary?.[0]}
             {primary?.[0]}
@@ -411,10 +422,7 @@ export default function ResultsPage({
             <span style={{ fontSize: 13, opacity: 0.5 }}>/100</span>
           </div>
           <div className="stat-sub">
-            <span
-              className="stat-dot"
-              style={{ background: "var(--muted)" }}
-            />
+            <span className="stat-dot" style={{ background: "var(--muted)" }} />
             Assessed {date}
           </div>
         </div>
@@ -497,15 +505,13 @@ export default function ResultsPage({
       </div>
 
       {/* Energy Profile Card */}
-      <div
-        className="pairing-card"
-        style={{ marginBottom: 16 }}
-      >
+      <div className="pairing-card" style={{ marginBottom: 16 }}>
         <div className="pairing-label">Energy Profile</div>
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
+            gridTemplateColumns: "repeat(2, 1fr)",
+
             gap: 12,
             marginTop: 12,
           }}
@@ -580,27 +586,84 @@ export default function ResultsPage({
         <div className="pairing-label">Your Unique Pairing</div>
         <div className="pairing-name">{pairingTitle}</div>
         <div className="pairing-code">
-          {primary?.[0]}{secondary?.[0]} | {secondary?.[0]}{primary?.[0]}
+          {primary?.[0]}
+          {secondary?.[0]} | {secondary?.[0]}
+          {primary?.[0]}
         </div>
         <div className="pairing-desc">{narrative.pairing_description}</div>
 
-        <ul style={{ listStyle: "none", padding: 0, margin: "16px 0 0 0", display: "flex", flexDirection: "column", gap: 8 }}>
+        <ul
+          style={{
+            listStyle: "none",
+            padding: 0,
+            margin: "16px 0 0 0",
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}
+        >
           {narrative.pairing_benefits.map((b, i) => (
-            <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 14, color: "var(--text-secondary, #9ca3af)" }}>
-              <span style={{ color: "#12A74C", marginTop: 2, flexShrink: 0 }}>✓</span>
+            <li
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 8,
+                fontSize: 14,
+                color: "var(--text-secondary, #9ca3af)",
+              }}
+            >
+              <span style={{ color: "#12A74C", marginTop: 2, flexShrink: 0 }}>
+                ✓
+              </span>
               {b}
             </li>
           ))}
         </ul>
 
-        <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-secondary, #9ca3af)", marginBottom: 10 }}>
+        <div
+          style={{
+            marginTop: 20,
+            paddingTop: 16,
+            borderTop: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              color: "var(--text-secondary, #9ca3af)",
+              marginBottom: 10,
+            }}
+          >
             Watch Outs
           </div>
-          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+          <ul
+            style={{
+              listStyle: "none",
+              padding: 0,
+              margin: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
             {narrative.pairing_watchouts.map((w, i) => (
-              <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 14, color: "var(--text-secondary, #9ca3af)" }}>
-                <span style={{ color: "#EF4444", marginTop: 2, flexShrink: 0 }}>⚠</span>
+              <li
+                key={i}
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 8,
+                  fontSize: 14,
+                  color: "var(--text-secondary, #9ca3af)",
+                }}
+              >
+                <span style={{ color: "#EF4444", marginTop: 2, flexShrink: 0 }}>
+                  ⚠
+                </span>
                 {w}
               </li>
             ))}

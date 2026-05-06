@@ -1,4 +1,3 @@
-
 import { notFound } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -9,12 +8,12 @@ import { RadarChart } from "@/components/results/RadarChart";
 import { DownloadPDFButton } from "./DownloadPDFButton";
 
 const ROLE_COLORS: Record<string, string> = {
-  Innovator: "#0a2540",
-  Achiever: "#1557d4",
-  Organizer: "#1a6bfa",
+  Spotter: "#0a2540",
+  Driver: "#1557d4",
+  Preparer: "#1a6bfa",
   Unifier: "#4d8ef8",
-  Builder: "#0d3060",
-  Refiner: "#93b8fb",
+  Activator: "#0d3060",
+  Stabilizer: "#93b8fb",
 };
 
 const STAGE_COLORS: Record<string, string> = {
@@ -154,10 +153,35 @@ export default async function ResultsPageById({ params }: PageProps) {
       </div>
 
       <div className="page">
+        {/* Report Overview notice */}
+        <div
+          style={{
+            background: "#fffbe6",
+            border: "1px solid #fde68a",
+            borderRadius: 10,
+            padding: "12px 18px",
+            marginBottom: 20,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <span style={{ fontSize: 16 }}>📋</span>
+          <div>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#92400e" }}>
+              Report Overview
+            </span>
+            <span style={{ fontSize: 12, color: "#b45309", marginLeft: 8 }}>
+              — This is a summary. Download the full report for complete
+              insights.
+            </span>
+          </div>
+        </div>
+
         {/* HERO */}
         <div
           style={{
-            background: roleColor,
+            background: "#1e293b",
             borderRadius: "var(--radius)",
             padding: 52,
             position: "relative",
@@ -768,7 +792,7 @@ export default async function ResultsPageById({ params }: PageProps) {
               LinkedIn.
             </div>
           </Link>
-          <DownloadPDFButton/>
+          <DownloadPDFButton />
           <Link
             href="/teams"
             style={{
@@ -802,7 +826,6 @@ export default async function ResultsPageById({ params }: PageProps) {
           </Link>
         </div>
       </div>
-
     </div>
   );
 }

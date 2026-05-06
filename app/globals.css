@@ -1917,10 +1917,10 @@ nav {
 }
 
 .pairing-card {
-  background: linear-gradient(135deg, #0000ff 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #fbfbff 0%, #fafbfd 100%);
   border-radius: var(--r);
   padding: 20px;
-  color: #fff;
+  color: #000;
 }
 .pairing-label {
   font-size: 11px;
@@ -2503,11 +2503,11 @@ nav {
     letter-spacing: -1px;
   }
   .benefits-list {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
   .benefits-list li {
-    font-size: 12px;
-    padding: 9px 12px 9px 18px;
+    font-size: 11px;
+    padding: 8px 10px 8px 16px;
   }
   .btn-hero-primary {
     font-size: 13px;
@@ -2825,4 +2825,11 @@ nav {
     width: 100%;
     justify-content: center;
   }
+}
+.payment-logo {
+  color: #ffffff;
+  text-decoration: none;
+}
+.payment-secure span:last-child {
+  color: white;
 }

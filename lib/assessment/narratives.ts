@@ -10,7 +10,21 @@ export interface NarrativeInput {
   top_adapts_stages: AdaptsStage[];
   bottom_adapts_stages: AdaptsStage[];
 }
-
+// Add this mapping function
+const ROLE_NAME_MAP: Record<string, Role> = {
+  Innovator: "Spotter",
+  Achiever: "Driver",
+  Organizer: "Preparer",
+  Builder: "Activator",
+  Refiner: "Stabilizer",
+  Unifier: "Unifier",
+};
+const ENERGY_NAME_MAP: Record<string, Energy> = {
+  Build: "Drive",
+  Polish: "Shape",
+  Spark: "Spark",
+  Bond: "Bond",
+};
 export interface Narrative {
   // Cover / executive summary
   executive_summary: string;
@@ -66,8 +80,8 @@ const ROLE_CONTENT: Record<
     in_team: string;
   }
 > = {
-  Innovator: {
-    name: "Innovator",
+  Spotter: {
+    name: "Spotter",
     summary:
       "You sense change before it arrives. Your strongest contribution is disrupting the status quo with fresh thinking and forward‑looking ideas.",
     detailed:
@@ -86,8 +100,8 @@ const ROLE_CONTENT: Record<
     in_team:
       "In a team context, you are the early warning system and idea generator. Teams need you most at the start of change – when the status quo needs challenging and new direction is required. Watch for the tendency to move on before implementation is complete.",
   },
-  Achiever: {
-    name: "Achiever",
+  Driver: {
+    name: "Driver",
     summary:
       "You drive initiatives forward. Your strongest contribution is converting intention into momentum. When progress stalls, you restart it.",
     detailed:
@@ -106,8 +120,8 @@ const ROLE_CONTENT: Record<
     in_team:
       "In a team context, you are the engine. Teams need you when momentum is at risk or deadlines are being missed. Your urgency is valuable – but ensure your pace doesn't leave key voices behind.",
   },
-  Organizer: {
-    name: "Organizer",
+  Preparer: {
+    name: "Preparer",
     summary:
       "You create the structure that makes change possible. Your strongest contribution is ensuring that good ideas don't collapse in execution.",
     detailed:
@@ -146,8 +160,8 @@ const ROLE_CONTENT: Record<
     in_team:
       "In a team context, you are the social glue. Teams need you when trust is low, conflict is rising, or alignment is breaking down. Your gift for connection is powerful – ensure decisions still get made.",
   },
-  Builder: {
-    name: "Builder",
+  Activator: {
+    name: "Activator",
     summary:
       "You connect strategy to execution. Your strongest contribution is ensuring that decisions translate into operational reality.",
     detailed:
@@ -166,8 +180,8 @@ const ROLE_CONTENT: Record<
     in_team:
       "In a team context, you are the bridge between thinking and doing. Teams need you to connect strategy to action. Your ability to align work to purpose prevents drift – ensure you challenge direction when needed.",
   },
-  Refiner: {
-    name: "Refiner",
+  Stabilizer: {
+    name: "Stabilizer",
     summary:
       "You make change last. Your strongest contribution is continuous improvement – learning from what happened and strengthening what works.",
     detailed:
@@ -217,8 +231,8 @@ const ENERGY_CONTENT: Record<
       "Risk of burning out without sustained support",
     ],
   },
-  Build: {
-    name: "Build",
+  Drive: {
+    name: "Drive",
     summary:
       "Your primary energy is Build – the energy of construction, progress, and momentum. You bring drive and discipline to change.",
     detailed:
@@ -235,12 +249,12 @@ const ENERGY_CONTENT: Record<
       "Risk of burnout from constant forward motion",
     ],
   },
-  Polish: {
-    name: "Polish",
+  Shape: {
+    name: "Shape",
     summary:
-      "Your primary energy is Polish – the energy of refinement, quality, and precision. You bring rigor and improvement to change.",
+      "Your primary energy is Shape – the energy of refinement, quality, and precision. You bring rigor and improvement to change.",
     detailed:
-      "Polish energy is about making good things great. People with Polish energy are most alive when systems can be made better – optimising processes, catching errors, and elevating quality. They excel at the final stages of change, when the focus shifts from deployment to refinement. Polish energy ensures that initiatives don’t just work, but work well. Leaders with Polish energy need partners who can help them balance perfectionism with progress.",
+      "Shape energy is about making good things great. People with Shape energy are most alive when systems can be made better – optimising processes, catching errors, and elevating quality. They excel at the final stages of change, when the focus shifts from deployment to refinement. Polish energy ensures that initiatives don’t just work, but work well. Leaders with Polish energy need partners who can help them balance perfectionism with progress.",
     benefits: [
       "Elevates quality and attention to detail",
       "Identifies and corrects errors before they become problems",
@@ -327,10 +341,10 @@ const PAIRING_CONTENT: Record<
     icon?: string;
   }
 > = {
-  "Innovator+Achiever": {
+  "Spotter+Driver": {
     name: "The Visionary Driver",
     description:
-      "A powerful combination of big‑picture thinking and relentless execution. You not only see where the world needs to go – you have the drive to get there. You excel at launching new initiatives and pushing them through obstacles.",
+      "A powerful combination of big-picture thinking and relentless execution. You not only see where the world needs to go – you have the drive to get there. You excel at launching new initiatives and pushing them through obstacles.",
     benefits: [
       "Exceptional at turning ideas into reality",
       "Creates urgency and momentum around new directions",
@@ -338,11 +352,11 @@ const PAIRING_CONTENT: Record<
     ],
     watchouts: [
       "May move too fast for others to keep up",
-      "Can struggle with mid‑course refinement",
+      "Can struggle with mid-course refinement",
       "Risk of burnout from constant high intensity",
     ],
   },
-  "Innovator+Organizer": {
+  "Spotter+Preparer": {
     name: "The Strategic Architect",
     description:
       "A rare combination of creative vision and structural discipline. You not only imagine what could be – you design the blueprint to get there. You excel at translating abstract ideas into actionable plans.",
@@ -352,17 +366,17 @@ const PAIRING_CONTENT: Record<
       "Prevents chaos while enabling innovation",
     ],
     watchouts: [
-      "May over‑engineer before testing ideas",
+      "May over-engineer before testing ideas",
       "Can become attached to plans rather than outcomes",
       "Risk of analysis paralysis",
     ],
   },
-  "Innovator+Unifier": {
+  "Spotter+Unifier": {
     name: "The Empathetic Visionary",
     description:
-      "A compelling combination of future‑thinking and people‑centeredness. You not only see where the world needs to go – you bring people along on the journey. You excel at creating change that people actually want.",
+      "A compelling combination of future-thinking and people-centeredness. You not only see where the world needs to go – you bring people along on the journey. You excel at creating change that people actually want.",
     benefits: [
-      "Builds buy‑in while painting compelling visions",
+      "Builds buy-in while painting compelling visions",
       "Creates change that people embrace, not resist",
       "Balances ambition with empathy",
     ],
@@ -372,7 +386,7 @@ const PAIRING_CONTENT: Record<
       "Risk of being seen as overly idealistic",
     ],
   },
-  "Innovator+Builder": {
+  "Spotter+Activator": {
     name: "The Bridge Builder",
     description:
       "A powerful combination of creativity and pragmatism. You not only imagine new possibilities – you connect them to operational reality. You excel at turning strategic insights into practical actions.",
@@ -387,8 +401,8 @@ const PAIRING_CONTENT: Record<
       "Risk of burnout from constant bridging",
     ],
   },
-  "Innovator+Refiner": {
-    name: "The Continuous Innovator",
+  "Spotter+Stabilizer": {
+    name: "The Continuous Stabilizer",
     description:
       "A unique combination of creation and improvement. You not only generate new ideas – you make them better over time. You excel at iterating toward excellence while never losing sight of the next breakthrough.",
     benefits: [
@@ -398,11 +412,11 @@ const PAIRING_CONTENT: Record<
     ],
     watchouts: [
       'May struggle to declare anything "finished"',
-      "Can over‑iterate before launching",
+      "Can over-iterate before launching",
       "Risk of perfectionism blocking progress",
     ],
   },
-  "Achiever+Innovator": {
+  "Driver+Spotter": {
     name: "The Momentum Builder",
     description:
       "A dynamic combination of action and imagination. You not only drive progress – you know when to pivot. You excel at keeping initiatives moving while remaining open to better approaches.",
@@ -414,10 +428,10 @@ const PAIRING_CONTENT: Record<
     watchouts: [
       "May change direction too frequently",
       "Can frustrate teams seeking stability",
-      "Risk of losing focus on long‑term goals",
+      "Risk of losing focus on long-term goals",
     ],
   },
-  "Achiever+Organizer": {
+  "Driver+Preparer": {
     name: "The Execution Specialist",
     description:
       "A formidable combination of drive and discipline. You not only push for results – you structure the path to get there. You excel at turning plans into completed projects on time and on budget.",
@@ -432,8 +446,8 @@ const PAIRING_CONTENT: Record<
       "Risk of burnout from constant pressure",
     ],
   },
-  "Achiever+Unifier": {
-    name: "The People‑Driven Leader",
+  "Driver+Unifier": {
+    name: "The People-Driven Leader",
     description:
       "A compelling combination of results and relationships. You not only drive progress – you bring people with you. You excel at achieving ambitious goals while building trust and engagement.",
     benefits: [
@@ -447,22 +461,22 @@ const PAIRING_CONTENT: Record<
       "Risk of spreading focus too thin",
     ],
   },
-  "Achiever+Builder": {
+  "Driver+Activator": {
     name: "The Strategic Executor",
     description:
-      "A powerful combination of drive and alignment. You not only push for results – you ensure those results matter. You excel at connecting day‑to‑day action to strategic intent.",
+      "A powerful combination of drive and alignment. You not only push for results – you ensure those results matter. You excel at connecting day-to-day action to strategic intent.",
     benefits: [
       "Aligns execution with organisational strategy",
-      "Prevents busy‑work and misdirection",
+      "Prevents busy-work and misdirection",
       "Creates momentum with purpose",
     ],
     watchouts: [
       "May struggle with purely tactical work",
       "Can become frustrated when strategy is unclear",
-      "Risk of over‑indexing on alignment at expense of speed",
+      "Risk of over-indexing on alignment at expense of speed",
     ],
   },
-  "Achiever+Refiner": {
+  "Driver+Stabilizer": {
     name: "The Performance Optimizer",
     description:
       "A unique combination of drive and improvement. You not only push for results – you make those results better over time. You excel at achieving goals while continuously raising the bar.",
@@ -477,7 +491,7 @@ const PAIRING_CONTENT: Record<
       "Risk of burnout from never being satisfied",
     ],
   },
-  "Organizer+Innovator": {
+  "Preparer+Spotter": {
     name: "The Structured Strategist",
     description:
       "A rare combination of discipline and creativity. You not only create structure – you know when to break it. You excel at building systems that enable, not constrain, innovation.",
@@ -487,12 +501,12 @@ const PAIRING_CONTENT: Record<
       "Prevents chaos without stifling creativity",
     ],
     watchouts: [
-      "May over‑complicate simple problems",
+      "May over-complicate simple problems",
       "Can struggle with purely unstructured work",
       "Risk of analysis paralysis",
     ],
   },
-  "Organizer+Achiever": {
+  "Preparer+Driver": {
     name: "The Delivery Architect",
     description:
       "A formidable combination of planning and execution. You not only design the path – you walk it. You excel at delivering complex initiatives with precision and pace.",
@@ -507,22 +521,22 @@ const PAIRING_CONTENT: Record<
       "Risk of burnout from constant delivery pressure",
     ],
   },
-  "Organizer+Unifier": {
+  "Preparer+Unifier": {
     name: "The Systems Unifier",
     description:
       "A powerful combination of structure and connection. You not only design systems – you ensure people can thrive within them. You excel at creating processes that build trust, not bureaucracy.",
     benefits: [
-      "Designs people‑centered systems",
+      "Designs people-centered systems",
       "Balances efficiency with empathy",
       "Creates structures that enable collaboration",
     ],
     watchouts: [
-      "May over‑engineer simple processes",
-      "Can struggle with tough trade‑offs",
-      "Risk of being seen as process‑heavy",
+      "May over-engineer simple processes",
+      "Can struggle with tough trade-offs",
+      "Risk of being seen as process-heavy",
     ],
   },
-  "Organizer+Builder": {
+  "Preparer+Activator": {
     name: "The Master Planner",
     description:
       "A rare combination of structure and alignment. You not only plan – you ensure plans connect to reality. You excel at creating roadmaps that actually get followed.",
@@ -534,30 +548,30 @@ const PAIRING_CONTENT: Record<
     watchouts: [
       "May struggle with ambiguity or rapid change",
       "Can become attached to plans over outcomes",
-      "Risk of over‑planning at expense of speed",
+      "Risk of over-planning at expense of speed",
     ],
   },
-  "Organizer+Refiner": {
+  "Preparer+Stabilizer": {
     name: "The Precision Operator",
     description:
       "A unique combination of structure and improvement. You not only create order – you make that order better over time. You excel at building systems that continuously improve.",
     benefits: [
-      "Creates self‑improving systems",
+      "Creates self-improving systems",
       "Combines planning with iteration",
       "Prevents stagnation and decay",
     ],
     watchouts: [
-      "May struggle with one‑off projects",
-      "Can over‑engineer temporary solutions",
+      "May struggle with one-off projects",
+      "Can over-engineer temporary solutions",
       "Risk of perfectionism blocking progress",
     ],
   },
-  "Unifier+Innovator": {
+  "Unifier+Spotter": {
     name: "The Empathetic Visionary",
     description:
       "A compelling combination of connection and creativity. You not only bring people together – you imagine where they could go. You excel at creating change that people actually want.",
     benefits: [
-      "Builds buy‑in for bold visions",
+      "Builds buy-in for bold visions",
       "Creates change people embrace",
       "Balances ambition with empathy",
     ],
@@ -567,7 +581,7 @@ const PAIRING_CONTENT: Record<
       "Risk of being seen as overly idealistic",
     ],
   },
-  "Unifier+Achiever": {
+  "Unifier+Driver": {
     name: "The Relationship Driver",
     description:
       "A powerful combination of connection and momentum. You not only build trust – you get things done. You excel at achieving results while keeping teams engaged.",
@@ -582,22 +596,22 @@ const PAIRING_CONTENT: Record<
       "Risk of spreading focus too thin",
     ],
   },
-  "Unifier+Organizer": {
-    name: "The Collaborative Organizer",
+  "Unifier+Preparer": {
+    name: "The Collaborative Preparer",
     description:
       "A rare combination of connection and structure. You not only bring people together – you create systems that help them work better together. You excel at designing collaborative processes.",
     benefits: [
-      "Creates people‑centered systems",
+      "Creates people-centered systems",
       "Balances efficiency with empathy",
       "Builds trust through reliable processes",
     ],
     watchouts: [
-      "May over‑engineer simple processes",
-      "Can struggle with tough trade‑offs",
-      "Risk of being seen as process‑heavy",
+      "May over-engineer simple processes",
+      "Can struggle with tough trade-offs",
+      "Risk of being seen as process-heavy",
     ],
   },
-  "Unifier+Builder": {
+  "Unifier+Activator": {
     name: "The Trust Builder",
     description:
       "A powerful combination of connection and alignment. You not only build relationships – you ensure those relationships serve a purpose. You excel at creating aligned, trusting teams.",
@@ -612,7 +626,7 @@ const PAIRING_CONTENT: Record<
       "Risk of being pulled in too many directions",
     ],
   },
-  "Unifier+Refiner": {
+  "Unifier+Stabilizer": {
     name: "The Inclusive Improver",
     description:
       "A unique combination of connection and improvement. You not only bring people together – you make things better for everyone. You excel at creating inclusive systems that continuously improve.",
@@ -623,11 +637,11 @@ const PAIRING_CONTENT: Record<
     ],
     watchouts: [
       "May struggle with tough prioritisation",
-      "Can over‑emphasise consensus at expense of speed",
-      "Risk of burnout from constant people‑focused improvement",
+      "Can over-emphasise consensus at expense of speed",
+      "Risk of burnout from constant people-focused improvement",
     ],
   },
-  "Builder+Innovator": {
+  "Activator+Spotter": {
     name: "The Bridge Builder",
     description:
       "A powerful combination of alignment and creativity. You not only connect strategy to action – you know when strategy needs to change. You excel at translating vision into reality while staying adaptable.",
@@ -642,22 +656,22 @@ const PAIRING_CONTENT: Record<
       "Risk of burnout from constant bridging",
     ],
   },
-  "Builder+Achiever": {
+  "Activator+Driver": {
     name: "The Strategic Activator",
     description:
       "A formidable combination of alignment and drive. You not only connect strategy to action – you get it done. You excel at turning strategic intent into completed results.",
     benefits: [
       "Aligns execution with strategy",
       "Creates momentum with purpose",
-      "Prevents busy‑work and misdirection",
+      "Prevents busy-work and misdirection",
     ],
     watchouts: [
       "May struggle with purely tactical work",
       "Can become frustrated when strategy is unclear",
-      "Risk of over‑indexing on alignment at expense of speed",
+      "Risk of over-indexing on alignment at expense of speed",
     ],
   },
-  "Builder+Organizer": {
+  "Activator+Preparer": {
     name: "The Systems Architect",
     description:
       "A rare combination of alignment and structure. You not only connect strategy to action – you design the systems that make it happen. You excel at creating aligned, executable plans.",
@@ -667,12 +681,12 @@ const PAIRING_CONTENT: Record<
       "Prevents planning that never becomes action",
     ],
     watchouts: [
-      "May over‑engineer simple problems",
+      "May over-engineer simple problems",
       "Can struggle with ambiguity or rapid change",
-      "Risk of over‑planning at expense of speed",
+      "Risk of over-planning at expense of speed",
     ],
   },
-  "Builder+Unifier": {
+  "Activator+Unifier": {
     name: "The Alignment Champion",
     description:
       "A powerful combination of alignment and connection. You not only connect work to purpose – you bring people along. You excel at creating aligned, trusting teams that execute effectively.",
@@ -687,23 +701,23 @@ const PAIRING_CONTENT: Record<
       "Risk of being pulled in too many directions",
     ],
   },
-  "Builder+Refiner": {
+  "Activator+Stabilizer": {
     name: "The Operational Excellence Leader",
     description:
       "A unique combination of alignment and improvement. You not only connect work to strategy – you make that connection better over time. You excel at creating aligned, continuously improving systems.",
     benefits: [
-      "Creates self‑improving, aligned systems",
+      "Creates self-improving, aligned systems",
       "Combines strategic clarity with operational excellence",
       "Prevents drift and decay",
     ],
     watchouts: [
-      "May struggle with one‑off initiatives",
-      "Can over‑engineer temporary solutions",
+      "May struggle with one-off initiatives",
+      "Can over-engineer temporary solutions",
       "Risk of perfectionism blocking progress",
     ],
   },
-  "Refiner+Innovator": {
-    name: "The Continuous Innovator",
+  "Stabilizer+Spotter": {
+    name: "The Continuous Stabilizer",
     description:
       "A unique combination of improvement and creativity. You not only make things better – you know when to start fresh. You excel at iterating toward excellence while remaining open to breakthrough ideas.",
     benefits: [
@@ -713,11 +727,11 @@ const PAIRING_CONTENT: Record<
     ],
     watchouts: [
       'May struggle to declare anything "finished"',
-      "Can over‑iterate before launching",
+      "Can over-iterate before launching",
       "Risk of perfectionism blocking progress",
     ],
   },
-  "Refiner+Achiever": {
+  "Stabilizer+Driver": {
     name: "The Performance Optimizer",
     description:
       "A powerful combination of improvement and drive. You not only raise the bar – you push to reach it. You excel at achieving ambitious goals while continuously raising standards.",
@@ -732,22 +746,22 @@ const PAIRING_CONTENT: Record<
       "Risk of burnout from never being satisfied",
     ],
   },
-  "Refiner+Organizer": {
+  "Stabilizer+Preparer": {
     name: "The Systems Perfectionist",
     description:
-      "A rare combination of improvement and structure. You not only make things better – you systematise that improvement. You excel at building self‑improving systems.",
+      "A rare combination of improvement and structure. You not only make things better – you systematise that improvement. You excel at building self-improving systems.",
     benefits: [
-      "Creates self‑improving, reliable systems",
+      "Creates self-improving, reliable systems",
       "Combines process discipline with iteration",
       "Prevents stagnation and decay",
     ],
     watchouts: [
-      "May over‑engineer simple processes",
-      "Can struggle with one‑off or unpredictable work",
+      "May over-engineer simple processes",
+      "Can struggle with one-off or unpredictable work",
       "Risk of perfectionism blocking progress",
     ],
   },
-  "Refiner+Unifier": {
+  "Stabilizer+Unifier": {
     name: "The Culture Steward",
     description:
       "A powerful combination of improvement and connection. You not only make things better – you make them better for everyone. You excel at creating inclusive, continuously improving cultures.",
@@ -758,27 +772,26 @@ const PAIRING_CONTENT: Record<
     ],
     watchouts: [
       "May struggle with tough prioritisation",
-      "Can over‑emphasise consensus at expense of speed",
-      "Risk of burnout from constant people‑focused improvement",
+      "Can over-emphasise consensus at expense of speed",
+      "Risk of burnout from constant people-focused improvement",
     ],
   },
-  "Refiner+Builder": {
+  "Stabilizer+Activator": {
     name: "The Sustainable Change Leader",
     description:
-      "A unique combination of improvement and alignment. You not only make things better – you ensure those improvements stick. You excel at creating aligned, self‑improving systems that deliver lasting impact.",
+      "A unique combination of improvement and alignment. You not only make things better – you ensure those improvements stick. You excel at creating aligned, self-improving systems that deliver lasting impact.",
     benefits: [
       "Creates sustainable, improving systems",
       "Combines strategic alignment with operational excellence",
       "Prevents drift, decay, and misalignment",
     ],
     watchouts: [
-      "May struggle with one‑off initiatives",
-      "Can over‑engineer temporary solutions",
+      "May struggle with one-off initiatives",
+      "Can over-engineer temporary solutions",
       "Risk of perfectionism blocking progress",
     ],
   },
 };
-
 // Helper to get pairing key (primary+secondary order doesn't matter for lookup)
 function getPairingKey(primary: Role, secondary: Role): string {
   // Try both orders
@@ -791,16 +804,27 @@ function getPairingKey(primary: Role, secondary: Role): string {
 
 export function buildNarrative(input: NarrativeInput): Narrative {
   const {
-    primary_role,
-    secondary_role,
     energy_profile,
     role_pair_title,
     top_adapts_stages,
     bottom_adapts_stages,
   } = input;
+  // Map old role names to new ones
+  const primary_role = ROLE_NAME_MAP[input.primary_role] || input.primary_role;
+  const secondary_role =
+    ROLE_NAME_MAP[input.secondary_role] || input.secondary_role;
+  // Map old energy names to new ones
+  const mappedDominant =
+    ENERGY_NAME_MAP[input.energy_profile.dominant] ||
+    input.energy_profile.dominant;
 
+  // Create a new energy_profile with mapped dominant energy
+  const mappedEnergyProfile = {
+    ...input.energy_profile,
+    dominant: mappedDominant,
+  };
   const role = ROLE_CONTENT[primary_role];
-  const energy = ENERGY_CONTENT[energy_profile.dominant]
+  const energy = ENERGY_CONTENT[mappedEnergyProfile.dominant];
   const pairingKey = getPairingKey(primary_role, secondary_role);
   const pairing = PAIRING_CONTENT[pairingKey] || {
     name: role_pair_title,
