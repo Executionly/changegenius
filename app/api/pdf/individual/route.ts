@@ -84,14 +84,19 @@ export async function GET(req: NextRequest) {
   try {
     const pdfBuffer = await generatePDF(html)
     const name = (profile?.full_name ?? 'change-genius').toLowerCase().replace(/\s+/g, '-')
-
-    return new NextResponse(new Uint8Array(pdfBuffer), {
+return new NextResponse(html, {
       headers: {
-        'Content-Type':        'application/pdf',
-        'Content-Disposition': `attachment; filename="${name}-change-genius-report.pdf"`,
-        'Cache-Control':       'private, no-cache',
+        'Content-Type':        'text/html',
+        'Content-Disposition': 'inline',
       },
     })
+    // return new NextResponse(new Uint8Array(pdfBuffer), {
+    //   headers: {
+    //     'Content-Type':        'application/pdf',
+    //     'Content-Disposition': `attachment; filename="${name}-change-genius-report.pdf"`,
+    //     'Cache-Control':       'private, no-cache',
+    //   },
+    // })
   } catch (err) {
     console.error('[pdf/individual] Chromium unavailable, returning HTML:', err)
     // Fallback: return print-optimised HTML
