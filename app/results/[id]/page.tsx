@@ -1,4 +1,3 @@
-
 import { notFound } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -154,10 +153,35 @@ export default async function ResultsPageById({ params }: PageProps) {
       </div>
 
       <div className="page">
+        {/* Report Overview notice */}
+        <div
+          style={{
+            background: "#fffbe6",
+            border: "1px solid #fde68a",
+            borderRadius: 10,
+            padding: "12px 18px",
+            marginBottom: 20,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <span style={{ fontSize: 16 }}>📋</span>
+          <div>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#92400e" }}>
+              Report Overview
+            </span>
+            <span style={{ fontSize: 12, color: "#b45309", marginLeft: 8 }}>
+              — This is a summary. Download the full report for complete
+              insights.
+            </span>
+          </div>
+        </div>
+
         {/* HERO */}
         <div
           style={{
-            background: roleColor,
+            background: "#1e293b",
             borderRadius: "var(--radius)",
             padding: 52,
             position: "relative",
@@ -768,7 +792,7 @@ export default async function ResultsPageById({ params }: PageProps) {
               LinkedIn.
             </div>
           </Link>
-          <DownloadPDFButton/>
+          <DownloadPDFButton />
           <Link
             href="/teams"
             style={{
@@ -802,7 +826,6 @@ export default async function ResultsPageById({ params }: PageProps) {
           </Link>
         </div>
       </div>
-
     </div>
   );
 }

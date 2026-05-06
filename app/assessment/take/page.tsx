@@ -112,11 +112,11 @@ function AssessmentTakePageContent() {
   );
 
   function selectAnswer(value: number) {
-  if (!question) return;
-  const qId = question.id;
-  setAnswers((prev) => ({ ...prev, [qId]: value }));
-  void saveAnswer(qId, value, currentIndex);
-}
+    if (!question) return;
+    const qId = question.id;
+    setAnswers((prev) => ({ ...prev, [qId]: value }));
+    void saveAnswer(qId, value, currentIndex);
+  }
 
   function goNext() {
     if (currentAnswer == null) return;
@@ -158,7 +158,7 @@ function AssessmentTakePageContent() {
         throw new Error(d.error ?? "Submission failed");
       }
       setLoadingState("done");
-      window.location.href = '/results'
+      window.location.href = "/results";
     } catch (err) {
       setError(
         err instanceof Error
@@ -336,24 +336,7 @@ function AssessmentTakePageContent() {
                 marginBottom: 20,
               }}
             >
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: "var(--blue)",
-                  background: "var(--blue-light)",
-                  padding: "3px 10px",
-                  borderRadius: "100px",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                }}
-              >
-                {question.role}
-              </span>
-              <span style={{ fontSize: 11, color: "var(--text-4)" }}>·</span>
-              <span style={{ fontSize: 11, color: "var(--text-4)" }}>
-                {question.stage}
-              </span>
+              {/* role and stage labels removed to avoid bias during assessment */}
             </div>
             <div
               style={{
@@ -505,9 +488,17 @@ function AssessmentTakePageContent() {
             </div>
           )}
 
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <button onClick={goBack} disabled={currentIndex === 0} 
+          <div
             style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <button
+              onClick={goBack}
+              disabled={currentIndex === 0}
+              style={{
                 padding: "11px 22px",
                 borderRadius: "100px",
                 border: "1.5px solid var(--border)",
@@ -518,7 +509,10 @@ function AssessmentTakePageContent() {
                 cursor: currentIndex === 0 ? "not-allowed" : "pointer",
                 opacity: currentIndex === 0 ? 0.5 : 1,
                 fontFamily: "Inter,sans-serif",
-            }}>← Back</button>
+              }}
+            >
+              ← Back
+            </button>
 
             <div
               style={{
@@ -559,10 +553,12 @@ function AssessmentTakePageContent() {
                 );
               })}
             </div>
-            
+
             {isLast ? (
-              <button onClick={handleSubmit} disabled={!allAnswered}
-              style={{
+              <button
+                onClick={handleSubmit}
+                disabled={!allAnswered}
+                style={{
                   padding: "11px 28px",
                   borderRadius: "100px",
                   border: "none",
@@ -572,28 +568,33 @@ function AssessmentTakePageContent() {
                   fontWeight: 700,
                   cursor: allAnswered ? "pointer" : "not-allowed",
                   fontFamily: "Inter,sans-serif",
-                }}>
-                {allAnswered ? "Submit & See Results →" : `${TOTAL_QUESTIONS - answered} remaining`}
+                }}
+              >
+                {allAnswered
+                  ? "Submit & See Results →"
+                  : `${TOTAL_QUESTIONS - answered} remaining`}
               </button>
             ) : (
-              <button onClick={goNext} disabled={currentAnswer === null}
-              style={{
+              <button
+                onClick={goNext}
+                disabled={currentAnswer === null}
+                style={{
                   padding: "11px 28px",
                   borderRadius: "100px",
                   border: "none",
-                  background: currentAnswer === null ? "var(--border)" : "var(--blue)",
+                  background:
+                    currentAnswer === null ? "var(--border)" : "var(--blue)",
                   color: currentAnswer === null ? "var(--text-4)" : "white",
                   fontSize: 14,
                   fontWeight: 700,
                   cursor: currentAnswer != null ? "pointer" : "not-allowed",
                   fontFamily: "Inter,sans-serif",
                 }}
-                >
+              >
                 Next →
               </button>
             )}
           </div>
-
 
           {currentAnswer == null && (
             <p

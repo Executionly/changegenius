@@ -9,12 +9,12 @@ import { useAuth } from "@/hooks/useAuth";
 // Data for interactive sections
 // ------------------------------
 const stages = [
-  "Alert the System",
-  "Diagnose the Gaps",
-  "Access Readiness",
-  "Participate Through Dialogue",
-  "Transform Through Alignment",
-  "Scale and Sustain",
+  "Alert — The Spotter",
+  "Diagnose — The Analyzer",
+  "Prepare — The Builder",
+  "Align — The Unifier",
+  "Transform — The Driver",
+  "Sustain — The Stabilizer",
 ];
 
 const stageDetails: Record<
@@ -22,52 +22,52 @@ const stageDetails: Record<
   { preview: string; title: string; description: string; insight: string }
 > = {
   alert: {
-    preview: "See what is changing early",
-    title: "Alert the System",
+    preview: "Sees early signs of what needs to change",
+    title: "Alert — The Spotter",
     description:
-      "Recognize problems, opportunities, or shifts before they become crises.",
+      "Quickly notices what others overlook and recognizes the early signs of what needs to change.",
     insight:
-      "Leaders with Alert the System strength recognize disruption before others do. They read weak signals in the market, culture, and operations — giving organizations the crucial head‑start needed to respond rather than react.",
+      "The Spotter sees disruption before others do. They read weak signals in the market, culture, and operations — giving organizations the crucial head‑start needed to respond rather than react. They get frustrated when obvious issues are ignored and naturally look for better ways forward.",
   },
   diagnose: {
-    preview: "Understand what is really wrong",
-    title: "Diagnose the Gaps",
+    preview: "Breaks problems down to the root cause",
+    title: "Diagnose — The Analyzer",
     description:
-      "Identify the difference between where you are and where you need to be.",
+      "Breaks problems down to understand what is really going on beneath the surface.",
     insight:
-      "Leaders with Diagnose the Gaps strength prevent organizations from solving the wrong problem. They ask harder questions, challenge assumptions, and ensure teams understand what is actually breaking before action begins.",
+      "The Analyzer prevents organizations from solving the wrong problem. They ask harder questions, challenge assumptions, and ensure teams understand what is actually breaking before action begins. They get uncomfortable with guesswork and push for clarity before action.",
   },
   access: {
-    preview: "Check if you are truly prepared",
-    title: "Access Readiness",
+    preview: "Sets people and systems up for success",
+    title: "Prepare — The Builder",
     description:
-      "Evaluate your people, systems, resources, and willingness to change.",
+      "Sets people, systems, and structures up so execution can succeed.",
     insight:
-      "Leaders with Access Readiness strength ensure the organization is genuinely prepared before change is deployed. They identify gaps in capability, capacity, and confidence — reducing execution risk.",
+      "The Builder ensures the organization is genuinely prepared before change is deployed. They identify gaps in capability, capacity, and confidence — reducing execution risk. They get frustrated when things start without proper planning and work to ensure everything is ready.",
   },
   participate: {
-    preview: "Align people through conversation",
-    title: "Participate Through Dialogue",
+    preview: "Brings people together around a clear direction",
+    title: "Align — The Unifier",
     description:
-      "Create shared understanding, trust, and clarity across everyone involved.",
+      "Brings people together around a clear direction and builds trust within the team.",
     insight:
-      "Leaders with Participate Through Dialogue strength prevent silent failures. They create environments where it is safe to surface problems early — keeping communication flowing and course-correcting in real time.",
+      "The Unifier prevents silent failures. They create environments where it is safe to surface problems early — keeping communication flowing and course-correcting in real time. They feel the tension when people are not on the same page and work to create unity and clarity.",
   },
   transform: {
-    preview: "Execute with the right structure",
-    title: "Transform Through Alignment",
+    preview: "Turns plans into action and keeps momentum moving",
+    title: "Transform — The Driver",
     description:
-      "Align people, roles, priorities, and actions to drive real results.",
+      "Turns plans into action and keeps momentum moving toward results.",
     insight:
-      "Leaders with Transform Through Alignment strength eliminate competing agendas. They build shared understanding that allows large, complex organizations to pull in one direction — even through ambiguity.",
+      "The Driver eliminates competing agendas. They build shared understanding that allows large, complex organizations to pull in one direction — even through ambiguity. They get frustrated when progress stalls and push things forward until outcomes are achieved.",
   },
   scale: {
-    preview: "Make it last and grow",
-    title: "Scale and Sustain",
+    preview: "Ensures what is built continues to work over time",
+    title: "Sustain — The Stabilizer",
     description:
-      "Embed the change into systems, culture, and daily operations so it continues.",
+      "Ensures what is built continues to work and improves over time.",
     insight:
-      "Leaders with Scale and Sustain strength ensure transformation goes beyond the initial pilot. They institutionalize new behaviors, expand impact, and build systems that make change self-sustaining.",
+      "The Stabilizer ensures transformation goes beyond the initial pilot. They institutionalize new behaviors, expand impact, and build systems that make change self-sustaining. They get frustrated when things are abandoned too quickly and focus on consistency and long-term impact.",
   },
 };
 
@@ -95,13 +95,13 @@ const energyCards = [
     ],
   },
   {
-    title: "Polish",
-    tagline: "You improve systems.",
-    desc: "You refine, optimize, and make change stick. Polish energy is essential after implementation — turning good into great.",
+    title: "Shape",
+    tagline: "You refine and structure.",
+    desc: "You set up systems, processes, and structures so that change can be sustained. Shape energy is essential when clarity, order, and preparation are needed.",
     chips: [
-      "Detail-oriented",
-      "Process-focused",
-      "Continuous improvement",
+      "Structure-focused",
+      "Process-oriented",
+      "Planning-led",
       "Quality-driven",
     ],
   },
@@ -930,8 +930,8 @@ export default function HomePage() {
               </g>
               <g
                 className="adapts-piece"
-                data-stage="access"
-                onClick={() => setActiveStage("access")}
+                data-stage="participate"
+                onClick={() => setActiveStage("participate")}
                 style={{ cursor: "pointer" }}
               >
                 {/* path for Access */}
@@ -945,8 +945,8 @@ export default function HomePage() {
               </g>
               <g
                 className="adapts-piece"
-                data-stage="participate"
-                onClick={() => setActiveStage("participate")}
+                data-stage="access"
+                onClick={() => setActiveStage("access")}
                 style={{ cursor: "pointer" }}
               >
                 {/* path for Participate */}

@@ -48,7 +48,6 @@ export default function PulsePage() {
   const [execution, setExecution] = useState(0);
   const [alreadySubmitted, setAlreadySubmitted] = useState(false);
 
-
   // Fetch teams owned by user
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -69,12 +68,18 @@ export default function PulsePage() {
     setLoadingData(true);
     fetch(`/api/pulse?teamId=${selectedTeam}`)
       .then((r) => r.json())
-      .then((d: { analytics?: WeekData[]; feeds?: FeedItem[],latestPulse?: { week_number: number } }) => {
-        setWeeks(d.analytics ?? []);
-        setFeeds(d.feeds ?? []);
-        setAlreadySubmitted(d.latestPulse?.week_number === CURRENT_WEEK);
-        setLoadingData(false);
-      })
+      .then(
+        (d: {
+          analytics?: WeekData[];
+          feeds?: FeedItem[];
+          latestPulse?: { week_number: number };
+        }) => {
+          setWeeks(d.analytics ?? []);
+          setFeeds(d.feeds ?? []);
+          setAlreadySubmitted(d.latestPulse?.week_number === CURRENT_WEEK);
+          setLoadingData(false);
+        },
+      )
       .catch(() => setLoadingData(false));
   }, [selectedTeam]);
 
@@ -189,7 +194,7 @@ export default function PulsePage() {
           <div className="stat-sub">Latest average</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">AI Insights</div>
+          <div className="stat-label">Insights</div>
           <div className="stat-value">{feeds.length}</div>
           <div className="stat-sub">Actionable recommendations</div>
         </div>
@@ -201,7 +206,7 @@ export default function PulsePage() {
           <h3>No teams yet</h3>
           <p>
             Create a team to start tracking weekly pulse data and receive
-            AI‑powered insights.
+            actionable insights.
           </p>
           <Link
             href="/teams/create"
@@ -215,7 +220,7 @@ export default function PulsePage() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
+            gridTemplateColumns: "1fr",
             gap: 16,
             alignItems: "start",
           }}
@@ -266,7 +271,9 @@ export default function PulsePage() {
               {alreadySubmitted ? (
                 <div style={{ textAlign: "center", padding: "32px 0" }}>
                   <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
-                  <h3 style={{ fontSize: 20, fontWeight: 800 }}>Already submitted</h3>
+                  <h3 style={{ fontSize: 20, fontWeight: 800 }}>
+                    Already submitted
+                  </h3>
                   <p style={{ color: "var(--text-3)" }}>
                     You've checked in for week {CURRENT_WEEK}.<br />
                     Come back next week to submit again.
@@ -316,7 +323,7 @@ export default function PulsePage() {
           {/* AI Feeds & Trend */}
           <div className="card">
             <div className="card-header">
-              <span className="card-title">AI Leadership Insights</span>
+              <span className="card-title">Actionable Leadership Insights</span>
             </div>
             <div className="card-body">
               {loadingData ? (
@@ -329,7 +336,7 @@ export default function PulsePage() {
                     color: "var(--muted)",
                   }}
                 >
-                  No insights yet. Submit your first pulse to unlock AI
+                  No insights yet. Submit your first pulse to unlock Actionable
                   recommendations.
                 </div>
               ) : (

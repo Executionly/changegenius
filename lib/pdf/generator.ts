@@ -9,34 +9,40 @@
  *   Cover → Overview → Stage coverage → Role map → Energy mix → Gaps → 90-day plan
  */
 
-import type { ScoreResult, StageBand } from '@/lib/assessment/scoring'
-import type { Narrative } from '@/lib/assessment/narratives'
-import type { TeamDiagnostic } from '@/lib/assessment/team-diagnostic'
+import type { ScoreResult, StageBand } from "@/lib/assessment/scoring";
+import type { Narrative } from "@/lib/assessment/narratives";
+import type { TeamDiagnostic } from "@/lib/assessment/team-diagnostic";
 
 // ── Colour palette (matches brand) ────────────────────────────
 const C = {
-  navy:       '#1B2A4A',
-  purple:     '#6B4FBB',
-  purpleLight:'#8B6FDB',
-  gold:       '#C9A84C',
-  green:      '#2E7D52',
-  red:        '#C0392B',
-  amber:      '#E67E22',
-  gray:       '#64748B',
-  grayLight:  '#F1F5F9',
-  white:      '#FFFFFF',
-  border:     '#E2E8F0',
-}
+  navy: "#1B2A4A",
+  purple: "#6B4FBB",
+  purpleLight: "#8B6FDB",
+  gold: "#C9A84C",
+  green: "#2E7D52",
+  red: "#C0392B",
+  amber: "#E67E22",
+  gray: "#64748B",
+  grayLight: "#F1F5F9",
+  white: "#FFFFFF",
+  border: "#E2E8F0",
+};
 
 // ── Band → colour ─────
 function bandColor(band: StageBand): string {
   switch (band) {
-    case 'Strategic Signature Strength': return C.green
-    case 'Strong Functional Strength':   return '#27AE60'
-    case 'Solid Capacity':               return C.purple
-    case 'Situational Capacity':         return C.gold
-    case 'Fragile Capacity':             return C.amber
-    case 'High-Risk Breakdown Zone':     return C.red
+    case "Strategic Signature Strength":
+      return C.green;
+    case "Strong Functional Strength":
+      return "#27AE60";
+    case "Solid Capacity":
+      return C.purple;
+    case "Situational Capacity":
+      return C.gold;
+    case "Fragile Capacity":
+      return C.amber;
+    case "High-Risk Breakdown Zone":
+      return C.red;
   }
 }
 
@@ -48,7 +54,7 @@ function scoreBar(score: number, color = C.purple): string {
         <div style="width:${score}%;height:100%;background:${color};border-radius:5px;transition:width 0.3s"></div>
       </div>
       <span style="font-size:13px;font-weight:700;color:${color};min-width:36px;text-align:right">${score}</span>
-    </div>`
+    </div>`;
 }
 
 // ── Shared CSS ────────
@@ -110,21 +116,29 @@ const BASE_CSS = `
     body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
     .page { page-break-after:always; }
   }
-`
+`;
 
 // ── Page wrapper ──────
-function page(content: string, pageNum?: number, sectionLabel = 'CHANGE GENIUS™'): string {
+function page(
+  content: string,
+  pageNum?: number,
+  sectionLabel = "CHANGE GENIUS™",
+): string {
   return `
   <div class="page">
     <div class="tag-bar"></div>
     ${content}
-    ${pageNum !== undefined ? `
+    ${
+      pageNum !== undefined
+        ? `
     <div class="footer">
       <span style="font-weight:600;color:${C.purple}">${sectionLabel}</span>
       <span>changegeniusai.com</span>
       <span>Page ${pageNum}</span>
-    </div>` : ''}
-  </div>`
+    </div>`
+        : ""
+    }
+  </div>`;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -132,26 +146,38 @@ function page(content: string, pageNum?: number, sectionLabel = 'CHANGE GENIUS�
 // ══════════════════════════════════════════════════════════════
 
 export interface IndividualReportInput {
-  fullName:    string | null
-  scores:      ScoreResult
-  narrative:   Narrative
-  completedAt: string
+  fullName: string | null;
+  scores: ScoreResult;
+  narrative: Narrative;
+  completedAt: string;
 }
 
-export function buildIndividualReportHTML(input: IndividualReportInput): string {
-  const { fullName, scores, narrative } = input
-  const name = fullName ?? 'Your'
-  const firstName = name.split(' ')[0]
-  const date = new Date(input.completedAt).toLocaleDateString('en-GB', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  })
-  const { derived, stage_scores, stage_detail, role_scores, energy_scores } = scores
-  const { primary_role, secondary_role, role_pair_title, energy_profile, change_capacity_score } = derived
+export function buildIndividualReportHTML(
+  input: IndividualReportInput,
+): string {
+  const { fullName, scores, narrative } = input;
+  const name = fullName ?? "Your";
+  const firstName = name.split(" ")[0];
+  const date = new Date(input.completedAt).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  const { derived, stage_scores, stage_detail, role_scores, energy_scores } =
+    scores;
+  const {
+    primary_role,
+    secondary_role,
+    role_pair_title,
+    energy_profile,
+    change_capacity_score,
+  } = derived;
 
-  const pages: string[] = []
+  const pages: string[] = [];
 
-  // ── Page 1: Cover 
-  pages.push(page(`
+  // ── Page 1: Cover
+  pages.push(
+    page(`
     <div style="height:100%;display:flex;flex-direction:column;justify-content:space-between;padding-top:40px">
       <div>
         <div class="label" style="color:${C.purple};margin-bottom:24px">ASSESSMENT REPORT</div>
@@ -172,10 +198,14 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
           <circle cx="80" cy="80" r="32" fill="${C.purple}" opacity="0.9"/>
           <text x="80" y="87" font-family="Inter,sans-serif" font-size="22" font-weight="800"
                 fill="white" text-anchor="middle">CG</text>
-          ${[0,60,120,180,240,300].map(a => {
-            const r = 72, rx = 80 + r*Math.cos(a*Math.PI/180), ry = 80 + r*Math.sin(a*Math.PI/180)
-            return `<circle cx="${rx.toFixed(1)}" cy="${ry.toFixed(1)}" r="7" fill="${C.purple}" opacity="0.6"/>`
-          }).join('')}
+          ${[0, 60, 120, 180, 240, 300]
+            .map((a) => {
+              const r = 72,
+                rx = 80 + r * Math.cos((a * Math.PI) / 180),
+                ry = 80 + r * Math.sin((a * Math.PI) / 180);
+              return `<circle cx="${rx.toFixed(1)}" cy="${ry.toFixed(1)}" r="7" fill="${C.purple}" opacity="0.6"/>`;
+            })
+            .join("")}
         </svg>
       </div>
 
@@ -207,10 +237,13 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
         </div>
       </div>
     </div>
-  `))
+  `),
+  );
 
   // ── Page 2: Overview ───────────────────────────────────────
-  pages.push(page(`
+  pages.push(
+    page(
+      `
     <div class="label" style="color:${C.purple};margin-bottom:6px">OVERVIEW</div>
     <h2 style="font-size:30px;margin-bottom:4px">A Brief Overview of Change Genius™</h2>
     <div class="divider"></div>
@@ -219,22 +252,30 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
 
     <h3 style="margin-bottom:16px">THE SIX CHANGE ROLES</h3>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px">
-      ${['Innovator','Achiever','Organizer','Unifier','Builder','Refiner'].map(r => `
+      ${["Spotter", "Driver", "Preparer", "Unifier", "Activator", "Stabilizer"]
+        .map(
+          (r) => `
         <div style="background:${C.grayLight};border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:12px">
           <div style="width:36px;height:36px;border-radius:50%;background:${C.purple};display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:14px;flex-shrink:0">${r[0]}</div>
           <div>
             <div style="font-weight:600;font-size:13px">${r}</div>
           </div>
-        </div>`).join('')}
+        </div>`,
+        )
+        .join("")}
     </div>
 
     <h3 style="margin-bottom:12px">THE ADAPTS MODEL</h3>
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:20px;flex-wrap:wrap">
-      ${['Alert','Diagnose','Access','Participate','Transform','Scale'].map((s,i) => `
+      ${["Alert", "Diagnose", "Access", "Participate", "Transform", "Scale"]
+        .map(
+          (s, i) => `
         <div style="display:flex;align-items:center;gap:6px">
           <div style="background:${C.navy};color:white;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:600">${s}</div>
-          ${i < 5 ? `<div style="color:${C.gray};font-size:18px">→</div>` : ''}
-        </div>`).join('')}
+          ${i < 5 ? `<div style="color:${C.gray};font-size:18px">→</div>` : ""}
+        </div>`,
+        )
+        .join("")}
     </div>
 
     <div class="card">
@@ -242,10 +283,15 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
         "Change Genius™ measures how you naturally contribute to change, where execution may break down, and how you can increase your long-term impact."
       </p>
     </div>
-  `, 1))
+  `,
+      1,
+    ),
+  );
 
   // ── Page 3: Results summary ────────────────────────────────
-  pages.push(page(`
+  pages.push(
+    page(
+      `
     <div class="label" style="color:${C.purple};margin-bottom:6px">RESULTS</div>
     <h2 style="font-size:30px;margin-bottom:4px">Your Results</h2>
     <p style="margin-bottom:24px"><strong>${firstName},</strong> the information below summarises the results of your assessment.</p>
@@ -291,19 +337,32 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
     <div style="background:${C.grayLight};border-radius:12px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
       <div>
         <div class="label" style="color:${C.green};margin-bottom:10px">✦ STRONGEST STAGES</div>
-        ${derived.top_adapts_stages.map(s => `
-          <div style="font-size:13px;font-weight:600;padding:6px 0;border-bottom:1px solid ${C.border}">${s}</div>`).join('')}
+        ${derived.top_adapts_stages
+          .map(
+            (s) => `
+          <div style="font-size:13px;font-weight:600;padding:6px 0;border-bottom:1px solid ${C.border}">${s}</div>`,
+          )
+          .join("")}
       </div>
       <div>
         <div class="label" style="color:${C.red};margin-bottom:10px">⚠ DEVELOPMENT AREAS</div>
-        ${derived.bottom_adapts_stages.map(s => `
-          <div style="font-size:13px;font-weight:600;padding:6px 0;border-bottom:1px solid ${C.border}">${s}</div>`).join('')}
+        ${derived.bottom_adapts_stages
+          .map(
+            (s) => `
+          <div style="font-size:13px;font-weight:600;padding:6px 0;border-bottom:1px solid ${C.border}">${s}</div>`,
+          )
+          .join("")}
       </div>
     </div>
-  `, 2))
+  `,
+      2,
+    ),
+  );
 
   // ── Page 4: Primary role deep-dive ────────────────────────
-  pages.push(page(`
+  pages.push(
+    page(
+      `
     <div class="label" style="color:${C.purple};margin-bottom:6px">RESULTS</div>
     <h2 style="font-size:28px;margin-bottom:4px">Your Primary Change Genius</h2>
     <div class="divider"></div>
@@ -322,13 +381,13 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       <div>
         <h3 style="color:${C.green};margin-bottom:12px">BENEFITS OF THIS GENIUS</h3>
         <ul class="bullets">
-          ${narrative.role_benefits.map(b => `<li>${b}</li>`).join('')}
+          ${narrative.role_benefits.map((b) => `<li>${b}</li>`).join("")}
         </ul>
       </div>
       <div>
         <h3 style="color:${C.amber};margin-bottom:12px">WATCHOUTS</h3>
         <ul class="bullets">
-          ${narrative.role_watchouts.map(w => `<li>${w}</li>`).join('')}
+          ${narrative.role_watchouts.map((w) => `<li>${w}</li>`).join("")}
         </ul>
       </div>
     </div>
@@ -338,10 +397,15 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       <div class="label" style="margin-bottom:8px">IN A TEAM CONTEXT</div>
       <p>${narrative.individual_in_team}</p>
     </div>
-  `, 3))
+  `,
+      3,
+    ),
+  );
 
   // ── Page 5: Secondary role ─────────────────────────────────
-  pages.push(page(`
+  pages.push(
+    page(
+      `
     <div class="label" style="color:${C.purple};margin-bottom:6px">RESULTS</div>
     <h2 style="font-size:28px;margin-bottom:4px">Your Secondary Change Genius</h2>
     <div class="divider"></div>
@@ -362,27 +426,33 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       ${Object.entries(role_scores as Record<string, number>)
         .sort(([, a], [, b]) => (b as number) - (a as number))
         .map(([role, score]) => {
-          const isTop = role === primary_role
-          const isSecond = role === secondary_role
-          const color = isTop ? C.green : isSecond ? C.gold : C.gray
+          const isTop = role === primary_role;
+          const isSecond = role === secondary_role;
+          const color = isTop ? C.green : isSecond ? C.gold : C.gray;
           return `
           <div>
             <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-              <span style="font-size:13px;font-weight:${isTop||isSecond?'700':'400'};color:${color}">${role}${isTop?' ★':isSecond?' ◆':''}</span>
+              <span style="font-size:13px;font-weight:${isTop || isSecond ? "700" : "400"};color:${color}">${role}${isTop ? " ★" : isSecond ? " ◆" : ""}</span>
             </div>
             ${scoreBar(Number(score), color)}
-          </div>`
-        }).join('')}
+          </div>`;
+        })
+        .join("")}
     </div>
 
     <div class="card" style="border-left-color:${C.gold}">
       <div class="label" style="margin-bottom:8px">NOTE</div>
       <p style="font-size:13px">Some people become quite good at activities within their secondary genius. However, you will derive your deepest joy and energy from your primary genius of <strong>${primary_role}</strong>.</p>
     </div>
-  `, 4))
+  `,
+      4,
+    ),
+  );
 
   // ── Page 6: Pairing ────────────────────────────────────────
-  pages.push(page(`
+  pages.push(
+    page(
+      `
     <div class="label" style="color:${C.purple};margin-bottom:6px">RESULTS</div>
     <h2 style="font-size:28px;margin-bottom:4px">Your Unique Pairing</h2>
     <div class="divider"></div>
@@ -407,36 +477,65 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       <div>
         <h3 style="color:${C.green};margin-bottom:12px">PAIRING STRENGTHS</h3>
         <ul class="bullets">
-          ${narrative.pairing_benefits.map(b => `<li>${b}</li>`).join('')}
+          ${narrative.pairing_benefits.map((b) => `<li>${b}</li>`).join("")}
         </ul>
       </div>
       <div>
         <h3 style="color:${C.amber};margin-bottom:12px">PAIRING WATCHOUTS</h3>
         <ul class="bullets">
-          ${narrative.pairing_watchouts.map(w => `<li>${w}</li>`).join('')}
+          ${narrative.pairing_watchouts.map((w) => `<li>${w}</li>`).join("")}
         </ul>
       </div>
     </div>
-  `, 5))
+  `,
+      5,
+    ),
+  );
 
   // ── Page 7: Energy profile ─────────────────────────────────
-  pages.push(page(`
+  pages.push(
+    page(
+      `
     <div class="label" style="color:${C.purple};margin-bottom:6px">RESULTS</div>
     <h2 style="font-size:28px;margin-bottom:4px">Your Productivity Energy Profile</h2>
     <div class="divider"></div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
-      ${([
-        { label: 'DOMINANT ENERGY',   value: energy_profile.dominant,  color: C.purple, note: 'Where you create the most impact' },
-        { label: 'SECONDARY ENERGY',  value: energy_profile.secondary, color: C.gold,   note: 'Reliable support mode' },
-        { label: 'STRAIN ZONE',       value: energy_profile.strain,    color: C.amber,  note: 'Functions but at hidden cost' },
-        { label: 'DEPLETED ENERGY',   value: energy_profile.depleted,  color: C.red,    note: 'Where energy is lost' },
-      ]).map(e => `
+      ${[
+        {
+          label: "DOMINANT ENERGY",
+          value: energy_profile.dominant,
+          color: C.purple,
+          note: "Where you create the most impact",
+        },
+        {
+          label: "SECONDARY ENERGY",
+          value: energy_profile.secondary,
+          color: C.gold,
+          note: "Reliable support mode",
+        },
+        {
+          label: "STRAIN ZONE",
+          value: energy_profile.strain,
+          color: C.amber,
+          note: "Functions but at hidden cost",
+        },
+        {
+          label: "DEPLETED ENERGY",
+          value: energy_profile.depleted,
+          color: C.red,
+          note: "Where energy is lost",
+        },
+      ]
+        .map(
+          (e) => `
         <div style="background:${C.grayLight};border-radius:10px;padding:18px;border-left:4px solid ${e.color}">
           <div class="label" style="color:${e.color};margin-bottom:6px">${e.label}</div>
           <div style="font-size:20px;font-weight:800;color:${C.navy}">${e.value}</div>
           <div style="font-size:11px;color:${C.gray};margin-top:4px">${e.note}</div>
-        </div>`).join('')}
+        </div>`,
+        )
+        .join("")}
     </div>
 
     <!-- Energy bar chart -->
@@ -445,14 +544,20 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       ${Object.entries(role_scores as Record<string, number>)
         .sort(([, a], [, b]) => (b as number) - (a as number))
         .map(([e, score]) => {
-          const color = e === energy_profile.dominant ? C.purple
-                      : e === energy_profile.secondary ? C.gold
-                      : e === energy_profile.strain ? C.amber : C.red
+          const color =
+            e === energy_profile.dominant
+              ? C.purple
+              : e === energy_profile.secondary
+                ? C.gold
+                : e === energy_profile.strain
+                  ? C.amber
+                  : C.red;
           return `<div>
             <div style="font-size:13px;font-weight:600;margin-bottom:4px">${e}</div>
             ${scoreBar(Number(score), color)}
-          </div>`
-        }).join('')}
+          </div>`;
+        })
+        .join("")}
     </div>
 
     <h3 style="margin-bottom:12px">${energy_profile.dominant.toUpperCase()} ENERGY</h3>
@@ -462,38 +567,44 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       <div>
         <h3 style="color:${C.green};font-size:13px;margin-bottom:8px">BENEFITS</h3>
         <ul class="bullets">
-          ${narrative.energy_benefits.map(b => `<li>${b}</li>`).join('')}
+          ${narrative.energy_benefits.map((b) => `<li>${b}</li>`).join("")}
         </ul>
       </div>
       <div>
         <h3 style="color:${C.amber};font-size:13px;margin-bottom:8px">WATCHOUTS</h3>
         <ul class="bullets">
-          ${narrative.energy_watchouts.map(w => `<li>${w}</li>`).join('')}
+          ${narrative.energy_watchouts.map((w) => `<li>${w}</li>`).join("")}
         </ul>
       </div>
     </div>
-  `, 6))
+  `,
+      6,
+    ),
+  );
 
   // ── Page 8: ADAPTS full profile ────────────────────────────
-  const stageAbbrevs: Record<string,string> = {
-    'Alert the System': 'Alert',
-    'Diagnose the Gaps': 'Diagnose',
-    'Access Readiness': 'Readiness',
-    'Participate Through Dialogue': 'Participate',
-    'Transform Through Alignment': 'Transform',
-    'Scale and Sustain': 'Scale',
-  }
-  pages.push(page(`
+  const stageAbbrevs: Record<string, string> = {
+    "Alert the System": "Alert",
+    "Diagnose the Gaps": "Diagnose",
+    "Access Readiness": "Readiness",
+    "Participate Through Dialogue": "Participate",
+    "Transform Through Alignment": "Transform",
+    "Scale and Sustain": "Scale",
+  };
+  pages.push(
+    page(
+      `
     <div class="label" style="color:${C.purple};margin-bottom:6px">RESULTS</div>
     <h2 style="font-size:28px;margin-bottom:4px">Your ADAPTS Profile</h2>
     <div class="divider"></div>
 
     <div style="display:flex;flex-direction:column;gap:12px">
-      ${Object.entries(stage_scores).map(([stage, score]) => {
-        const detail = stage_detail[stage as keyof typeof stage_detail]
-        const color = bandColor(detail.band)
-        const abbrev = stageAbbrevs[stage] ?? stage
-        return `
+      ${Object.entries(stage_scores)
+        .map(([stage, score]) => {
+          const detail = stage_detail[stage as keyof typeof stage_detail];
+          const color = bandColor(detail.band);
+          const abbrev = stageAbbrevs[stage] ?? stage;
+          return `
         <div style="background:${C.grayLight};border-radius:10px;padding:16px 20px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <div>
@@ -508,13 +619,19 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
             <span style="font-size:11px;color:${C.gray}">Integrity: <strong>${detail.integrity}</strong></span>
             <span style="font-size:11px;color:${detail.risk > 50 ? C.red : C.gray}">Risk: <strong>${detail.risk}</strong></span>
           </div>
-        </div>`
-      }).join('')}
+        </div>`;
+        })
+        .join("")}
     </div>
-  `, 7))
+  `,
+      7,
+    ),
+  );
 
   // ── Page 9: ADAPTS strengths ───────────────────────────────
-  pages.push(page(`
+  pages.push(
+    page(
+      `
     <div class="label" style="color:${C.purple};margin-bottom:6px">RESULTS</div>
     <h2 style="font-size:28px;margin-bottom:4px">Your Strongest ADAPTS Stages</h2>
     <div class="divider"></div>
@@ -532,36 +649,50 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       <div class="label" style="color:${C.amber};margin-bottom:8px">NOTE ON DEVELOPMENT AREAS</div>
       <p style="font-size:13px">Keep in mind that some people can become adept in their development stages through experience or circumstance. However, focusing on these areas for extended periods without support may lead to fatigue. Seek partners with complementary strengths.</p>
     </div>
-  `, 8))
+  `,
+      8,
+    ),
+  );
 
   // ── Page 10: Application ───────────────────────────────────
-  pages.push(page(`
+  pages.push(
+    page(
+      `
     <div class="label" style="color:${C.purple};margin-bottom:6px">APPLICATION</div>
     <h2 style="font-size:28px;margin-bottom:4px">Applying Your Change Genius™</h2>
     <div class="divider"></div>
 
     <h3 style="margin-bottom:12px">WORK FROM YOUR GENIUS</h3>
     <ul class="bullets" style="margin-bottom:24px">
-      ${narrative.how_to_apply_as_individual.map(a => `<li>${a}</li>`).join('')}
+      ${narrative.how_to_apply_as_individual.map((a) => `<li>${a}</li>`).join("")}
     </ul>
 
     <h3 style="margin-bottom:12px">USE CHANGE GENIUS™ AS A TEAM</h3>
     <ul class="bullets" style="margin-bottom:24px">
-      ${narrative.how_to_apply_as_team.map(a => `<li>${a}</li>`).join('')}
+      ${narrative.how_to_apply_as_team.map((a) => `<li>${a}</li>`).join("")}
     </ul>
 
     <h3 style="margin-bottom:12px">YOUR 30-DAY ACTION PLAN</h3>
     <div style="display:flex;flex-direction:column;gap:10px">
-      ${narrative.next_30_days.map((action, i) => `
+      ${narrative.next_30_days
+        .map(
+          (action, i) => `
         <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:${C.grayLight};border-radius:8px">
-          <div style="width:28px;height:28px;border-radius:50%;background:${C.purple};color:white;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+          <div style="width:28px;height:28px;border-radius:50%;background:${C.purple};color:white;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i + 1}</div>
           <p style="font-size:13px;margin:0">${action}</p>
-        </div>`).join('')}
+        </div>`,
+        )
+        .join("")}
     </div>
-  `, 9))
+  `,
+      9,
+    ),
+  );
 
   // ── Page 11: What's next ───────────────────────────────────
-  pages.push(page(`
+  pages.push(
+    page(
+      `
     <div class="label" style="color:${C.purple};margin-bottom:6px">APPLICATION</div>
     <h2 style="font-size:28px;margin-bottom:4px">Want to Go Deeper?</h2>
     <div class="divider"></div>
@@ -570,23 +701,46 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
       ${[
-        { title:'Team Change Map™', desc:'Have your team take the assessment and build a complete team change profile. Unlock handoff risks, friction patterns, and role gaps.', cta:'Build Your Team Map' },
-        { title:'Coaching & Facilitation', desc:'Work with a Change Genius™ certified facilitator to deepen your understanding and apply the framework in your organisation.', cta:'Find a Facilitator' },
-        { title:'Certification', desc:'Become a certified Change Genius™ practitioner and use the framework with your own clients and teams.', cta:'Get Certified' },
-        { title:'90-Day Growth Path', desc:'Follow your personalised development path to strengthen your vulnerable stages and maximise your primary genius.', cta:'Start Your Path' },
-      ].map(card => `
+        {
+          title: "Team Change Map™",
+          desc: "Have your team take the assessment and build a complete team change profile. Unlock handoff risks, friction patterns, and role gaps.",
+          cta: "Build Your Team Map",
+        },
+        {
+          title: "Coaching & Facilitation",
+          desc: "Work with a Change Genius™ certified facilitator to deepen your understanding and apply the framework in your organisation.",
+          cta: "Find a Facilitator",
+        },
+        {
+          title: "Certification",
+          desc: "Become a certified Change Genius™ practitioner and use the framework with your own clients and teams.",
+          cta: "Get Certified",
+        },
+        {
+          title: "90-Day Growth Path",
+          desc: "Follow your personalised development path to strengthen your vulnerable stages and maximise your primary genius.",
+          cta: "Start Your Path",
+        },
+      ]
+        .map(
+          (card) => `
         <div style="background:${C.grayLight};border-radius:12px;padding:22px;border-top:3px solid ${C.purple}">
           <h3 style="margin-bottom:8px">${card.title}</h3>
           <p style="font-size:13px;margin-bottom:16px">${card.desc}</p>
           <div style="background:${C.purple};color:white;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:600;display:inline-block">${card.cta}</div>
-        </div>`).join('')}
+        </div>`,
+        )
+        .join("")}
     </div>
 
     <div style="margin-top:40px;text-align:center;padding:32px;background:${C.navy};border-radius:12px;color:white">
       <div style="font-size:24px;font-weight:800;margin-bottom:8px">Ready to see how your team functions together?</div>
       <p style="color:rgba(255,255,255,0.75);margin-bottom:0">Visit changegeniusai.com to build your Team Change Map™</p>
     </div>
-  `, 10))
+  `,
+      10,
+    ),
+  );
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -597,25 +751,24 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
   <style>${BASE_CSS}</style>
 </head>
 <body>
-  ${pages.join('\n')}
+  ${pages.join("\n")}
 </body>
-</html>`
+</html>`;
 }
 
 // ══════════════════════════════════════════════════════════════
 // TEAM REPORT
 // ══════════════════════════════════════════════════════════════
 
-
 export interface TeamReportInput {
-  teamName: string
-  diagnostic: TeamDiagnostic
-  memberNames: string[]
-  date: string
+  teamName: string;
+  diagnostic: TeamDiagnostic;
+  memberNames: string[];
+  date: string;
 }
 
 export function buildTeamReportHTML(input: TeamReportInput): string {
-  const { teamName, diagnostic, memberNames, date } = input
+  const { teamName, diagnostic, memberNames, date } = input;
 
   const {
     stageScores,
@@ -624,20 +777,20 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
     riskScore,
     frictionPatterns,
     rollout90Days,
-  } = diagnostic
+  } = diagnostic;
 
-  const teamChangeCapacityScore = 100 - riskScore
+  const teamChangeCapacityScore = 100 - riskScore;
 
-  const sortedStages = Object.entries(stageScores)
-    .sort((a, b) => b[1] - a[1])
+  const sortedStages = Object.entries(stageScores).sort((a, b) => b[1] - a[1]);
 
-  const topStages = sortedStages.slice(0, 2).map(([s]) => s)
-  const bottomStages = sortedStages.slice(-2).map(([s]) => s)
+  const topStages = sortedStages.slice(0, 2).map(([s]) => s);
+  const bottomStages = sortedStages.slice(-2).map(([s]) => s);
 
-  const pages: string[] = []
+  const pages: string[] = [];
 
-  // ── Page 1: Cover 
-  pages.push(page(`
+  // ── Page 1: Cover
+  pages.push(
+    page(`
     <div style="height:100%;display:flex;flex-direction:column;justify-content:space-between;padding-top:40px">
       <div>
         <div class="label" style="color:${C.purple};margin-bottom:24px">
@@ -700,10 +853,13 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
         Prepared for team development and organisational insight · changegeniusai.com
       </p>
     </div>
-  `))
+  `),
+  );
 
   // ── Page 2: Stage coverage ─────────────────────────────────
-  pages.push(page(`
+  pages.push(
+    page(
+      `
     <div class="label" style="color:${C.purple};margin-bottom:6px">
       TEAM RESULTS
     </div>
@@ -715,38 +871,30 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
     <div class="divider"></div>
 
     <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px">
-      ${Object.entries(stageScores).map(([stage, avg]) => {
-        const isTop = topStages.includes(stage)
-        const isBottom = bottomStages.includes(stage)
+      ${Object.entries(stageScores)
+        .map(([stage, avg]) => {
+          const isTop = topStages.includes(stage);
+          const isBottom = bottomStages.includes(stage);
 
-        const color = isTop
-          ? C.green
-          : isBottom
-            ? C.red
-            : C.purple
+          const color = isTop ? C.green : isBottom ? C.red : C.purple;
 
-        return `
+          return `
         <div>
           <div style="display:flex;justify-content:space-between;margin-bottom:4px">
             <span style="font-size:13px;font-weight:600">
-              ${stage}${isTop ? ' ✦' : isBottom ? ' ⚠' : ''}
+              ${stage}${isTop ? " ✦" : isBottom ? " ⚠" : ""}
             </span>
 
             <span style="font-size:11px;color:${color};font-weight:700">
-              ${
-                isTop
-                  ? 'Team Strength'
-                  : isBottom
-                    ? 'Coverage Gap'
-                    : 'Solid'
-              }
+              ${isTop ? "Team Strength" : isBottom ? "Coverage Gap" : "Solid"}
             </span>
           </div>
 
           ${scoreBar(Math.round(avg), color)}
         </div>
-      `
-      }).join('')}
+      `;
+        })
+        .join("")}
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -755,11 +903,15 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
           TEAM STRENGTHS
         </div>
 
-        ${topStages.map((s) => `
+        ${topStages
+          .map(
+            (s) => `
           <div style="font-size:13px;font-weight:600;padding:4px 0">
             ${s}
           </div>
-        `).join('')}
+        `,
+          )
+          .join("")}
       </div>
 
       <div style="background:${C.grayLight};border-radius:10px;padding:18px;border-left:4px solid ${C.red}">
@@ -767,17 +919,26 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
           COVERAGE GAPS
         </div>
 
-        ${bottomStages.map((s) => `
+        ${bottomStages
+          .map(
+            (s) => `
           <div style="font-size:13px;font-weight:600;padding:4px 0">
             ${s}
           </div>
-        `).join('')}
+        `,
+          )
+          .join("")}
       </div>
     </div>
-  `, 1))
+  `,
+      1,
+    ),
+  );
 
   // ── Page 3: Role + energy map ──────────────────────────────
-  pages.push(page(`
+  pages.push(
+    page(
+      `
     <div class="label" style="color:${C.purple};margin-bottom:6px">
       TEAM RESULTS
     </div>
@@ -789,7 +950,9 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
     <div class="divider"></div>
 
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px">
-      ${Object.entries(roleDistribution).map(([role, count]) => `
+      ${Object.entries(roleDistribution)
+        .map(
+          ([role, count]) => `
         <div style="background:${C.grayLight};border-radius:10px;padding:16px;text-align:center">
           <div
             style="
@@ -818,16 +981,12 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
           </div>
 
           <div style="font-size:10px;color:${C.gray}">
-            ${
-              count === 0
-                ? 'MISSING'
-                : count === 1
-                  ? 'member'
-                  : 'members'
-            }
+            ${count === 0 ? "MISSING" : count === 1 ? "member" : "members"}
           </div>
         </div>
-      `).join('')}
+      `,
+        )
+        .join("")}
     </div>
 
     <h2 style="font-size:22px;margin-bottom:8px">
@@ -837,17 +996,18 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
     <div class="divider"></div>
 
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-      ${Object.entries(energyScores).map(([energy, avg]) => {
-        const colors: Record<string, string> = {
-          Spark: C.gold,
-          Build: C.purple,
-          Polish: C.green,
-          Bond: '#E84393',
-        }
+      ${Object.entries(energyScores)
+        .map(([energy, avg]) => {
+          const colors: Record<string, string> = {
+            Spark: C.gold,
+            Build: C.purple,
+            Polish: C.green,
+            Bond: "#E84393",
+          };
 
-        const color = colors[energy] ?? C.purple
+          const color = colors[energy] ?? C.purple;
 
-        return `
+          return `
         <div
           style="
             background:${C.grayLight};
@@ -869,13 +1029,19 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
             avg score
           </div>
         </div>
-      `
-      }).join('')}
+      `;
+        })
+        .join("")}
     </div>
-  `, 2))
+  `,
+      2,
+    ),
+  );
 
   // ── Page 4: Friction + recommendations ────────────────────
-  pages.push(page(`
+  pages.push(
+    page(
+      `
     <div class="label" style="color:${C.purple};margin-bottom:6px">
       TEAM DIAGNOSTICS
     </div>
@@ -894,7 +1060,9 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
       </h3>
 
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
-        ${frictionPatterns.map((f) => `
+        ${frictionPatterns
+          .map(
+            (f) => `
           <div
             style="
               background:#FEF3C7;
@@ -907,7 +1075,9 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
               ${f}
             </p>
           </div>
-        `).join('')}
+        `,
+          )
+          .join("")}
       </div>
     `
         : `
@@ -933,7 +1103,9 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
     </h3>
 
     <div style="display:flex;flex-direction:column;gap:10px">
-      ${(rollout90Days ?? []).map((r, i) => `
+      ${(rollout90Days ?? [])
+        .map(
+          (r, i) => `
         <div
           style="
             display:flex;
@@ -966,9 +1138,14 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
             ${r}
           </p>
         </div>
-      `).join('')}
+      `,
+        )
+        .join("")}
     </div>
-  `, 3))
+  `,
+      3,
+    ),
+  );
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -987,9 +1164,9 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
 </head>
 
 <body>
-  ${pages.join('\n')}
+  ${pages.join("\n")}
 </body>
-</html>`
+</html>`;
 }
 
 // ── Puppeteer PDF renderer
@@ -1026,49 +1203,48 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
 //   }
 // }
 
-
 export async function generatePDF(html: string): Promise<Buffer> {
-  const isDev = process.env.NODE_ENV === 'development'
-  let browser: any
+  const isDev = process.env.NODE_ENV === "development";
+  let browser: any;
 
   if (isDev) {
-    const puppeteer = await import('puppeteer')
+    const puppeteer = await import("puppeteer");
     browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    })
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
   } else {
-    console.log('[pdf] importing @sparticuz/chromium...')
-    const chromium = (await import('@sparticuz/chromium')).default
-    console.log('[pdf] chromium imported, getting executablePath...')
-    const executablePath = await chromium.executablePath()
-    console.log('[pdf] executablePath:', executablePath)
-    const puppeteer = (await import('puppeteer-core')).default
+    console.log("[pdf] importing @sparticuz/chromium...");
+    const chromium = (await import("@sparticuz/chromium")).default;
+    console.log("[pdf] chromium imported, getting executablePath...");
+    const executablePath = await chromium.executablePath();
+    console.log("[pdf] executablePath:", executablePath);
+    const puppeteer = (await import("puppeteer-core")).default;
 
     browser = await puppeteer.launch({
       args: [
         ...chromium.args,
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--single-process',
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--single-process",
       ],
       executablePath: await chromium.executablePath(),
       headless: true,
-    })
+    });
   }
 
   try {
-    const page = await browser.newPage()
-    await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 })
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: "networkidle0", timeout: 30000 });
     const pdf = await page.pdf({
-      format: 'A4',
+      format: "A4",
       printBackground: true,
-      margin: { top: '0', right: '0', bottom: '0', left: '0' },
+      margin: { top: "0", right: "0", bottom: "0", left: "0" },
       preferCSSPageSize: false,
-    })
-    return Buffer.from(pdf)
+    });
+    return Buffer.from(pdf);
   } finally {
-    await browser.close()
+    await browser.close();
   }
 }

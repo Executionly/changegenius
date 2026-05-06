@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 interface SidebarProps {
   activePage: string;
   onNavigate: (pageId: string, href?: string) => void;
@@ -67,7 +69,7 @@ export default function Sidebar({
     },
     {
       id: "results",
-      label: "View Results",
+      label: "Last Report Overview",
       icon: IconResults,
       href: "/results",
     },
@@ -93,7 +95,11 @@ export default function Sidebar({
   return (
     <>
       <div className="brand">
-        <div className="brand-name">Change Genius</div>
+        <div className="brand-name">
+          <Link href="/" style={{ textDecoration: "none", color: "blue" }}>
+            Change Genius
+          </Link>
+        </div>
         <div className="brand-sub">Assessment Platform</div>
       </div>
       <div className="nav">
