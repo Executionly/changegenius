@@ -8,12 +8,12 @@ import { RadarChart } from "@/components/results/RadarChart";
 import { DownloadPDFButton } from "./DownloadPDFButton";
 
 const ROLE_COLORS: Record<string, string> = {
-  Innovator: "#0a2540",
-  Achiever: "#1557d4",
-  Organizer: "#1a6bfa",
+  Spotter: "#0a2540",
+  Driver: "#1557d4",
+  Preparer: "#1a6bfa",
   Unifier: "#4d8ef8",
-  Builder: "#0d3060",
-  Refiner: "#93b8fb",
+  Activator: "#0d3060",
+  Stabilizer: "#93b8fb",
 };
 
 const STAGE_COLORS: Record<string, string> = {
