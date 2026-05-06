@@ -67,7 +67,13 @@ console.log("members", members)
   const memberScores: IMemberScore[] = []
 
   for (const member of members ?? []) {
-    const profile = member.profiles as any
+    const { data: profile } = await supabase
+    .from('profiles')
+    .select('full_name, email, change_genius_role, change_genius_role_2')
+    .eq('id', member.user_id)
+    .single()
+
+    console.log("profile for", member.user_id, profile)
 
     // Default empty scores
     let stageScores: Record<AdaptsStage, number> | null = null

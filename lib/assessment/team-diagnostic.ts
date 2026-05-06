@@ -233,17 +233,25 @@ function build90DayPlan(
 
 // ── MAIN FUNCTION ──────────────────────────────────────────────
 export function computeTeamDiagnostic(members: MemberScore[]): TeamDiagnostic {
+  // Only compute averages from members who have completed scores
+  const scoredMembers = members.filter(
+    (m) => m.stageScores !== null && m.energyScores !== null,
+  );
   const n = members.length;
+  const sn = scoredMembers.length;
 
-  // ── Role distribution (top 2 roles per member) ───────────────
+  // ── Role distribution (top 2 roles per member) 
   const roleDistribution = Object.fromEntries(
     ROLES.map((r) => [r, 0]),
   ) as Record<Role, number>;
+
   for (const m of members) {
-    roleDistribution[m.primaryRole] =
-      (roleDistribution[m.primaryRole] ?? 0) + 1;
-    roleDistribution[m.secondaryRole] =
-      (roleDistribution[m.secondaryRole] ?? 0) + 1;
+    if (m.primaryRole) {
+      roleDistribution[m.primaryRole] = (roleDistribution[m.primaryRole] ?? 0) + 1;
+    }
+    if (m.secondaryRole) {
+      roleDistribution[m.secondaryRole] = (roleDistribution[m.secondaryRole] ?? 0) + 1;
+    }
   }
 
   const missingRoles = ROLES.filter((r) => roleDistribution[r] === 0);
@@ -251,18 +259,18 @@ export function computeTeamDiagnostic(members: MemberScore[]): TeamDiagnostic {
     (r) => n > 0 && roleDistribution[r] / (n * 2) > 0.4,
   );
 
-  // ── Stage means ──────────────────────────────────────────────
-  const stageScores = Object.fromEntries(STAGES.map((s) => [s, 0])) as Record<
-    AdaptsStage,
-    number
-  >;
-  if (n > 0) {
+  // ── Stage means 
+  const stageScores = Object.fromEntries(
+    STAGES.map((s) => [s, 0]),
+  ) as Record<AdaptsStage, number>;
+
+  if (sn > 0) {
     for (const s of STAGES) {
-      const total = members.reduce(
-        (sum, m) => sum + (m.stageScores[s] ?? 0),
+      const total = scoredMembers.reduce(
+        (sum, m) => sum + (m.stageScores?.[s] ?? 0),
         0,
       );
-      stageScores[s] = Math.round(total / n);
+      stageScores[s] = Math.round(total / sn);
     }
   }
 
@@ -270,31 +278,33 @@ export function computeTeamDiagnostic(members: MemberScore[]): TeamDiagnostic {
     STAGES.map((s) => [s, getStageHealth(stageScores[s])]),
   ) as Record<AdaptsStage, StageHealth>;
 
-  // ── Energy means ─────────────────────────────────────────────
+  // ── Energy means 
   const energyScores = Object.fromEntries(
     ENERGIES.map((e) => [e, 0]),
   ) as Record<Energy, number>;
-  if (n > 0) {
+
+  if (sn > 0) {
     for (const e of ENERGIES) {
-      const total = members.reduce(
-        (sum, m) => sum + (m.energyScores[e] ?? 0),
+      const total = scoredMembers.reduce(
+        (sum, m) => sum + (m.energyScores?.[e] ?? 0),
         0,
       );
-      energyScores[e] = Math.round(total / n);
+      energyScores[e] = Math.round(total / sn);
     }
   }
-  const dominantEnergy = ENERGIES.sort(
+
+  const dominantEnergy = [...ENERGIES].sort(
     (a, b) => energyScores[b] - energyScores[a],
   )[0];
 
-  // ── Risk score ───────────────────────────────────────────────
+  // ── Risk score 
   let riskScore = 0;
-  riskScore += missingRoles.length * 12; // 12 pts per missing role
-  riskScore += overweightRoles.length * 8; // 8 pts per overweight role
+  riskScore += missingRoles.length * 12;
+  riskScore += overweightRoles.length * 8;
   const criticalStages = STAGES.filter((s) => stageHealth[s] === "Critical");
   const atRiskStages = STAGES.filter((s) => stageHealth[s] === "At Risk");
-  riskScore += criticalStages.length * 15; // 15 pts per critical stage
-  riskScore += atRiskStages.length * 7; // 7 pts per at-risk stage
+  riskScore += criticalStages.length * 15;
+  riskScore += atRiskStages.length * 7;
   riskScore = Math.min(100, riskScore);
 
   const riskLevel: TeamDiagnostic["riskLevel"] =
@@ -333,6 +343,6 @@ export function computeTeamDiagnostic(members: MemberScore[]): TeamDiagnostic {
     changePods,
     rollout90Days,
     memberCount: n,
-    completedCount: members.length,
+    completedCount: sn,
   };
 }
