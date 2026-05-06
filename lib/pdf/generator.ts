@@ -1204,47 +1204,34 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
 // }
 
 export async function generatePDF(html: string): Promise<Buffer> {
-  const isDev = process.env.NODE_ENV === "development";
-  let browser: any;
+  const isDev = process.env.NODE_ENV === 'development'
 
   if (isDev) {
-    const puppeteer = await import("puppeteer");
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-  } else {
-    console.log("[pdf] importing @sparticuz/chromium...");
-    const chromium = (await import("@sparticuz/chromium")).default;
-    console.log("[pdf] chromium imported, getting executablePath...");
-    const executablePath = await chromium.executablePath();
-    console.log("[pdf] executablePath:", executablePath);
-    const puppeteer = (await import("puppeteer-core")).default;
-
-    browser = await puppeteer.launch({
-      args: [
-        ...chromium.args,
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--single-process",
-      ],
-      executablePath: await chromium.executablePath(),
-      headless: true,
-    });
+    const { chromium } = await import('playwright')
+    const browser = await chromium.launch()
+    const page = await browser.newPage()
+    await page.setContent(html, { waitUntil: 'networkidle' })
+    const pdf = await page.pdf({ format: 'A4', printBackground: true })
+    await browser.close()
+    return Buffer.from(pdf)
   }
 
-  try {
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0", timeout: 30000 });
-    const pdf = await page.pdf({
-      format: "A4",
-      printBackground: true,
-      margin: { top: "0", right: "0", bottom: "0", left: "0" },
-      preferCSSPageSize: false,
-    });
-    return Buffer.from(pdf);
-  } finally {
-    await browser.close();
-  }
+  const chromium = (await import('@sparticuz/chromium-min')).default
+  const { chromium: playwright } = await import('playwright-core')
+
+  const executablePath = await chromium.executablePath(
+    'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
+  )
+
+  const browser = await playwright.launch({
+    args: chromium.args,
+    executablePath,
+    headless: true,
+  })
+
+  const page = await browser.newPage()
+  await page.setContent(html, { waitUntil: 'networkidle' })
+  const pdf = await page.pdf({ format: 'A4', printBackground: true })
+  await browser.close()
+  return Buffer.from(pdf)
 }
