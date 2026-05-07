@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   // Verify ownership
   const { data: assessment } = await supabase
     .from("assessments")
-    .select("id, user_id, status")
+    .select("id, user_id, status, team_id")
     .eq("id", assessmentId)
     .eq("user_id", session.user.id)
     .single();
@@ -106,8 +106,27 @@ export async function POST(req: NextRequest) {
     .update({ status: "completed", completed_at: new Date().toISOString() })
     .eq("id", assessmentId);
 
-  // Update profile with derived results and set onboarded = true
+  // Update member/profile
   const { derived } = scores;
+  const isTeamAssessment = !!assessment.team_id;
+
+  if (isTeamAssessment) {
+    // Mark team member as completed
+    const { error: memberError } = await supabase
+      .from("team_members")
+      .update({ status: "completed" })
+      .eq("team_id", assessment.team_id)
+      .eq("user_id", session.user.id);
+
+    if (memberError) {
+      console.error("[assessment/complete] team_members update error:", memberError);
+      return NextResponse.json(
+        { error: "Failed to update team membership" },
+        { status: 500 },
+      );
+    }
+  }
+  
   const { error: profileError } = await supabase
     .from("profiles")
     .update({

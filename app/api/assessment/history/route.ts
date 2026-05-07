@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
   const { data: assessments, error } = await supabase
   .from("assessments")
-  .select("id, completed_at")
+  .select("id, completed_at, team_id")
   .eq("user_id", session.user.id)
   .eq("status", "completed")
   .order("completed_at", { ascending: false });
@@ -45,6 +45,7 @@ export async function GET(req: NextRequest) {
 
       return {
         id: a.id,
+        teamId: a.team_id,
         completed_at: a.completed_at,
         role_scores:   score?.role_scores   ?? {},
         stage_scores:  score?.stage_scores  ?? {},

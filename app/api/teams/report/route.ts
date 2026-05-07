@@ -53,6 +53,7 @@ export async function GET(req: NextRequest) {
   }
 
   // Get all members + their scores
+
   const { data: members } = await supabase
     .from('team_members')
     .select(`
@@ -60,41 +61,33 @@ export async function GET(req: NextRequest) {
       profiles(full_name, email, change_genius_role, change_genius_role_2)
     `)
     .eq('team_id', teamId)
-console.log("members", members)
-  const completedMembers = (members ?? []).filter(m => m.status === 'completed' || m.status === 'joined')
 
-  // Fetch scores for completed members
+  const completedMembers = (members ?? []).filter(m => m.status === 'completed')
   const memberScores: IMemberScore[] = []
 
   for (const member of members ?? []) {
-    const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name, email, change_genius_role, change_genius_role_2')
-    .eq('id', member.user_id)
-    .single()
+    const profile = member.profiles as any  // already joined, no second fetch needed
 
-    console.log("profile for", member.user_id, profile)
-
-    // Default empty scores
     let stageScores: Record<AdaptsStage, number> | null = null
     let energyScores: Record<Energy, number> | null = null
 
-    // Try to fetch assessment
+    // Scope to team_id so we get the right assessment
     const { data: assessment } = await supabase
       .from('assessments')
       .select('id')
       .eq('user_id', member.user_id)
+      .eq('team_id', teamId) 
       .eq('status', 'completed')
       .order('completed_at', { ascending: false })
       .limit(1)
-      .single()
+      .maybeSingle()
 
     if (assessment) {
       const { data: scores } = await supabase
         .from('scores')
         .select('stage_scores, energy_scores')
         .eq('assessment_id', assessment.id)
-        .single()
+        .maybeSingle()
 
       if (scores) {
         stageScores = scores.stage_scores as Record<AdaptsStage, number>
@@ -103,10 +96,10 @@ console.log("members", members)
     }
 
     memberScores.push({
-      userId: member.user_id,
-      fullName: profile?.full_name ?? profile?.email ?? 'Member',
-      primaryRole: (profile?.change_genius_role ?? null) as Role | null,
-      secondaryRole: (profile?.change_genius_role_2 ?? null) as Role | null,
+      userId:       member.user_id,
+      fullName:     profile?.full_name ?? profile?.email ?? 'Member',
+      primaryRole:  (profile?.change_genius_role ?? null) as Role | null,
+      secondaryRole:(profile?.change_genius_role_2 ?? null) as Role | null,
       stageScores,
       energyScores,
     })
@@ -149,8 +142,10 @@ console.log("members", members)
     members: (members ?? []).map(m => ({
       userId:   m.user_id,
       status:   m.status,
+      isOwner:  m.user_id === team.owner_id,
       fullName: (m.profiles as any)?.full_name ?? (m.profiles as any)?.email ?? 'Member',
-      role:     (m.profiles as any)?.change_genius_role ?? null,
+      role: m.user_id === team.owner_id ? "Admin" : "Member",
+      energy_profile: (m.profiles as any)?.change_genius_role ?? null,
     })),
     totalMembers,
     completedCount,

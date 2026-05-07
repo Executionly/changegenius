@@ -201,14 +201,15 @@ function computeWeightedStageScore(raw: StageRaw): number {
  * Returns 0–100 (100 = fully stable)
  */
 function computeStability(raw: StageRaw): number {
-  const prefAvg = raw.preference.length > 0 ? mean(raw.preference) : null;
-  const pressAvg = raw.pressure.length > 0 ? mean(raw.pressure) : null;
-
-  if (prefAvg === null || pressAvg === null) return 50; // not enough data
-
-  const gap = Math.abs(prefAvg - pressAvg);
-  // Max possible gap on a 1–5 scale is 4
-  return Math.round((1 - gap / 4) * 100);
+  if (raw.preference.length === 0 || raw.pressure.length === 0) {
+    const all = [...raw.behavior];
+    if (all.length < 2) return 75;
+    return Math.round(Math.max(0, 100 - (variance(all) / 4) * 100));
+  }
+  const gap = Math.abs(mean(raw.preference) - mean(raw.pressure));
+  // Same sensitivity tightening — a gap of 1.5 on a 1-5 scale is meaningful
+  const sensitivity = 2.5;
+  return Math.round(Math.max(0, Math.min(100, (1 - gap / sensitivity) * 100)));
 }
 
 /**
@@ -220,13 +221,23 @@ function computeIntegrity(raw: StageRaw): number {
   const normalItems = [...raw.preference, ...raw.behavior, ...raw.pressure];
   const reverseItems = raw.reverse;
 
-  if (normalItems.length === 0 || reverseItems.length === 0) return 50;
+  if (normalItems.length === 0 || reverseItems.length === 0) {
+    // Not enough data — measure internal consistency of what we have
+    const all = normalItems.length > 0 ? normalItems : reverseItems;
+    if (all.length < 2) return 75;
+    const v = variance(all);
+    return Math.round(Math.max(0, 100 - (v / 4) * 100));
+  }
 
   const normalAvg = mean(normalItems);
-  const reverseAvg = mean(reverseItems); // already polarity-adjusted
-
+  const reverseAvg = mean(reverseItems);
   const gap = Math.abs(normalAvg - reverseAvg);
-  return Math.round((1 - gap / 4) * 100);
+
+  // Gap of 0 = perfect integrity (consistent answers)
+  // Gap of 4 = maximum inconsistency
+  // Use a tighter sensitivity curve: gap of 2 already signals real inconsistency
+  const sensitivity = 2.5; // instead of 4, makes score more responsive
+  return Math.round(Math.max(0, Math.min(100, (1 - gap / sensitivity) * 100)));
 }
 
 /**

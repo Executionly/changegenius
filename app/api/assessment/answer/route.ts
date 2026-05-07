@@ -5,6 +5,7 @@ import { z } from "zod";
 
 const schema = z.object({
   assessmentId: z.string().uuid(),
+  teamId: z.string().optional(),
   questionId: z.string().min(1),
   value: z.number().int().min(1).max(5),
   questionIndex: z.number().int().min(0).max(72),
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { assessmentId, questionId, value, questionIndex } = parsed.data;
+  const { assessmentId, questionId, value, questionIndex, teamId } = parsed.data;
 
   const cookieStore = await cookies();
   const supabase = createServerClient(
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
   // Verify assessment belongs to user and is in progress
   const { data: assessment, error: fetchError } = await supabase
     .from("assessments")
-    .select("id, user_id, status")
+    .select("id, user_id, status, team_id")
     .eq("id", assessmentId)
     .eq("user_id", session.user.id)
     .single();
@@ -62,6 +63,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       { error: "Assessment already completed" },
       { status: 409 },
+    );
+  }
+
+  if(teamId && assessment.team_id !== teamId) {
+    return NextResponse.json(
+      { error: "Assessment does not belong to the specified team" },
+      { status: 403 },
     );
   }
 

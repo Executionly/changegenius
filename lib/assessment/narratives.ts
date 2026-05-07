@@ -894,7 +894,7 @@ export function buildNarrative(input: NarrativeInput): Narrative {
     how_to_apply_as_individual: [
       "Review your results and identify one change in your current role that would allow you to spend more time in your genius.",
       "Share your profile with your manager and discuss how to adjust your responsibilities to better align with your strengths.",
-      "Use the 30‑day action plan above to build habits that reinforce your genius.",
+      "Use the 30‑day action plan below to build habits that reinforce your genius.",
       "Invite your team to take the assessment so you can build a Team Change Map™ together.",
     ],
 

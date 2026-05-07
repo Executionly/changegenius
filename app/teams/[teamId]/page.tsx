@@ -10,6 +10,7 @@ interface Member {
   fullName: string;
   status: string;
   role: string | null;
+  energy_profile: string | null;
 }
 
 interface TeamDetail {
@@ -291,6 +292,9 @@ export default function TeamDetailPage() {
                     <th style={{ padding: "10px 12px", textAlign: "left" }}>
                       Role
                     </th>
+                    <th style={{ padding: "10px 12px", textAlign: "left" }}>
+                      Energy Profile
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -323,6 +327,14 @@ export default function TeamDetailPage() {
                         }}
                       >
                         {member.role || "—"}
+                      </td>
+                      <td
+                        style={{
+                          padding: "8px 12px",
+                          borderTop: "1px solid var(--border)",
+                        }}
+                      >
+                        {member.energy_profile || "—"}
                       </td>
                     </tr>
                   ))}

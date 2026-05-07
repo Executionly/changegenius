@@ -19,6 +19,7 @@ function AssessmentTakePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isRetake = searchParams.get("retake") === "true";
+  const teamId = searchParams.get("teamId")
 
   const [assessmentId, setAssessmentId] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -43,7 +44,7 @@ function AssessmentTakePageContent() {
       router.push("/auth?returnUrl=/assessment/take");
       return;
     }
-    if (profile && !profile.has_paid) {
+    if (profile && !profile.has_paid && !teamId) {
       router.push("/payment?plan=individual");
       return;
     }
@@ -51,13 +52,13 @@ function AssessmentTakePageContent() {
 
   // Start or resume assessment
   useEffect(() => {
-    if (authLoading || !isAuthenticated || !profile?.has_paid) return;
+    if (authLoading || !isAuthenticated || (!profile?.has_paid && !teamId)) return;
     async function init() {
       try {
         const url = isRetake
           ? "/api/assessment/start?fresh=true"
           : "/api/assessment/start";
-        const res = await fetch(url, { method: "POST" });
+        const res = await fetch(url, { method: "POST", body: JSON.stringify({ teamId }) });
         if (!res.ok) {
           const data = await res.json();
           if (res.status === 403 && data.paymentRequired) {
@@ -84,7 +85,7 @@ function AssessmentTakePageContent() {
       }
     }
     void init();
-  }, [authLoading, isAuthenticated, profile, router, isRetake]);
+  }, [authLoading, isAuthenticated, profile, router, isRetake, teamId]);
 
   // Save single answer
   const saveAnswer = useCallback(
@@ -100,6 +101,7 @@ function AssessmentTakePageContent() {
             questionId: qId,
             value,
             questionIndex: qIndex,
+            teamId
           }),
         });
         setSaveStatus(res.ok ? "saved" : "error");
@@ -108,7 +110,7 @@ function AssessmentTakePageContent() {
         setSaveStatus("error");
       }
     },
-    [assessmentId],
+    [assessmentId, teamId],
   );
 
   function selectAnswer(value: number) {

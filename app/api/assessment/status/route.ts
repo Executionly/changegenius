@@ -24,12 +24,53 @@ export async function GET(req: NextRequest) {
   if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: inProgress } = await supabase
+  const { data: assessments } = await supabase
     .from("assessments")
-    .select("id")
+    .select(`
+      id, status, team_id, started_at, completed_at,
+      teams(id, name)
+    `)
     .eq("user_id", session.user.id)
-    .eq("status", "in_progress")
-    .maybeSingle();
+    .order("started_at", { ascending: false });
 
-  return NextResponse.json({ hasInProgress: !!inProgress });
+  const all = (assessments ?? []).map((a: any) => ({
+    id:          a.id,
+    status:      a.status,
+    startedAt:   a.started_at,
+    completedAt: a.completed_at,
+    isTeam:      !!a.team_id,
+    team:        a.teams
+      ? { id: a.teams.id, name: a.teams.name }
+      : null,
+  }))
+
+  const inProgress = all.filter(a => a.status === 'in_progress')
+  const completed  = all.filter(a => a.status === 'completed')
+
+  const { data: teamMemberships } = await supabase
+  .from("team_members")
+  .select("team_id, status, teams(id, name)")
+  .eq("user_id", session.user.id)
+
+  // Find teams where member hasn't started an assessment yet
+  const assessedTeamIds = new Set(
+    (assessments ?? [])
+      .filter((a: any) => a.team_id)
+      .map((a: any) => a.team_id)
+  )
+
+  const notStarted = (teamMemberships ?? [])
+    .filter((m: any) => m.teams && !assessedTeamIds.has(m.team_id) && m.status !== "completed")
+    .map((m: any) => ({
+      teamId:   m.teams.id,
+      teamName: m.teams.name,
+    }))
+
+  return NextResponse.json({
+    hasInProgress: inProgress.length > 0,
+    inProgress,
+    completed,
+    all,
+    teamNotStarted: notStarted
+  });
 }
