@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
+import { formatPrice, PRICING } from "@/lib/config/pricing";
 
 export default function AssessmentSelectPage() {
   const router = useRouter();
@@ -53,7 +54,8 @@ export default function AssessmentSelectPage() {
             <strong>For Individuals</strong>
             <br />
             <span style={{ fontSize: 14 }}>
-              Discover your Change Genius role – $24 one-time
+              Discover your Change Genius role –{" "}
+              {formatPrice(PRICING.INDIVIDUAL)} one-time
             </span>
           </button>
           <button
@@ -69,7 +71,9 @@ export default function AssessmentSelectPage() {
             <strong>For Teams</strong>
             <br />
             <span style={{ fontSize: 14 }}>
-              Build your Team Change Map™ – $24 per person (min. 3)
+              Build your Team Change Map™ –{" "}
+              {formatPrice(PRICING.TEAM_PER_PERSON)} per person (min.{" "}
+              {PRICING.TEAM_MIN_MEMBERS})
             </span>
           </button>
         </div>

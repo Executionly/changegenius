@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import { formatPrice, PRICING } from "@/lib/config/pricing";
 
 interface AssessmentEntry {
   id: string;
@@ -20,8 +21,9 @@ export default function AssessmentRoute() {
   const [inProgress, setInProgress] = useState<AssessmentEntry[]>([]);
   const [completed, setCompleted] = useState<AssessmentEntry[]>([]);
   const [statusLoading, setStatusLoading] = useState(true);
-  const [teamNotStarted, setTeamNotStarted] = useState<{ teamId: string; teamName: string }[]>([]);
-
+  const [teamNotStarted, setTeamNotStarted] = useState<
+    { teamId: string; teamName: string }[]
+  >([]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -44,14 +46,13 @@ export default function AssessmentRoute() {
 
   // Separate personal vs team in-progress
   const personalInProgress = inProgress.find((a) => !a.isTeam) ?? null;
-  const teamInProgress     = inProgress.filter((a) => a.isTeam);
-  const teamCompleted      = completed.filter((a) => a.isTeam);
-  const personalCompleted  = completed.find((a) => !a.isTeam) ?? null;
+  const teamInProgress = inProgress.filter((a) => a.isTeam);
+  const teamCompleted = completed.filter((a) => a.isTeam);
+  const personalCompleted = completed.find((a) => !a.isTeam) ?? null;
 
   return (
     <DashboardLayout title="Assessment">
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-
         {/* ── Personal Assessment ── */}
         <div className="card" style={{ textAlign: "center", padding: 48 }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
@@ -62,7 +63,10 @@ export default function AssessmentRoute() {
 
           {!hasPaid ? (
             <>
-              <p>A one‑time payment of $24 unlocks your personal assessment.</p>
+              <p>
+                A one‑time payment of {formatPrice(PRICING.INDIVIDUAL)} unlocks
+                your personal assessment.
+              </p>
               <button
                 onClick={() => router.push("/payment?plan=individual")}
                 className="btn btn-primary"
@@ -77,7 +81,14 @@ export default function AssessmentRoute() {
                 Completed{" "}
                 {new Date(personalCompleted.completedAt!).toLocaleDateString()}
               </p>
-              <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 24 }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 12,
+                  justifyContent: "center",
+                  marginTop: 24,
+                }}
+              >
                 <button
                   onClick={() => router.push("/results")}
                   className="btn btn-primary"
@@ -104,13 +115,17 @@ export default function AssessmentRoute() {
               className="btn btn-primary"
               style={{ marginTop: 24 }}
             >
-              {personalInProgress ? "Resume Assessment →" : "Begin Assessment →"}
+              {personalInProgress
+                ? "Resume Assessment →"
+                : "Begin Assessment →"}
             </button>
           )}
         </div>
 
         {/* ── Team Assessments ── */}
-        {(teamInProgress.length > 0 || teamCompleted.length > 0 || teamNotStarted.length > 0) && (
+        {(teamInProgress.length > 0 ||
+          teamCompleted.length > 0 ||
+          teamNotStarted.length > 0) && (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <h4 style={{ margin: 0 }}>Team Assessments</h4>
 
@@ -128,12 +143,20 @@ export default function AssessmentRoute() {
               >
                 <div>
                   <p style={{ margin: 0, fontWeight: 500 }}>{t.teamName}</p>
-                  <p style={{ margin: 0, fontSize: 13, color: "var(--color-text-secondary)" }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: 13,
+                      color: "var(--color-text-secondary)",
+                    }}
+                  >
                     Not started · Team assessment pending
                   </p>
                 </div>
                 <button
-                  onClick={() => router.push(`/assessment/take?teamId=${t.teamId}`)}
+                  onClick={() =>
+                    router.push(`/assessment/take?teamId=${t.teamId}`)
+                  }
                   className="btn btn-primary"
                 >
                   Begin →
@@ -154,8 +177,15 @@ export default function AssessmentRoute() {
               >
                 <div>
                   <p style={{ margin: 0, fontWeight: 500 }}>{a.team?.name}</p>
-                  <p style={{ margin: 0, fontSize: 13, color: "var(--color-text-secondary)" }}>
-                    In progress · Started {new Date(a.startedAt).toLocaleDateString()}
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: 13,
+                      color: "var(--color-text-secondary)",
+                    }}
+                  >
+                    In progress · Started{" "}
+                    {new Date(a.startedAt).toLocaleDateString()}
                   </p>
                 </div>
                 <button
@@ -184,7 +214,13 @@ export default function AssessmentRoute() {
               >
                 <div>
                   <p style={{ margin: 0, fontWeight: 500 }}>{a.team?.name}</p>
-                  <p style={{ margin: 0, fontSize: 13, color: "var(--color-text-secondary)" }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: 13,
+                      color: "var(--color-text-secondary)",
+                    }}
+                  >
                     Completed · {new Date(a.completedAt!).toLocaleDateString()}
                   </p>
                 </div>
