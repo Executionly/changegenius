@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-
+import { PRICING, formatPrice, getTeamTotalPrice } from "@/lib/config/pricing";
 export default function PricingPage() {
   const individualFeatures = [
     "Full 72-question assessment",
@@ -42,7 +42,7 @@ export default function PricingPage() {
             <div
               style={{ fontSize: 30, fontWeight: 700, color: "var(--text)" }}
             >
-              $24
+              {formatPrice(PRICING.INDIVIDUAL)}
               <span
                 style={{ fontSize: 14, fontWeight: 400, color: "var(--muted)" }}
               >
@@ -95,7 +95,7 @@ export default function PricingPage() {
             <div
               style={{ fontSize: 30, fontWeight: 700, color: "var(--text)" }}
             >
-              $24
+              {formatPrice(PRICING.TEAM_PER_PERSON)}
               <span
                 style={{ fontSize: 14, fontWeight: 400, color: "var(--muted)" }}
               >

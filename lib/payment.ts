@@ -59,7 +59,7 @@ export const AFRICAN_COUNTRIES = new Set([
   "ZM",
   "ZW",
 ]);
-
+import { PRICING } from "@/lib/config/pricing";
 export type PaymentProvider = "stripe" | "paystack";
 export type PlanType = "individual" | "team";
 
@@ -85,8 +85,8 @@ export function getPriceConfig(
   plan: PlanType,
   teamSize = 1,
 ): PriceConfig {
-  const baseUSD = plan === "individual" ? 24 : 24; // $24 per person
-  const baseNGN = plan === "individual" ? 39000 : 39000; // ₦39,000 per person
+  const baseUSD = plan === "individual" ? PRICING.INDIVIDUAL : 27; // $27 per person
+  const baseNGN = plan === "individual" ? 36900 : 36900; // ₦39,000 per person
 
   if (provider === "paystack") {
     const amount = baseNGN * (plan === "team" ? teamSize : 1);

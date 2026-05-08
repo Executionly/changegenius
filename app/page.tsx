@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-
+import { PRICING, formatPrice, getTeamTotalPrice } from "@/lib/config/pricing";
 // ------------------------------
 // Data for interactive sections
 // ------------------------------
@@ -396,7 +396,8 @@ export default function HomePage() {
                 <strong>For Individuals</strong>
                 <br />
                 <span style={{ fontSize: 14 }}>
-                  Discover your Change Genius role – $24 one-time
+                  Discover your Change Genius role –{" "}
+                  {formatPrice(PRICING.INDIVIDUAL)} one-time
                 </span>
               </button>
               <button
@@ -416,7 +417,9 @@ export default function HomePage() {
                 <strong>For Teams</strong>
                 <br />
                 <span style={{ fontSize: 14 }}>
-                  Build your Team Change Map™ – $24 per person (min. 3)
+                  Build your Team Change Map™ –{" "}
+                  {formatPrice(PRICING.TEAM_PER_PERSON)} per person (min.{" "}
+                  {PRICING.TEAM_MIN_MEMBERS})
                 </span>
               </button>
             </div>
@@ -506,16 +509,23 @@ export default function HomePage() {
             <h1 className="hero-headline">
               Discover Your Change Genius.<sup>™</sup>
             </h1>
+            <h5
+              style={{ color: "white", fontSize: "1rem", fontStyle: "italic" }}
+            >
+              Understand how you naturally think, execute, lead, and create
+              results so you can improve workplace performance, strengthen
+              alignment, grow sustainably, and generate more consistent income.
+            </h5>
             <div className="adapts-rotating-line">
               <span>{stages[rotatingIndex]}</span>
             </div>
             <ul className="benefits-list">
               <li>More Joy & Energy</li>
               <li>Increased Productivity</li>
-              <li>Revitalized Workplace</li>
-              <li>Lead Better Meetings</li>
-              <li>Improve Hiring</li>
-              <li>Boost Morale</li>
+              <li>Stronger Team Alignment</li>
+              <li>Healthier Workplace Culture</li>
+              <li>Better Leadership Decisions</li>
+              <li>Sustainable Growth & Results</li>
             </ul>
             <button className="btn-hero-primary" onClick={handleStart}>
               Take the Assessment Now<span className="arrow">→</span>
@@ -742,7 +752,9 @@ export default function HomePage() {
           </div>
           <div className="stat-item">
             <div className="stat-number-container">
-              <span className="stat-number">$24</span>
+              <span className="stat-number">
+                {formatPrice(PRICING.INDIVIDUAL)}
+              </span>
             </div>
             <div className="stat-label">Per Person</div>
             <div className="stat-desc">
@@ -1156,7 +1168,8 @@ export default function HomePage() {
           {/* CTA Button */}
           <div className="promise-cta">
             <Link href="/assessment" className="btn-primary promise-btn">
-              Take the Assessment → <span>$24 one-time</span>
+              Take the Assessment →{" "}
+              <span>{formatPrice(PRICING.INDIVIDUAL)} one-time</span>
             </Link>
           </div>
         </div>
@@ -1436,7 +1449,9 @@ export default function HomePage() {
                     <li>Download and share your results</li>
                   </ul>
                   <div className="price-block">
-                    <span className="price">$24</span>
+                    <span className="price">
+                      {formatPrice(PRICING.INDIVIDUAL)}
+                    </span>
                     <span className="price-caption">one‑time payment</span>
                   </div>
                   <button className="btn-primary" onClick={handleStart}>
@@ -1478,7 +1493,9 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div className="price-block">
-                    <span className="price">$24</span>
+                    <span className="price">
+                      {formatPrice(PRICING.INDIVIDUAL)}
+                    </span>
                     <span className="price-caption">per person · one‑time</span>
                   </div>
                   <button
@@ -1663,7 +1680,9 @@ export default function HomePage() {
           <button className="cta-button" onClick={handleStart}>
             Take The Assessment Now →
           </button>
-          <div className="cta-price">$24 per license</div>
+          <div className="cta-price">
+            {formatPrice(PRICING.INDIVIDUAL)} per license
+          </div>
         </div>
       </section>
 

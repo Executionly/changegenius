@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 interface SidebarProps {
   activePage: string;
@@ -52,6 +53,18 @@ const IconPulse = () => (
     <path d="M2 8h2l2-4 2 8 2-6 2 4h2" />
   </svg>
 );
+const IconUserGroup = () => (
+  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <path d="M1 12c0-2 2-3 4-3s4 1 4 3M9 9c1.5 0 3 1 3 3M5 5a2 2 0 100-4 2 2 0 000 4zM11 5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+  </svg>
+);
+
+interface Team {
+  id: string;
+  name: string;
+  isOwner: boolean;
+}
+
 export default function Sidebar({
   activePage,
   onNavigate,
@@ -60,6 +73,37 @@ export default function Sidebar({
   userRole,
   onSignOut,
 }: SidebarProps) {
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [teamsLoading, setTeamsLoading] = useState(true);
+
+  // Fetch user's teams
+  useEffect(() => {
+    async function fetchTeams() {
+      try {
+        const res = await fetch("/api/teams/list");
+        if (res.ok) {
+          const data = await res.json();
+          const allTeams = [
+            ...(data.owned || []).map((t: any) => ({ ...t, isOwner: true })),
+            ...(data.memberOf || []).map((t: any) => ({
+              ...t,
+              isOwner: false,
+            })),
+          ];
+          setTeams(allTeams);
+        }
+      } catch (error) {
+        console.error("Failed to fetch teams:", error);
+      } finally {
+        setTeamsLoading(false);
+      }
+    }
+    fetchTeams();
+  }, []);
+
+  const ownedTeams = teams.filter((t) => t.isOwner);
+  const memberTeams = teams.filter((t) => !t.isOwner);
+
   const navItems = [
     {
       id: "assessment",
@@ -72,13 +116,6 @@ export default function Sidebar({
       label: "Last Report Overview",
       icon: IconResults,
       href: "/results",
-    },
-    { id: "teams", label: "View Teams", icon: IconTeams, href: "/teams" },
-    {
-      id: "build",
-      label: "Build Team",
-      icon: IconBuild,
-      href: "/teams/create",
     },
     { id: "pulse", label: "Weekly Pulse", icon: IconPulse, href: "/pulse" },
     { id: "history", label: "History", icon: IconHistory, href: "/history" },
@@ -105,7 +142,6 @@ export default function Sidebar({
       <div className="nav">
         <div className="nav-section">Workspace</div>
         {navItems.map((item) => (
-          // Inside Sidebar component, when mapping navItems
           <div
             key={item.id}
             className={`nav-item ${activePage === item.id ? "active" : ""}`}
@@ -115,6 +151,39 @@ export default function Sidebar({
             {item.label}
           </div>
         ))}
+
+        <div className="nav-divider"></div>
+
+        {/* Create Team Button */}
+        <div
+          className={`nav-item ${activePage === "build" ? "active" : ""}`}
+          onClick={() => handleClick({ id: "build", href: "/teams/create" })}
+        >
+          <span className="nav-icon">{IconBuild()}</span>Create Team
+        </div>
+
+        {/* My Teams (teams I own) */}
+        <div
+          className={`nav-item ${activePage === "my-teams" ? "active" : ""}`}
+          onClick={() =>
+            handleClick({ id: "my-teams", href: "/teams/my-teams" })
+          }
+        >
+          <span className="nav-icon">{IconTeams()}</span>
+          My Teams
+        </div>
+
+        {/* Teams I'm In */}
+        <div
+          className={`nav-item ${activePage === "teams-im-in" ? "active" : ""}`}
+          onClick={() =>
+            handleClick({ id: "teams-im-in", href: "/teams/teams-im-in" })
+          }
+        >
+          <span className="nav-icon">{IconUserGroup()}</span>
+          Teams I'm In
+        </div>
+
         <div className="nav-divider"></div>
         <div className="nav-section">Account</div>
         <div className="nav-item" onClick={onSignOut}>

@@ -1,5 +1,6 @@
 "use client";
 
+import { formatPrice, PRICING } from "@/lib/config/pricing";
 import Link from "next/link";
 
 interface AssessmentPageProps {
@@ -16,7 +17,10 @@ export default function AssessmentPage({
       <div className="card" style={{ textAlign: "center", padding: 48 }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
         <h3>Assessment locked</h3>
-        <p>A one-time payment of $24 unlocks your assessment.</p>
+        <p>
+          A one-time payment of {formatPrice(PRICING.INDIVIDUAL)} unlocks your
+          assessment.
+        </p>
         <Link
           href="/payment?plan=individual"
           className="btn btn-primary"

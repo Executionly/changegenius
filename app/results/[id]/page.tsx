@@ -6,6 +6,7 @@ import { buildNarrative } from "@/lib/assessment/narratives";
 import { BarChart } from "@/components/results/BarChart";
 import { RadarChart } from "@/components/results/RadarChart";
 import { DownloadPDFButton } from "./DownloadPDFButton";
+import { formatPrice, PRICING } from "@/lib/config/pricing";
 
 const ROLE_COLORS: Record<string, string> = {
   Spotter: "#0a2540",
@@ -352,7 +353,7 @@ export default async function ResultsPageById({ params }: PageProps) {
               marginTop: 16,
             }}
           >
-            Invite your team – $24 per person
+            Invite your team – {formatPrice(PRICING.TEAM_PER_PERSON)} per person
           </p>
         </div>
 
