@@ -9,6 +9,7 @@ export interface NarrativeInput {
   energy_profile: EnergyProfile;
   top_adapts_stages: AdaptsStage[];
   bottom_adapts_stages: AdaptsStage[];
+  stage_scores: Record<AdaptsStage, number>;
 }
 // Add this mapping function
 const ROLE_NAME_MAP: Record<string, Role> = {
@@ -66,7 +67,251 @@ export interface Narrative {
   what_is_change_genius: string;
   how_to_apply_as_individual: string[];
   how_to_apply_as_team: string[];
+
+  // entrepreneurship/business content (unique to individual report)
+  entrepreneur_growth_pattern: string;
+  revenue_leakage_pattern: string;
+  best_business_focus: string;
+  offer_feedback: {
+    problem: string;
+    audience: string;
+    outcome: string;
+    simplify: string;
+    stop: string;
+  };
+  content_direction: {
+    style: string;
+    topics: string[];
+    pain_points: string[];
+    frequency: string;
+    cta: string;
+  };
+  execution_recommendations: string[];
+  next_best_move: {
+    fix_first: string;
+    stop_doing: string;
+    start_doing: string;
+    monetization_opportunity: string;
+  };
 }
+
+// ── Entrepreneur content maps ──────────────────────────────────
+
+const ROLE_GROWTH_PATTERN: Record<Role, string> = {
+  Spotter:
+    "You create value best when you are working at the edges of what is known — spotting emerging opportunities, reframing problems, and generating ideas that others haven't seen yet. Your business grows when your offer is anchored to a real insight, and when you have execution support around you. Revenue slows when you chase too many ideas, position too broadly, or rely on inspiration rather than a repeatable system.",
+  Driver:
+    "You create value best when you are moving — executing, delivering, and making tangible progress. Your business grows when you have a clear offer, a defined audience, and a consistent sales rhythm. Revenue slows when you are stuck in planning, unclear on your message, or spending energy on work that doesn't directly drive income.",
+  Preparer:
+    "You create value best when there is structure — a clear process, a defined offer, and a reliable delivery system. Your business grows when you package your knowledge into a repeatable, scalable offer. Revenue slows when you over-prepare without launching, or when your systems are so complex that only you can run them.",
+  Unifier:
+    "You create value best through relationships — trust, community, and connection. Your business grows through word of mouth, partnerships, and audiences that feel personally served by you. Revenue slows when you avoid direct offers, undercharge out of relationship sensitivity, or fail to convert goodwill into income.",
+  Activator:
+    "You create value best when you are translating strategy into action — aligning people, resources, and execution toward a clear outcome. Your business grows when your offer solves a specific operational or strategic problem for a defined client. Revenue slows when your positioning is too broad, your offer too complex, or your delivery inconsistent.",
+  Stabilizer:
+    "You create value best when you are improving and sustaining — optimising systems, refining quality, and creating reliable outcomes. Your business grows when you build offers around consistency, retention, and long-term client results. Revenue slows when you delay launching while perfecting, or when you fail to create systems that generate income without your constant presence.",
+};
+
+const STAGE_REVENUE_LEAKAGE: Record<AdaptsStage, string> = {
+  "Alert the System":
+    "You may be missing early market signals, shifts in customer demand, or emerging competition. Your offer may be positioned around a problem that is no longer urgent for your audience. Invest time in customer observation, competitor analysis, and industry trend monitoring before refining your offer.",
+  "Diagnose the Gaps":
+    "You may be building offers without deeply understanding the real problem your clients face. Symptoms get addressed, but root causes go untouched — leading to offers that feel generic or fail to convert. Invest in customer interviews, discovery conversations, and problem validation before scaling your offer.",
+  "Access Readiness":
+    "You may be launching without the structure, pricing clarity, or delivery system your offer requires. Clients say yes but the experience is inconsistent, which slows referrals and repeat business. Invest in offer packaging, onboarding design, and delivery workflows before pushing volume.",
+  "Participate Through Dialogue":
+    "You may struggle to connect your message with your audience. Trust is low, content doesn't convert, and potential clients don't feel understood. Invest in clearer messaging, audience-specific communication, and relationship-building before scaling paid acquisition.",
+  "Transform Through Alignment":
+    "You may have the strategy but struggle with consistent execution — selling, following up, delivering, and showing up repeatedly. Revenue is inconsistent because activity is inconsistent. Invest in a weekly sales and content rhythm, and track one revenue-driving action daily.",
+  "Scale and Sustain":
+    "You may start well but fail to maintain momentum — losing clients, dropping content, or abandoning systems after early success. Revenue spikes but doesn't compound. Invest in retention systems, recurring offer structures, and documented processes that don't depend solely on your energy.",
+};
+
+const STAGE_BUSINESS_FOCUS: Record<AdaptsStage, string> = {
+  "Alert the System":
+    "Spend one hour this week researching what your target client is most worried about right now. Reposition your offer around that specific, current pain point.",
+  "Diagnose the Gaps":
+    "Conduct three discovery conversations with potential clients this week. Ask only about their problems — not your solution. Use what you hear to sharpen your offer.",
+  "Access Readiness":
+    "Write out your complete offer delivery process from sale to completion. Identify the one step that is unclear or missing. Fix it before your next sale.",
+  "Participate Through Dialogue":
+    "Rewrite your core message in one sentence that speaks directly to your client's most painful problem. Test it in content or a direct outreach message this week.",
+  "Transform Through Alignment":
+    "Commit to one sales or content action every day for the next seven days. Do not break the chain. Consistency this week creates revenue next month.",
+  "Scale and Sustain":
+    "Identify your most successful client outcome and build a retention or referral offer around it. Create one repeatable system this week that doesn't require your direct involvement.",
+};
+
+const ROLE_OFFER_FEEDBACK: Record<
+  Role,
+  { problem: string; audience: string; outcome: string; simplify: string; stop: string }
+> = {
+  Spotter: {
+    problem: "A problem that requires fresh thinking, trend awareness, or strategic reframing",
+    audience: "Leaders or entrepreneurs who feel stuck in outdated thinking or missing the next opportunity",
+    outcome: "A new direction, strategy, or framework that gives them clarity on where to move next",
+    simplify: "Remove every deliverable that isn't directly tied to insight or strategic clarity",
+    stop: "Selling broad consulting or general advisory without a specific, named outcome",
+  },
+  Driver: {
+    problem: "A problem that requires faster execution, more accountability, or better results",
+    audience: "Founders or professionals who know what to do but struggle to do it consistently",
+    outcome: "Measurable progress on a specific goal within a defined timeframe",
+    simplify: "Remove any deliverable that doesn't directly drive action or accountability",
+    stop: "Taking on clients who aren't ready to execute — they will drain your energy",
+  },
+  Preparer: {
+    problem: "A problem that requires better structure, clearer process, or more reliable systems",
+    audience: "Entrepreneurs or teams who are doing good work but losing time, money, or clients to disorganisation",
+    outcome: "A system, process, or framework they can use repeatedly without reinventing it",
+    simplify: "Package your process into a fixed-scope offer rather than open-ended consulting",
+    stop: "Custom work that can't be replicated — it limits your revenue ceiling",
+  },
+  Unifier: {
+    problem: "A problem rooted in disconnection — team conflict, low trust, unclear culture, or weak client relationships",
+    audience: "Leaders, teams, or communities that want deeper connection, alignment, or trust",
+    outcome: "A stronger relationship, culture, or community that people actively choose to stay in",
+    simplify: "Remove any deliverable that doesn't directly build connection or trust",
+    stop: "Undercharging for relational work — connection is hard to build and highly valuable",
+  },
+  Activator: {
+    problem: "A problem that requires better alignment between strategy and execution",
+    audience: "Founders or leaders whose teams are busy but not moving in the right direction",
+    outcome: "Clear roles, aligned priorities, and a team that executes with purpose",
+    simplify: "Narrow your offer to one specific alignment or activation outcome",
+    stop: "Trying to solve both strategic and operational problems in the same engagement",
+  },
+  Stabilizer: {
+    problem: "A problem that requires better systems, higher quality, or more consistent results",
+    audience: "Entrepreneurs or teams who are inconsistent, prone to rework, or unable to scale without chaos",
+    outcome: "A reliable system, improved process, or measurably better outcome they can sustain",
+    simplify: "Launch a done version before the perfect version — your first offer doesn't need to be final",
+    stop: "Delaying your offer while you refine it — launch, learn, and improve in the market",
+  },
+};
+
+const ROLE_CONTENT_DIRECTION: Record<
+  Role,
+  { style: string; topics: string[]; pain_points: string[]; frequency: string; cta: string }
+> = {
+  Spotter: {
+    style: "Insight-led and forward-looking — share what others haven't seen yet",
+    topics: ["Emerging trends in your industry", "Reframes of common assumptions", "Strategic questions worth asking"],
+    pain_points: ["Feeling stuck in outdated thinking", "Missing the next opportunity", "Unclear on where the market is moving"],
+    frequency: "3x per week — prioritise depth over volume",
+    cta: "Book a strategy session or download a framework",
+  },
+  Driver: {
+    style: "Action-oriented and results-focused — share what works and what you've built",
+    topics: ["Execution case studies", "Practical action steps", "How you overcame specific obstacles"],
+    pain_points: ["Inconsistent execution", "Slow progress", "Getting stuck in planning"],
+    frequency: "Daily or 5x per week — volume and consistency are your advantage",
+    cta: "Join an accountability programme or book a results audit",
+  },
+  Preparer: {
+    style: "Structured and educational — share frameworks, checklists, and processes",
+    topics: ["Step-by-step guides", "Systems and templates", "How to avoid common execution mistakes"],
+    pain_points: ["Chaotic workflows", "Repeated mistakes", "Wasted time on disorganised work"],
+    frequency: "3x per week — prioritise practical, repeatable content",
+    cta: "Download a template or book a systems audit",
+  },
+  Unifier: {
+    style: "Relational and empathetic — share stories, lessons, and human insight",
+    topics: ["Community and belonging", "Trust and relationships in business", "Stories of connection and collaboration"],
+    pain_points: ["Feeling isolated in business", "Team conflict or low trust", "Disconnected from clients or community"],
+    frequency: "3–4x per week — focus on conversation and engagement over broadcast",
+    cta: "Join the community or book a trust-building session",
+  },
+  Activator: {
+    style: "Strategic and operational — share how to connect big thinking to daily work",
+    topics: ["Aligning strategy to execution", "Role clarity and team focus", "Turning decisions into action"],
+    pain_points: ["Strategy that never gets executed", "Teams that are busy but not effective", "Misalignment between vision and reality"],
+    frequency: "3x per week — prioritise strategic depth and practical application",
+    cta: "Book an alignment session or download a strategic planning tool",
+  },
+  Stabilizer: {
+    style: "Evidence-based and improvement-focused — share what gets better results over time",
+    topics: ["Systems for consistency", "How to improve without starting over", "Long-term quality and retention"],
+    pain_points: ["Inconsistent results", "Repeated mistakes", "Losing clients after good starts"],
+    frequency: "3x per week — prioritise depth and credibility over volume",
+    cta: "Book a systems review or download a retention framework",
+  },
+};
+
+const ROLE_EXECUTION: Record<Role, string[]> = {
+  Spotter: [
+    "Choose one idea per quarter and execute it fully before starting the next.",
+    "Partner with a Driver or Preparer who can carry your ideas into consistent action.",
+    "Set a weekly output goal — one piece of content, one offer conversation, one follow-up.",
+  ],
+  Driver: [
+    "Build a weekly sales rhythm — outreach, follow-up, and offer conversations on fixed days.",
+    "Track one revenue-driving action daily and review your streak every Friday.",
+    "Block two hours each week for strategic thinking — not just execution.",
+  ],
+  Preparer: [
+    "Set a launch date and work backwards — your offer doesn't need to be perfect to be sold.",
+    "Create a simple onboarding checklist so delivery is consistent from client one.",
+    "Identify one process you can delegate or automate this month.",
+  ],
+  Unifier: [
+    "Create a direct offer this week — a specific service, price, and outcome for a specific person.",
+    "Follow up with three past contacts this week without waiting for them to reach out.",
+    "Build a simple referral system — ask satisfied clients for one introduction per month.",
+  ],
+  Activator: [
+    "Narrow your current focus to one client type and one offer for the next 90 days.",
+    "Create a weekly team or accountability check-in to align action with priorities.",
+    "Identify one high-value task you are doing that someone else could do — delegate it.",
+  ],
+  Stabilizer: [
+    "Set a public launch date for your current offer — accountability accelerates completion.",
+    "Document your best client result and turn it into a repeatable case study.",
+    "Build a monthly review process — assess what worked, what didn't, and what to improve.",
+  ],
+};
+
+const ROLE_NEXT_MOVE: Record<
+  Role,
+  { fix_first: string; stop_doing: string; start_doing: string; monetization_opportunity: string }
+> = {
+  Spotter: {
+    fix_first: "Narrow your positioning to one specific problem for one specific audience",
+    stop_doing: "Starting new ideas before your current offer has been fully tested and sold",
+    start_doing: "Booking one discovery conversation per week to validate your current offer",
+    monetization_opportunity: "Package your insight into a paid workshop, advisory session, or strategic framework",
+  },
+  Driver: {
+    fix_first: "Create a weekly sales rhythm and protect it from other work",
+    stop_doing: "Waiting for perfect conditions before making offers or following up",
+    start_doing: "Tracking one revenue-driving action every day without exception",
+    monetization_opportunity: "Create a results-based offer with a clear outcome and timeline — clients pay more for certainty",
+  },
+  Preparer: {
+    fix_first: "Set a launch date for your current offer and commit to it publicly",
+    stop_doing: "Adding more structure or features to an offer that hasn't been sold yet",
+    start_doing: "Selling your offer before it's complete — validate first, then build",
+    monetization_opportunity: "Package your process into a group programme or productised service that can run without you",
+  },
+  Unifier: {
+    fix_first: "Write one clear, direct offer and send it to three people this week",
+    stop_doing: "Giving away value through free advice without converting it into a paid engagement",
+    start_doing: "Asking every satisfied client for one introduction or referral",
+    monetization_opportunity: "Build a community, membership, or cohort offer that monetises your ability to bring people together",
+  },
+  Activator: {
+    fix_first: "Define your one target client and one core offer for the next 90 days",
+    stop_doing: "Solving both strategic and operational problems in the same engagement — pick one",
+    start_doing: "Creating a weekly alignment check-in with your clients or team to track execution",
+    monetization_opportunity: "Offer a 90-day alignment or activation programme with a defined outcome and weekly check-ins",
+  },
+  Stabilizer: {
+    fix_first: "Launch your current offer now — improvement happens in the market, not before it",
+    stop_doing: "Refining your offer, content, or systems in private while delaying revenue",
+    start_doing: "Documenting your best client result and using it as social proof immediately",
+    monetization_opportunity: "Build a retainer or subscription offer around ongoing improvement, quality assurance, or system maintenance",
+  },
+};
 
 // Detailed role content
 const ROLE_CONTENT: Record<
@@ -254,7 +499,7 @@ const ENERGY_CONTENT: Record<
     summary:
       "Your primary energy is Shape – the energy of refinement, quality, and precision. You bring rigor and improvement to change.",
     detailed:
-      "Shape energy is about making good things great. People with Shape energy are most alive when systems can be made better – optimising processes, catching errors, and elevating quality. They excel at the final stages of change, when the focus shifts from deployment to refinement. Polish energy ensures that initiatives don’t just work, but work well. Leaders with Polish energy need partners who can help them balance perfectionism with progress.",
+      "Shape energy is about making good things great. People with Shape energy are most alive when systems can be made better – optimising processes, catching errors, and elevating quality. They excel at the final stages of change, when the focus shifts from deployment to refinement. Shape energy ensures that initiatives don’t just work, but work well. Leaders with Shape energy need partners who can help them balance perfectionism with progress.",
     benefits: [
       "Elevates quality and attention to detail",
       "Identifies and corrects errors before they become problems",
@@ -854,6 +1099,18 @@ export function buildNarrative(input: NarrativeInput): Narrative {
   const secondStageGrowth = secondBottom
     ? STAGE_CONTENT[secondBottom]?.growth
     : "";
+  
+  // ── Entrepreneur Application ───────────────────────────────
+  const weakestStage  = bottom_adapts_stages[0];
+  const strongestStage = top_adapts_stages[0];
+
+  const entrepreneur_growth_pattern = ROLE_GROWTH_PATTERN[primary_role];
+  const revenue_leakage_pattern     = STAGE_REVENUE_LEAKAGE[weakestStage];
+  const best_business_focus         = STAGE_BUSINESS_FOCUS[weakestStage];
+  const offer_feedback              = ROLE_OFFER_FEEDBACK[primary_role];
+  const content_direction           = ROLE_CONTENT_DIRECTION[primary_role];
+  const execution_recommendations   = ROLE_EXECUTION[primary_role];
+  const next_best_move              = ROLE_NEXT_MOVE[primary_role];
 
   return {
     executive_summary: `Your Change Genius™ profile reveals that you are a ${role_pair_title} — a ${primary_role} with a strong ${secondary_role} dimension. ${role.summary} Your ${secondary_role} secondary role adds ${ROLE_CONTENT[secondary_role]?.summary.split(".")[0].toLowerCase() || "additional strengths"} to your change leadership approach.`,
@@ -881,6 +1138,14 @@ export function buildNarrative(input: NarrativeInput): Narrative {
     pairing_watchouts: pairing.watchouts,
 
     individual_in_team: role.in_team,
+
+    entrepreneur_growth_pattern,
+    revenue_leakage_pattern,
+    best_business_focus,
+    offer_feedback,
+    content_direction,
+    execution_recommendations,
+    next_best_move,
 
     next_30_days: [
       `Identify one change initiative you're currently involved in and deliberately apply your ${primary_role} strengths to move it forward.`,

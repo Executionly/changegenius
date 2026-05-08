@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
       ) as Record<AdaptsStage, StageDetail>,
     }
 
-  const narrative = buildNarrative(scores.derived)
+  const narrative = buildNarrative({...scores.derived, stage_scores: scores.stage_scores,})
 
   const html = buildIndividualReportHTML({
     fullName:    profile?.full_name ?? null,

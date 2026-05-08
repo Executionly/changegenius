@@ -615,9 +615,9 @@ export function buildIndividualReportHTML(
           </div>
           ${scoreBar(Number(score), color)}
           <div style="display:flex;gap:16px;margin-top:8px">
-            <span style="font-size:11px;color:${C.gray}">Stability: <strong>${detail.stability}</strong></span>
-            <span style="font-size:11px;color:${C.gray}">Integrity: <strong>${detail.integrity}</strong></span>
-            <span style="font-size:11px;color:${detail.risk > 50 ? C.red : C.gray}">Risk: <strong>${detail.risk}</strong></span>
+            <span style="font-size:11px;color:${C.gray}">Stability: <strong>${detail.stability}/100</strong></span>
+            <span style="font-size:11px;color:${C.gray}">Integrity: <strong>${detail.integrity}/100</strong></span>
+            <span style="font-size:11px;color:${detail.risk > 50 ? C.red : C.gray}">Risk: <strong>${detail.risk}/100</strong></span>
           </div>
         </div>`;
         })
@@ -688,8 +688,154 @@ export function buildIndividualReportHTML(
       9,
     ),
   );
+  // ── Page 11: Entrepreneur Application (Part 1) ─────────────
+  const weakestStage = derived.bottom_adapts_stages[0];
+  const strongestStage = derived.top_adapts_stages[0];
 
-  // ── Page 11: What's next ───────────────────────────────────
+  pages.push(
+    page(
+      `
+    <div class="label" style="color:${C.purple};margin-bottom:6px">APPLICATION</div>
+    <h2 style="font-size:28px;margin-bottom:4px">Entrepreneur Application</h2>
+    <p style="font-size:13px;color:${C.gray};margin-bottom:4px;font-style:italic">
+      Turn Your Genius Into a Thriving Business — Clear Offers, Consistent Execution, and Real Income
+    </p>
+    <div class="divider"></div>
+
+    <!-- Section 1: Business Growth Pattern -->
+    <div style="background:${C.navy};border-radius:12px;padding:28px 32px;margin-bottom:20px;color:white">
+      <div class="label" style="color:rgba(255,255,255,0.6);margin-bottom:10px">YOUR BUSINESS GROWTH PATTERN</div>
+      <p style="font-size:14px;color:rgba(255,255,255,0.9);margin:0;line-height:1.7">${narrative.entrepreneur_growth_pattern}</p>
+    </div>
+
+    <!-- Section 2: Revenue Leakage Pattern -->
+    <div style="background:${C.grayLight};border-radius:12px;padding:24px 28px;margin-bottom:20px;border-left:4px solid ${C.red}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div class="label" style="color:${C.red}">REVENUE LEAKAGE PATTERN™</div>
+        <span class="chip" style="background:${C.red}20;color:${C.red};font-size:10px;white-space:nowrap;margin-left:16px">WEAKEST: ${weakestStage}</span>
+      </div>
+      <p style="font-size:14px;margin:0;line-height:1.7">${narrative.revenue_leakage_pattern}</p>
+    </div>
+
+    <!-- Strongest Stage Banner -->
+    <div style="background:${C.grayLight};border-radius:12px;padding:20px 24px;margin-bottom:20px;border-left:4px solid ${C.green};display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div class="label" style="color:${C.green};margin-bottom:6px">YOUR STRONGEST STAGE</div>
+        <p style="font-size:14px;margin:0;line-height:1.7">You are already strong in <strong>${strongestStage}</strong>. Build your offer and content around this — it is where you create the most natural value and credibility.</p>
+      </div>
+      <span class="chip" style="background:${C.green}20;color:${C.green};font-size:10px;white-space:nowrap;margin-left:20px">LEVERAGE THIS</span>
+    </div>
+
+    <!-- Section 3: Best Business Focus + Offer Feedback -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+      <div style="background:${C.grayLight};border-radius:12px;padding:22px;border-left:4px solid ${C.gold}">
+        <div class="label" style="color:${C.gold};margin-bottom:10px">YOUR BEST FOCUS RIGHT NOW</div>
+        <p style="font-size:13px;margin:0;line-height:1.7;margin-bottom:14px">${narrative.best_business_focus}</p>
+        <div style="font-size:12px;color:${C.gray};border-top:1px solid ${C.border};padding-top:10px">
+          Lean into <strong>${strongestStage}</strong> while fixing <strong>${weakestStage}</strong>.
+        </div>
+      </div>
+
+      <div style="background:${C.grayLight};border-radius:12px;padding:22px;border-left:4px solid ${C.purple}">
+        <div class="label" style="color:${C.purple};margin-bottom:10px">OFFER FEEDBACK</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:13px"><span style="color:${C.gray};font-weight:600">Solve: </span>${narrative.offer_feedback.problem}</div>
+          <div style="font-size:13px"><span style="color:${C.gray};font-weight:600">Serve: </span>${narrative.offer_feedback.audience}</div>
+          <div style="font-size:13px"><span style="color:${C.gray};font-weight:600">Promise: </span>${narrative.offer_feedback.outcome}</div>
+          <div style="font-size:13px"><span style="color:${C.gray};font-weight:600">Simplify: </span>${narrative.offer_feedback.simplify}</div>
+          <div style="font-size:13px"><span style="color:${C.red};font-weight:600">Stop: </span>${narrative.offer_feedback.stop}</div>
+        </div>
+      </div>
+
+    </div>
+  `,
+      10,
+    ),
+  );
+
+  // ── Page 12: Entrepreneur Application (Part 2) ─────────────
+  pages.push(
+    page(
+      `
+    <div class="label" style="color:${C.purple};margin-bottom:6px">APPLICATION</div>
+    <h2 style="font-size:28px;margin-bottom:4px">Entrepreneur Application <span style="font-size:16px;font-weight:400;color:${C.gray}">continued</span></h2>
+    <div class="divider"></div>
+
+    <!-- Section 5: Content Direction -->
+    <div style="background:${C.grayLight};border-radius:12px;padding:24px 28px;margin-bottom:20px">
+      <div class="label" style="color:${C.purple};margin-bottom:14px">CONTENT DIRECTION</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <div>
+          <div style="font-size:11px;color:${C.gray};margin-bottom:6px;font-weight:600">STYLE</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:16px;line-height:1.5">${narrative.content_direction.style}</div>
+          <div style="font-size:11px;color:${C.gray};margin-bottom:6px;font-weight:600">FREQUENCY</div>
+          <div style="font-size:13px;margin-bottom:12px">${narrative.content_direction.frequency}</div>
+          <div style="font-size:11px;color:${C.gray};margin-bottom:6px;font-weight:600">CALL TO ACTION</div>
+          <div style="font-size:13px;color:${C.purple};font-weight:600">${narrative.content_direction.cta}</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:${C.gray};margin-bottom:6px;font-weight:600">TOPICS TO COVER</div>
+          <ul class="bullets" style="margin:0 0 14px 0">
+            ${narrative.content_direction.topics.map((t) => `<li style="font-size:13px;margin-bottom:4px">${t}</li>`).join("")}
+          </ul>
+          <div style="font-size:11px;color:${C.gray};margin-bottom:6px;font-weight:600">PAIN POINTS TO ADDRESS</div>
+          <ul class="bullets" style="margin:0">
+            ${narrative.content_direction.pain_points.map((t) => `<li style="font-size:13px;margin-bottom:4px">${t}</li>`).join("")}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 6: Execution Support -->
+    <div style="background:${C.grayLight};border-radius:12px;padding:24px 28px;margin-bottom:20px">
+      <div class="label" style="color:${C.navy};margin-bottom:14px">EXECUTION SUPPORT</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        ${narrative.execution_recommendations
+          .map(
+            (rec, i) => `
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="width:28px;height:28px;border-radius:50%;background:${C.purple};color:white;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i + 1}</div>
+            <p style="font-size:13px;margin:0;line-height:1.7;padding-top:4px">${rec}</p>
+          </div>`,
+          )
+          .join("")}
+      </div>
+    </div>
+
+    <!-- Section 7: Next Best Move -->
+    <div style="background:${C.navy};border-radius:12px;padding:28px 32px;margin-bottom:20px;color:white">
+      <div class="label" style="color:rgba(255,255,255,0.6);margin-bottom:16px">YOUR NEXT BEST MOVE</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:16px">
+          <div style="font-size:11px;color:${C.gold};font-weight:700;letter-spacing:0.08em;margin-bottom:8px">FIX FIRST</div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.9);margin:0;line-height:1.6">${narrative.next_best_move.fix_first}</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:16px">
+          <div style="font-size:11px;color:${C.red};font-weight:700;letter-spacing:0.08em;margin-bottom:8px">STOP DOING</div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.9);margin:0;line-height:1.6">${narrative.next_best_move.stop_doing}</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:16px">
+          <div style="font-size:11px;color:${C.green};font-weight:700;letter-spacing:0.08em;margin-bottom:8px">START DOING</div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.9);margin:0;line-height:1.6">${narrative.next_best_move.start_doing}</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:16px">
+          <div style="font-size:11px;color:${C.purple};font-weight:700;letter-spacing:0.08em;margin-bottom:8px">MONETIZATION OPPORTUNITY</div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.9);margin:0;line-height:1.6">${narrative.next_best_move.monetization_opportunity}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div style="padding:20px 28px;background:${C.grayLight};border-radius:10px;border-top:3px solid ${C.gold};text-align:center">
+      <div style="font-size:15px;font-weight:700;color:${C.navy};margin-bottom:6px">Build from your genius.</div>
+      <p style="font-size:13px;color:${C.gray};margin:0;line-height:1.6">Your Change Genius™ is not just about self-awareness. It is a guide for turning your value into clear offers, consistent execution, and sustainable income.</p>
+    </div>
+  `,
+      11,
+    ),
+  );
+  // ── Page 13: What's next 
   pages.push(
     page(
       `
@@ -737,8 +883,15 @@ export function buildIndividualReportHTML(
       <div style="font-size:24px;font-weight:800;margin-bottom:8px">Ready to see how your team functions together?</div>
       <p style="color:rgba(255,255,255,0.75);margin-bottom:0">Visit changegeniusai.com to build your Team Change Map™</p>
     </div>
+
+    <!-- Email CTA -->
+    <div style="margin-top:20px;text-align:center;padding:24px 32px;background:${C.grayLight};border-radius:12px;border-top:3px solid ${C.gold}">
+      <div style="font-size:13px;color:${C.gray};margin-bottom:8px">Have a question or want to get started?</div>
+      <div style="font-size:16px;font-weight:700;color:${C.navy}">Reach us at</div>
+      <a href="mailto:info@changegeniusai.com" style="display:inline-block;margin-top:8px;font-size:18px;font-weight:800;color:${C.purple};text-decoration:none">info@changegeniusai.com</a>
+    </div>
   `,
-      10,
+      12,
     ),
   );
 
