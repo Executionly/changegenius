@@ -9,7 +9,7 @@ export interface NarrativeInput {
   energy_profile: EnergyProfile;
   top_adapts_stages: AdaptsStage[];
   bottom_adapts_stages: AdaptsStage[];
-  stage_scores: Record<AdaptsStage, number>;
+  stage_scores?: Record<AdaptsStage, number>;
 }
 // Add this mapping function
 const ROLE_NAME_MAP: Record<string, Role> = {
