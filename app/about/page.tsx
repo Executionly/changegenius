@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
-
+import { PRICING, formatPrice, getTeamTotalPrice } from "@/lib/config/pricing";
 export default function AboutPage() {
   const { isAuthenticated } = useAuth();
 
@@ -313,7 +313,9 @@ export default function AboutPage() {
           </div>
           <div className="stat-item">
             <div className="stat-number-container">
-              <span className="stat-number">$24</span>
+              <span className="stat-number">
+                {formatPrice(PRICING.INDIVIDUAL)}
+              </span>
             </div>
             <div className="stat-label">Per Person</div>
             <div className="stat-desc">
@@ -348,7 +350,9 @@ export default function AboutPage() {
           >
             Take The Assessment Now →
           </Link>
-          <div className="cta-price">$24 per license · One-time payment</div>
+          <div className="cta-price">
+            {formatPrice(PRICING.INDIVIDUAL)} per license · One-time payment
+          </div>
         </div>
       </section>
 
