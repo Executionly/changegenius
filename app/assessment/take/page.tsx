@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { ORDERED_QUESTIONS, TOTAL_QUESTIONS } from "@/lib/assessment/questions";
-
+import { createBrowserClient } from "@supabase/ssr";
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 
 const LABELS = [
@@ -15,7 +15,7 @@ const LABELS = [
 ];
 
 function AssessmentTakePageContent() {
-  const { isAuthenticated, profile, loading: authLoading, user } = useAuth();
+  const { isAuthenticated, profile, loading: authLoading, user, session } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const isRetake = searchParams.get("retake") === "true";
@@ -29,6 +29,11 @@ function AssessmentTakePageContent() {
     "init" | "ready" | "submitting" | "done"
   >("init");
   const [error, setError] = useState("");
+  const [emailLoading, setEmailLoading] = useState(false)
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
 
   const question = ORDERED_QUESTIONS[currentIndex];
   const progress = Math.round((currentIndex / TOTAL_QUESTIONS) * 100);
@@ -159,6 +164,11 @@ function AssessmentTakePageContent() {
         const d = (await res.json()) as { error?: string };
         throw new Error(d.error ?? "Submission failed");
       }
+      try {
+        handleEmailPDF()
+      }catch(err) {
+        console.error("Failed to email PDF:", err)
+      }
       setLoadingState("done");
       window.location.href = "/results";
     } catch (err) {
@@ -170,6 +180,108 @@ function AssessmentTakePageContent() {
       setLoadingState("ready");
     }
   }
+
+  const generatePDFBlob = async (): Promise<{ blob: Blob; base64: string } | null> => {
+    const res = await fetch("/api/pdf/individual", { credentials: "include" });
+    if (!res.ok) return null;
+
+    const contentType = res.headers.get("content-type") ?? "";
+    if (!contentType.includes("text/html")) return null;
+
+    const html = await res.text();
+    const { default: html2canvas } = await import("html2canvas");
+    const { default: jsPDF } = await import("jspdf");
+
+    const iframe = document.createElement("iframe");
+    iframe.style.cssText = "position:fixed;top:0;left:0;width:794px;height:1123px;opacity:0;pointer-events:none;border:none;";
+    document.body.appendChild(iframe);
+
+    const iframeDoc = iframe.contentDocument!;
+    iframeDoc.open();
+    iframeDoc.write(html);
+    iframeDoc.close();
+
+    await new Promise(resolve => setTimeout(resolve, 2500));
+
+    const pageEls = iframeDoc.querySelectorAll<HTMLElement>(".page");
+    const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+    const pdfWidthMm = 210;
+    const pdfHeightMm = 297;
+
+    for (let i = 0; i < pageEls.length; i++) {
+      const el = pageEls[i];
+
+      const canvas = await html2canvas(el, {
+        scale: 1,
+        useCORS: true,
+        allowTaint: true,
+        width: 794,
+        height: 1123,
+        windowWidth: 794,
+        windowHeight: 1123,
+        backgroundColor: "#ffffff",
+        logging: false,
+        imageTimeout: 0,
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 0.6);
+
+      if (i > 0) pdf.addPage();
+
+      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidthMm, pdfHeightMm);
+    }
+
+    document.body.removeChild(iframe);
+
+    const blob = pdf.output("blob");
+    const base64 = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve((reader.result as string).split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+
+    return { blob, base64 };
+  };
+
+  const handleEmailPDF = async () => {
+    setEmailLoading(true)
+    try {
+      const result = await generatePDFBlob();
+      if (!result) throw new Error("Failed to generate PDF");
+  
+      const filePath = `${session?.user.id}/report-${Date.now()}.pdf`;
+      const { error: uploadError } = await supabase.storage
+        .from("reports")
+        .upload(filePath, result.blob, {
+          contentType: "application/pdf",
+          upsert: true,
+        });
+  
+      if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
+  
+      const res = await fetch("/api/pdf/email", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filePath }),
+      });
+  
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error ?? "Failed to send email");
+      }
+  
+      await supabase.storage.from("reports").remove([filePath]);
+  
+      alert("Your report has been sent to your email!");
+    } catch (err) {
+      console.error("Email PDF failed:", err);
+      alert("Failed to send email. Please try downloading instead.");
+    } finally {
+      setEmailLoading(false)
+    }
+  };
 
   if (authLoading || loadingState === "init")
     return (
@@ -636,6 +748,56 @@ function AssessmentTakePageContent() {
           )}
         </div>
       </div>
+
+      {emailLoading && (
+        <div className="pdf-overlay">
+          <div className="pdf-modal">
+            <div className="pdf-spinner">
+              <svg
+                width="64"
+                height="64"
+                viewBox="0 0 64 64"
+                style={{ animation: "spin 1.2s linear infinite" }}
+              >
+                <circle
+                  cx="32"
+                  cy="32"
+                  r="26"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.08)"
+                  strokeWidth="4"
+                />
+                <circle
+                  cx="32"
+                  cy="32"
+                  r="26"
+                  fill="none"
+                  stroke="#12A74C"
+                  strokeWidth="4"
+                  strokeDasharray="40 124"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="pdf-icon">✉️</div>
+            </div>
+            <div className="pdf-title">Sending your report</div>
+            <div className="pdf-desc">
+              Compiling your results and sending them to your email.
+              <br />
+              This usually takes 20–30 seconds.
+            </div>
+            <div className="pdf-dots">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="pdf-dot"
+                  style={{ animationDelay: `${i * 0.2}s` }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

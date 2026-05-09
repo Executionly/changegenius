@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
     '@sparticuz/chromium-min',
     'playwright-core',
   ],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb',
+    },
+  },
 };
 
 export default nextConfig;

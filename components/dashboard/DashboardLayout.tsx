@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { signOut } from "@/lib/auth";
 import Sidebar from "./Sidebar";
 
+
 interface DashboardLayoutProps {
   children: ReactNode;
   title: string;
@@ -57,7 +58,7 @@ export default function DashboardLayout({
     alert("Link copied to clipboard");
   };
 
-    const handleDownloadPDF = async () => {
+  const handleDownloadPDF = async () => {
       console.log("handleDownloadPDF called")
       setPdfLoading(true);
       try {
@@ -134,7 +135,7 @@ export default function DashboardLayout({
       } finally {
         setPdfLoading(false);
       }
-    };
+  };
 
   const toggleSidebar = () => {
     if (window.innerWidth <= 768) {
