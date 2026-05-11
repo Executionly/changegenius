@@ -737,8 +737,8 @@ export default function AdminPage() {
               {[
                 "Spotter",
                 "Driver",
-                "Preparer",
-                "Unifier",
+                "Architect",
+                "Connector",
                 "Activator",
                 "Stabilizer",
               ].map((role) => (

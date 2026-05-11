@@ -22,8 +22,8 @@ interface ShareData {
 const ROLE_COLORS: Record<string, string> = {
   Spotter: "#0a2540",
   Driver: "#1557d4",
-  Preparer: "#1a6bfa",
-  Unifier: "#4d8ef8",
+  Architect: "#1a6bfa",
+  Connector: "#4d8ef8",
   Activator: "#93b8fb",
   Stabilizer: "#0d3060",
 };
@@ -156,7 +156,7 @@ function ShareCardInner() {
     secondary: primary_energy, // placeholder – same as dominant
     strain: primary_energy, // placeholder
     depleted: primary_energy, // placeholder
-    scores: { Spark: 0, Drive: 0, Shape: 0, Bond: 0 }, // dummy scores (not used in share card)
+    scores: { Innovator: 0, Achiever: 0, Organizer: 0, Unifier: 0 }, // dummy scores (not used in share card)
   };
 
   const narrativeInput = {

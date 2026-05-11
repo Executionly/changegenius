@@ -10,9 +10,9 @@ import { PRICING, formatPrice, getTeamTotalPrice } from "@/lib/config/pricing";
 // ------------------------------
 const stages = [
   "Alert — The Spotter",
-  "Diagnose — The Analyzer",
-  "Prepare — The Builder",
-  "Align — The Unifier",
+  "Diagnose — The Activator",
+  "Prepare — The Architect",
+  "Align — The Connector",
   "Transform — The Driver",
   "Sustain — The Stabilizer",
 ];
@@ -31,27 +31,27 @@ const stageDetails: Record<
   },
   diagnose: {
     preview: "Breaks problems down to the root cause",
-    title: "Diagnose — The Analyzer",
+    title: "Diagnose — The Activator",
     description:
-      "Breaks problems down to understand what is really going on beneath the surface.",
+      "Represents people who naturally initiate movement, energize action, and help teams move from ideas into momentum.",
     insight:
-      "The Analyzer prevents organizations from solving the wrong problem. They ask harder questions, challenge assumptions, and ensure teams understand what is actually breaking before action begins. They get uncomfortable with guesswork and push for clarity before action.",
+      "The activator focuses on activation, urgency, and driving forward motion.",
   },
   access: {
     preview: "Sets people and systems up for success",
-    title: "Prepare — The Builder",
+    title: "Prepare — The Architect",
     description:
       "Sets people, systems, and structures up so execution can succeed.",
     insight:
-      "The Builder ensures the organization is genuinely prepared before change is deployed. They identify gaps in capability, capacity, and confidence — reducing execution risk. They get frustrated when things start without proper planning and work to ensure everything is ready.",
+      "The Architect ensures the organization is genuinely prepared before change is deployed. They identify gaps in capability, capacity, and confidence — reducing execution risk. They get frustrated when things start without proper planning and work to ensure everything is ready.",
   },
   participate: {
     preview: "Brings people together around a clear direction",
-    title: "Align — The Unifier",
+    title: "Align — The Connector",
     description:
       "Brings people together around a clear direction and builds trust within the team.",
     insight:
-      "The Unifier prevents silent failures. They create environments where it is safe to surface problems early — keeping communication flowing and course-correcting in real time. They feel the tension when people are not on the same page and work to create unity and clarity.",
+      "The Connector prevents silent failures. They create environments where it is safe to surface problems early — keeping communication flowing and course-correcting in real time. They feel the tension when people are not on the same page and work to create unity and clarity.",
   },
   transform: {
     preview: "Turns plans into action and keeps momentum moving",
@@ -73,9 +73,9 @@ const stageDetails: Record<
 
 const energyCards = [
   {
-    title: "Spark",
+    title: "Innovator",
     tagline: "You ignite change.",
-    desc: "You generate ideas, sense disruption early, and energize people toward new possibilities. Spark energy is essential at the start of transformation.",
+    desc: "You generate ideas, sense disruption early, and energize people toward new possibilities. Innovator energy is essential at the start of transformation.",
     chips: [
       "Future-focused",
       "Idea-generating",
@@ -84,9 +84,9 @@ const energyCards = [
     ],
   },
   {
-    title: "Drive",
+    title: "Achiever",
     tagline: "You drive results.",
-    desc: "You convert ideas into action, push initiatives forward, and keep teams moving. Build energy is essential when momentum needs to be created.",
+    desc: "You convert ideas into action, push initiatives forward, and keep teams moving. Achiever energy is essential when momentum needs to be created.",
     chips: [
       "Action-oriented",
       "Results-driven",
@@ -95,9 +95,9 @@ const energyCards = [
     ],
   },
   {
-    title: "Shape",
+    title: "Organizer",
     tagline: "You refine and structure.",
-    desc: "You set up systems, processes, and structures so that change can be sustained. Shape energy is essential when clarity, order, and preparation are needed.",
+    desc: "You set up systems, processes, and structures so that change can be sustained. Organizer energy is essential when clarity, order, and preparation are needed.",
     chips: [
       "Structure-focused",
       "Process-oriented",
@@ -106,9 +106,9 @@ const energyCards = [
     ],
   },
   {
-    title: "Bond",
+    title: "Unifier",
     tagline: "You unify people.",
-    desc: "You build trust, facilitate dialogue, and keep teams connected through disruption. Bond energy is essential when alignment is breaking down.",
+    desc: "You build trust, facilitate dialogue, and keep teams connected through disruption. Unifier energy is essential when alignment is breaking down.",
     chips: [
       "Trust-building",
       "Dialogue-focused",
@@ -130,7 +130,7 @@ const testimonials = [
   },
   {
     quote:
-      "The assessment uncovered my 'Spark' energy. Now my team's productivity is through the roof.",
+      "The assessment uncovered my 'Innovator' energy. Now my team's productivity is through the roof.",
     name: "James Chen",
     role: "VP of Transformation",
     avatar: "https://randomuser.me/api/portraits/men/32.jpg",
@@ -1257,9 +1257,9 @@ export default function HomePage() {
               <div className="tab-pane active">
                 <div className="impact-description">
                   Hire for what people naturally do best. ChangeGenius reveals
-                  productivity energies — Spark, Build, Polish, Bond — so you
-                  can build teams that complement each other, reduce friction,
-                  and close capability gaps before they emerge.
+                  productivity energies — Innovator, Achiever, Organizer,
+                  Unifier — so you can build teams that complement each other,
+                  reduce friction, and close capability gaps before they emerge.
                 </div>
                 <div className="testimonial-block">
                   <div className="quote-icon">“</div>
@@ -1323,9 +1323,9 @@ export default function HomePage() {
               <div className="tab-pane active">
                 <div className="impact-description">
                   Most change fails because teams don't speak the same language.
-                  ChangeGenius introduces a simple, powerful vocabulary — Spark,
-                  Build, Polish, Bond — that everyone can use to name what they
-                  need and where they struggle.
+                  ChangeGenius introduces a simple, powerful vocabulary —
+                  Innovator, Achiever, Organizer, Unifier — that everyone can
+                  use to name what they need and where they struggle.
                 </div>
                 <div className="testimonial-block">
                   <div className="quote-icon">“</div>
@@ -1615,7 +1615,10 @@ export default function HomePage() {
         <div className="resources-grid">
           <div className="resource-card">
             <div className="resource-image">
-              <img src="/FocusOnTeams-Ex1.svgz" alt="All about teams" />
+              <img
+                src="https://www.mckinsey.com/~/media/mckinsey/business%20functions/people%20and%20organizational%20performance/our%20insights/all%20about%20teams%20a%20new%20approach%20to%20organizational%20transformation/focusonteams-ex1.svgz?cq=50&cpy=Center"
+                alt="All about teams"
+              />
             </div>
             <h3 className="resource-title">
               All about teams: A new approach to organizational transformation
@@ -1631,7 +1634,7 @@ export default function HomePage() {
           <div className="resource-card">
             <div className="resource-image">
               <img
-                src="/PerformanceEdgeTransformation_Ex1.svgz"
+                src="https://www.mckinsey.com/~/media/mckinsey/business%20functions/people%20and%20organizational%20performance/our%20insights/how%20to%20capture%20the%20elusive%20performance%20edge%20in%20true%20transformations/performanceedgetransformation_ex1.svgz?cq=50&cpy=Center"
                 alt="How to capture the elusive performance edge"
               />
             </div>
@@ -1644,13 +1647,13 @@ export default function HomePage() {
               className="resource-link"
               target="_blank"
             >
-              Download PDF →
+              Read article →
             </a>
           </div>
           <div className="resource-card">
             <div className="resource-image">
               <img
-                src="/scale.webp"
+                src="https://imageio.forbes.com/specials-images/imageserve/69418a438c33187fc09a977e/Excited-male-and-female-entrepreneurs-celebrating-achievement-sitting-at-desk-in/0x0.jpg?width=960&dpr=1.5"
                 alt="Why You Can't Scale A Business Without Scaling Its Leaders First"
               />
             </div>
@@ -1662,7 +1665,43 @@ export default function HomePage() {
               className="resource-link"
               target="_blank"
             >
-              Explore interactive guide →
+              Read article →
+            </a>
+          </div>
+          <div className="resource-card">
+            <div className="resource-image">
+              <img
+                src="https://hbr.org/resources/images/article_assets/2026/01/Jan26_14_90442277.jpg"
+                alt="What Leaders Get Wrong About Strategic Alignment"
+              />
+            </div>
+            <h3 className="resource-title">
+              What Leaders Get Wrong About Strategic Alignment{" "}
+            </h3>
+            <a
+              href="https://hbr.org/2026/01/what-leaders-get-wrong-about-strategic-alignment"
+              className="resource-link"
+              target="_blank"
+            >
+              Read article →
+            </a>
+          </div>
+          <div className="resource-card">
+            <div className="resource-image">
+              <img
+                src="https://hbr.org/resources/images/article_assets/2024/05/R2404C_EIS-1900x1069.jpg"
+                alt="Build a Corporate Culture That Works"
+              />
+            </div>
+            <h3 className="resource-title">
+              Build a Corporate Culture That Works{" "}
+            </h3>
+            <a
+              href="https://hbr.org/2024/07/build-a-corporate-culture-that-works"
+              className="resource-link"
+              target="_blank"
+            >
+              Read article →
             </a>
           </div>
         </div>
