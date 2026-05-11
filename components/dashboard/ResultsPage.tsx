@@ -11,7 +11,7 @@ interface RoleScores {
   Unifier: number;
   Driver: number;
   Spotter: number;
-  Preparer: number;
+  Architect: number;
 }
 
 interface StageScores {
@@ -24,10 +24,10 @@ interface StageScores {
 }
 
 interface EnergyScores {
-  Bond: number;
-  Drive: number;
-  Spark: number;
-  Shape: number;
+  Unifier: number;
+  Achiever: number;
+  Innovator: number;
+  Organizer: number;
 }
 
 // interface EnergyProfile {
@@ -385,6 +385,7 @@ export default function ResultsPage({
     secondary_role: derived.secondary_role as Role,
     role_pair_title: derived.role_pair_title,
     energy_profile: derived.energy_profile,
+    stage_scores: stageScores as Record<AdaptsStage, number>,
     top_adapts_stages: derived.top_adapts_stages as AdaptsStage[],
     bottom_adapts_stages: derived.bottom_adapts_stages as AdaptsStage[],
   });
