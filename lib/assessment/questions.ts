@@ -858,7 +858,12 @@ export const STAGES: AdaptsStage[] = [
   "Scale and Sustain",
 ];
 
-export const ENERGIES: Energy[] = ["Innovator", "Achiever", "Organizer", "Unifier"];
+export const ENERGIES: Energy[] = [
+  "Innovator",
+  "Achiever",
+  "Organizer",
+  "Unifier",
+];
 
 /** Items per stage broken down by type — useful for weighted scoring */
 export const STAGE_ITEM_COUNTS = {

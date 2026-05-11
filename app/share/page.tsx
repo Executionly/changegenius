@@ -16,6 +16,7 @@ interface ShareData {
     top_adapts_stages: AdaptsStage[];
     bottom_adapts_stages: AdaptsStage[];
   };
+  stage_scores: Record<AdaptsStage, number>;
   profile: { full_name: string | null };
 }
 
@@ -150,7 +151,6 @@ function ShareCardInner() {
   } = data.derived;
   const roleColor = ROLE_COLORS[primary_role] ?? "var(--navy)";
 
-  // Build a valid energy_profile for buildNarrative (API only provides primary_energy)
   const energyProfile = {
     dominant: primary_energy,
     secondary: primary_energy, // placeholder – same as dominant
@@ -164,6 +164,7 @@ function ShareCardInner() {
     secondary_role,
     role_pair_title,
     energy_profile: energyProfile,
+    stage_scores: data.stage_scores,
     top_adapts_stages: top_adapts_stages || [],
     bottom_adapts_stages: bottom_adapts_stages || [],
   };

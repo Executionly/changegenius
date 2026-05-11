@@ -385,6 +385,7 @@ export default function ResultsPage({
     secondary_role: derived.secondary_role as Role,
     role_pair_title: derived.role_pair_title,
     energy_profile: derived.energy_profile,
+    stage_scores: stageScores as Record<AdaptsStage, number>,
     top_adapts_stages: derived.top_adapts_stages as AdaptsStage[],
     bottom_adapts_stages: derived.bottom_adapts_stages as AdaptsStage[],
   });
