@@ -5,7 +5,7 @@ import { z } from "zod";
 
 const schema = z.object({
   assessmentId: z.string().uuid(),
-  teamId: z.string().optional(),
+  teamId: z.string().nullable().optional(),
   questionId: z.string().min(1),
   value: z.number().int().min(1).max(5),
   questionIndex: z.number().int().min(0).max(72),
@@ -21,7 +21,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { assessmentId, questionId, value, questionIndex, teamId } = parsed.data;
+  const { assessmentId, questionId, value, questionIndex, teamId } =
+    parsed.data;
 
   const cookieStore = await cookies();
   const supabase = createServerClient(
@@ -66,7 +67,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if(teamId && assessment.team_id !== teamId) {
+  if (teamId && assessment.team_id !== teamId) {
     return NextResponse.json(
       { error: "Assessment does not belong to the specified team" },
       { status: 403 },

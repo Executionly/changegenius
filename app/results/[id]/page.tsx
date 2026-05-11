@@ -11,8 +11,8 @@ import { formatPrice, PRICING } from "@/lib/config/pricing";
 const ROLE_COLORS: Record<string, string> = {
   Spotter: "#0a2540",
   Driver: "#1557d4",
-  Preparer: "#1a6bfa",
-  Unifier: "#4d8ef8",
+  Architect: "#1a6bfa",
+  Connector: "#4d8ef8",
   Activator: "#0d3060",
   Stabilizer: "#93b8fb",
 };
@@ -27,10 +27,10 @@ const STAGE_COLORS: Record<string, string> = {
 };
 
 const ENERGY_COLORS: Record<string, string> = {
-  Spark: "#0a2540",
-  Build: "#1557d4",
-  Polish: "#1a6bfa",
-  Bond: "#4d8ef8",
+  Innovator: "#0a2540",
+  Achiever: "#1557d4",
+  Organizer: "#1a6bfa",
+  Unifier: "#4d8ef8",
 };
 
 interface PageProps {

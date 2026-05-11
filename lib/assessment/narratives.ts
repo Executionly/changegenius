@@ -13,18 +13,32 @@ export interface NarrativeInput {
 }
 // Add this mapping function
 const ROLE_NAME_MAP: Record<string, Role> = {
+  // Legacy display-name → internal role (old data in DB)
   Innovator: "Spotter",
   Achiever: "Driver",
-  Organizer: "Preparer",
+  Organizer: "Architect",
   Builder: "Activator",
   Refiner: "Stabilizer",
-  Unifier: "Unifier",
+  Unifier: "Connector",
+  // Current role names → pass-through
+  Spotter: "Spotter",
+  Driver: "Driver",
+  Architect: "Architect",
+  Connector: "Connector",
+  Activator: "Activator",
+  Stabilizer: "Stabilizer",
 };
 const ENERGY_NAME_MAP: Record<string, Energy> = {
-  Build: "Drive",
-  Polish: "Shape",
-  Spark: "Spark",
-  Bond: "Bond",
+  // Legacy energy names → new names (old data in DB)
+  Spark: "Innovator",
+  Drive: "Achiever",
+  Shape: "Organizer",
+  Bond: "Unifier",
+  // Current energy names → pass-through
+  Innovator: "Innovator",
+  Achiever: "Achiever",
+  Organizer: "Organizer",
+  Unifier: "Unifier",
 };
 export interface Narrative {
   // Cover / executive summary
@@ -102,9 +116,9 @@ const ROLE_GROWTH_PATTERN: Record<Role, string> = {
     "You create value best when you are working at the edges of what is known — spotting emerging opportunities, reframing problems, and generating ideas that others haven't seen yet. Your business grows when your offer is anchored to a real insight, and when you have execution support around you. Revenue slows when you chase too many ideas, position too broadly, or rely on inspiration rather than a repeatable system.",
   Driver:
     "You create value best when you are moving — executing, delivering, and making tangible progress. Your business grows when you have a clear offer, a defined audience, and a consistent sales rhythm. Revenue slows when you are stuck in planning, unclear on your message, or spending energy on work that doesn't directly drive income.",
-  Preparer:
+  Architect:
     "You create value best when there is structure — a clear process, a defined offer, and a reliable delivery system. Your business grows when you package your knowledge into a repeatable, scalable offer. Revenue slows when you over-prepare without launching, or when your systems are so complex that only you can run them.",
-  Unifier:
+  Connector:
     "You create value best through relationships — trust, community, and connection. Your business grows through word of mouth, partnerships, and audiences that feel personally served by you. Revenue slows when you avoid direct offers, undercharge out of relationship sensitivity, or fail to convert goodwill into income.",
   Activator:
     "You create value best when you are translating strategy into action — aligning people, resources, and execution toward a clear outcome. Your business grows when your offer solves a specific operational or strategic problem for a defined client. Revenue slows when your positioning is too broad, your offer too complex, or your delivery inconsistent.",
@@ -144,95 +158,188 @@ const STAGE_BUSINESS_FOCUS: Record<AdaptsStage, string> = {
 
 const ROLE_OFFER_FEEDBACK: Record<
   Role,
-  { problem: string; audience: string; outcome: string; simplify: string; stop: string }
+  {
+    problem: string;
+    audience: string;
+    outcome: string;
+    simplify: string;
+    stop: string;
+  }
 > = {
   Spotter: {
-    problem: "A problem that requires fresh thinking, trend awareness, or strategic reframing",
-    audience: "Leaders or entrepreneurs who feel stuck in outdated thinking or missing the next opportunity",
-    outcome: "A new direction, strategy, or framework that gives them clarity on where to move next",
-    simplify: "Remove every deliverable that isn't directly tied to insight or strategic clarity",
+    problem:
+      "A problem that requires fresh thinking, trend awareness, or strategic reframing",
+    audience:
+      "Leaders or entrepreneurs who feel stuck in outdated thinking or missing the next opportunity",
+    outcome:
+      "A new direction, strategy, or framework that gives them clarity on where to move next",
+    simplify:
+      "Remove every deliverable that isn't directly tied to insight or strategic clarity",
     stop: "Selling broad consulting or general advisory without a specific, named outcome",
   },
   Driver: {
-    problem: "A problem that requires faster execution, more accountability, or better results",
-    audience: "Founders or professionals who know what to do but struggle to do it consistently",
-    outcome: "Measurable progress on a specific goal within a defined timeframe",
-    simplify: "Remove any deliverable that doesn't directly drive action or accountability",
+    problem:
+      "A problem that requires faster execution, more accountability, or better results",
+    audience:
+      "Founders or professionals who know what to do but struggle to do it consistently",
+    outcome:
+      "Measurable progress on a specific goal within a defined timeframe",
+    simplify:
+      "Remove any deliverable that doesn't directly drive action or accountability",
     stop: "Taking on clients who aren't ready to execute — they will drain your energy",
   },
-  Preparer: {
-    problem: "A problem that requires better structure, clearer process, or more reliable systems",
-    audience: "Entrepreneurs or teams who are doing good work but losing time, money, or clients to disorganisation",
-    outcome: "A system, process, or framework they can use repeatedly without reinventing it",
-    simplify: "Package your process into a fixed-scope offer rather than open-ended consulting",
+  Architect: {
+    problem:
+      "A problem that requires better structure, clearer process, or more reliable systems",
+    audience:
+      "Entrepreneurs or teams who are doing good work but losing time, money, or clients to disorganisation",
+    outcome:
+      "A system, process, or framework they can use repeatedly without reinventing it",
+    simplify:
+      "Package your process into a fixed-scope offer rather than open-ended consulting",
     stop: "Custom work that can't be replicated — it limits your revenue ceiling",
   },
-  Unifier: {
-    problem: "A problem rooted in disconnection — team conflict, low trust, unclear culture, or weak client relationships",
-    audience: "Leaders, teams, or communities that want deeper connection, alignment, or trust",
-    outcome: "A stronger relationship, culture, or community that people actively choose to stay in",
-    simplify: "Remove any deliverable that doesn't directly build connection or trust",
+  Connector: {
+    problem:
+      "A problem rooted in disconnection — team conflict, low trust, unclear culture, or weak client relationships",
+    audience:
+      "Leaders, teams, or communities that want deeper connection, alignment, or trust",
+    outcome:
+      "A stronger relationship, culture, or community that people actively choose to stay in",
+    simplify:
+      "Remove any deliverable that doesn't directly build connection or trust",
     stop: "Undercharging for relational work — connection is hard to build and highly valuable",
   },
   Activator: {
-    problem: "A problem that requires better alignment between strategy and execution",
-    audience: "Founders or leaders whose teams are busy but not moving in the right direction",
-    outcome: "Clear roles, aligned priorities, and a team that executes with purpose",
-    simplify: "Narrow your offer to one specific alignment or activation outcome",
+    problem:
+      "A problem that requires better alignment between strategy and execution",
+    audience:
+      "Founders or leaders whose teams are busy but not moving in the right direction",
+    outcome:
+      "Clear roles, aligned priorities, and a team that executes with purpose",
+    simplify:
+      "Narrow your offer to one specific alignment or activation outcome",
     stop: "Trying to solve both strategic and operational problems in the same engagement",
   },
   Stabilizer: {
-    problem: "A problem that requires better systems, higher quality, or more consistent results",
-    audience: "Entrepreneurs or teams who are inconsistent, prone to rework, or unable to scale without chaos",
-    outcome: "A reliable system, improved process, or measurably better outcome they can sustain",
-    simplify: "Launch a done version before the perfect version — your first offer doesn't need to be final",
+    problem:
+      "A problem that requires better systems, higher quality, or more consistent results",
+    audience:
+      "Entrepreneurs or teams who are inconsistent, prone to rework, or unable to scale without chaos",
+    outcome:
+      "A reliable system, improved process, or measurably better outcome they can sustain",
+    simplify:
+      "Launch a done version before the perfect version — your first offer doesn't need to be final",
     stop: "Delaying your offer while you refine it — launch, learn, and improve in the market",
   },
 };
 
 const ROLE_CONTENT_DIRECTION: Record<
   Role,
-  { style: string; topics: string[]; pain_points: string[]; frequency: string; cta: string }
+  {
+    style: string;
+    topics: string[];
+    pain_points: string[];
+    frequency: string;
+    cta: string;
+  }
 > = {
   Spotter: {
-    style: "Insight-led and forward-looking — share what others haven't seen yet",
-    topics: ["Emerging trends in your industry", "Reframes of common assumptions", "Strategic questions worth asking"],
-    pain_points: ["Feeling stuck in outdated thinking", "Missing the next opportunity", "Unclear on where the market is moving"],
+    style:
+      "Insight-led and forward-looking — share what others haven't seen yet",
+    topics: [
+      "Emerging trends in your industry",
+      "Reframes of common assumptions",
+      "Strategic questions worth asking",
+    ],
+    pain_points: [
+      "Feeling stuck in outdated thinking",
+      "Missing the next opportunity",
+      "Unclear on where the market is moving",
+    ],
     frequency: "3x per week — prioritise depth over volume",
     cta: "Book a strategy session or download a framework",
   },
   Driver: {
-    style: "Action-oriented and results-focused — share what works and what you've built",
-    topics: ["Execution case studies", "Practical action steps", "How you overcame specific obstacles"],
-    pain_points: ["Inconsistent execution", "Slow progress", "Getting stuck in planning"],
-    frequency: "Daily or 5x per week — volume and consistency are your advantage",
+    style:
+      "Action-oriented and results-focused — share what works and what you've built",
+    topics: [
+      "Execution case studies",
+      "Practical action steps",
+      "How you overcame specific obstacles",
+    ],
+    pain_points: [
+      "Inconsistent execution",
+      "Slow progress",
+      "Getting stuck in planning",
+    ],
+    frequency:
+      "Daily or 5x per week — volume and consistency are your advantage",
     cta: "Join an accountability programme or book a results audit",
   },
-  Preparer: {
-    style: "Structured and educational — share frameworks, checklists, and processes",
-    topics: ["Step-by-step guides", "Systems and templates", "How to avoid common execution mistakes"],
-    pain_points: ["Chaotic workflows", "Repeated mistakes", "Wasted time on disorganised work"],
+  Architect: {
+    style:
+      "Structured and educational — share frameworks, checklists, and processes",
+    topics: [
+      "Step-by-step guides",
+      "Systems and templates",
+      "How to avoid common execution mistakes",
+    ],
+    pain_points: [
+      "Chaotic workflows",
+      "Repeated mistakes",
+      "Wasted time on disorganised work",
+    ],
     frequency: "3x per week — prioritise practical, repeatable content",
     cta: "Download a template or book a systems audit",
   },
-  Unifier: {
-    style: "Relational and empathetic — share stories, lessons, and human insight",
-    topics: ["Community and belonging", "Trust and relationships in business", "Stories of connection and collaboration"],
-    pain_points: ["Feeling isolated in business", "Team conflict or low trust", "Disconnected from clients or community"],
-    frequency: "3–4x per week — focus on conversation and engagement over broadcast",
+  Connector: {
+    style:
+      "Relational and empathetic — share stories, lessons, and human insight",
+    topics: [
+      "Community and belonging",
+      "Trust and relationships in business",
+      "Stories of connection and collaboration",
+    ],
+    pain_points: [
+      "Feeling isolated in business",
+      "Team conflict or low trust",
+      "Disconnected from clients or community",
+    ],
+    frequency:
+      "3–4x per week — focus on conversation and engagement over broadcast",
     cta: "Join the community or book a trust-building session",
   },
   Activator: {
-    style: "Strategic and operational — share how to connect big thinking to daily work",
-    topics: ["Aligning strategy to execution", "Role clarity and team focus", "Turning decisions into action"],
-    pain_points: ["Strategy that never gets executed", "Teams that are busy but not effective", "Misalignment between vision and reality"],
-    frequency: "3x per week — prioritise strategic depth and practical application",
+    style:
+      "Strategic and operational — share how to connect big thinking to daily work",
+    topics: [
+      "Aligning strategy to execution",
+      "Role clarity and team focus",
+      "Turning decisions into action",
+    ],
+    pain_points: [
+      "Strategy that never gets executed",
+      "Teams that are busy but not effective",
+      "Misalignment between vision and reality",
+    ],
+    frequency:
+      "3x per week — prioritise strategic depth and practical application",
     cta: "Book an alignment session or download a strategic planning tool",
   },
   Stabilizer: {
-    style: "Evidence-based and improvement-focused — share what gets better results over time",
-    topics: ["Systems for consistency", "How to improve without starting over", "Long-term quality and retention"],
-    pain_points: ["Inconsistent results", "Repeated mistakes", "Losing clients after good starts"],
+    style:
+      "Evidence-based and improvement-focused — share what gets better results over time",
+    topics: [
+      "Systems for consistency",
+      "How to improve without starting over",
+      "Long-term quality and retention",
+    ],
+    pain_points: [
+      "Inconsistent results",
+      "Repeated mistakes",
+      "Losing clients after good starts",
+    ],
     frequency: "3x per week — prioritise depth and credibility over volume",
     cta: "Book a systems review or download a retention framework",
   },
@@ -241,7 +348,7 @@ const ROLE_CONTENT_DIRECTION: Record<
 const ROLE_EXECUTION: Record<Role, string[]> = {
   Spotter: [
     "Choose one idea per quarter and execute it fully before starting the next.",
-    "Partner with a Driver or Preparer who can carry your ideas into consistent action.",
+    "Partner with a Driver or Architect who can carry your ideas into consistent action.",
     "Set a weekly output goal — one piece of content, one offer conversation, one follow-up.",
   ],
   Driver: [
@@ -249,12 +356,12 @@ const ROLE_EXECUTION: Record<Role, string[]> = {
     "Track one revenue-driving action daily and review your streak every Friday.",
     "Block two hours each week for strategic thinking — not just execution.",
   ],
-  Preparer: [
+  Architect: [
     "Set a launch date and work backwards — your offer doesn't need to be perfect to be sold.",
     "Create a simple onboarding checklist so delivery is consistent from client one.",
     "Identify one process you can delegate or automate this month.",
   ],
-  Unifier: [
+  Connector: [
     "Create a direct offer this week — a specific service, price, and outcome for a specific person.",
     "Follow up with three past contacts this week without waiting for them to reach out.",
     "Build a simple referral system — ask satisfied clients for one introduction per month.",
@@ -273,43 +380,71 @@ const ROLE_EXECUTION: Record<Role, string[]> = {
 
 const ROLE_NEXT_MOVE: Record<
   Role,
-  { fix_first: string; stop_doing: string; start_doing: string; monetization_opportunity: string }
+  {
+    fix_first: string;
+    stop_doing: string;
+    start_doing: string;
+    monetization_opportunity: string;
+  }
 > = {
   Spotter: {
-    fix_first: "Narrow your positioning to one specific problem for one specific audience",
-    stop_doing: "Starting new ideas before your current offer has been fully tested and sold",
-    start_doing: "Booking one discovery conversation per week to validate your current offer",
-    monetization_opportunity: "Package your insight into a paid workshop, advisory session, or strategic framework",
+    fix_first:
+      "Narrow your positioning to one specific problem for one specific audience",
+    stop_doing:
+      "Starting new ideas before your current offer has been fully tested and sold",
+    start_doing:
+      "Booking one discovery conversation per week to validate your current offer",
+    monetization_opportunity:
+      "Package your insight into a paid workshop, advisory session, or strategic framework",
   },
   Driver: {
     fix_first: "Create a weekly sales rhythm and protect it from other work",
-    stop_doing: "Waiting for perfect conditions before making offers or following up",
-    start_doing: "Tracking one revenue-driving action every day without exception",
-    monetization_opportunity: "Create a results-based offer with a clear outcome and timeline — clients pay more for certainty",
+    stop_doing:
+      "Waiting for perfect conditions before making offers or following up",
+    start_doing:
+      "Tracking one revenue-driving action every day without exception",
+    monetization_opportunity:
+      "Create a results-based offer with a clear outcome and timeline — clients pay more for certainty",
   },
-  Preparer: {
-    fix_first: "Set a launch date for your current offer and commit to it publicly",
-    stop_doing: "Adding more structure or features to an offer that hasn't been sold yet",
-    start_doing: "Selling your offer before it's complete — validate first, then build",
-    monetization_opportunity: "Package your process into a group programme or productised service that can run without you",
+  Architect: {
+    fix_first:
+      "Set a launch date for your current offer and commit to it publicly",
+    stop_doing:
+      "Adding more structure or features to an offer that hasn't been sold yet",
+    start_doing:
+      "Selling your offer before it's complete — validate first, then build",
+    monetization_opportunity:
+      "Package your process into a group programme or productised service that can run without you",
   },
-  Unifier: {
-    fix_first: "Write one clear, direct offer and send it to three people this week",
-    stop_doing: "Giving away value through free advice without converting it into a paid engagement",
-    start_doing: "Asking every satisfied client for one introduction or referral",
-    monetization_opportunity: "Build a community, membership, or cohort offer that monetises your ability to bring people together",
+  Connector: {
+    fix_first:
+      "Write one clear, direct offer and send it to three people this week",
+    stop_doing:
+      "Giving away value through free advice without converting it into a paid engagement",
+    start_doing:
+      "Asking every satisfied client for one introduction or referral",
+    monetization_opportunity:
+      "Build a community, membership, or cohort offer that monetises your ability to bring people together",
   },
   Activator: {
-    fix_first: "Define your one target client and one core offer for the next 90 days",
-    stop_doing: "Solving both strategic and operational problems in the same engagement — pick one",
-    start_doing: "Creating a weekly alignment check-in with your clients or team to track execution",
-    monetization_opportunity: "Offer a 90-day alignment or activation programme with a defined outcome and weekly check-ins",
+    fix_first:
+      "Define your one target client and one core offer for the next 90 days",
+    stop_doing:
+      "Solving both strategic and operational problems in the same engagement — pick one",
+    start_doing:
+      "Creating a weekly alignment check-in with your clients or team to track execution",
+    monetization_opportunity:
+      "Offer a 90-day alignment or activation programme with a defined outcome and weekly check-ins",
   },
   Stabilizer: {
-    fix_first: "Launch your current offer now — improvement happens in the market, not before it",
-    stop_doing: "Refining your offer, content, or systems in private while delaying revenue",
-    start_doing: "Documenting your best client result and using it as social proof immediately",
-    monetization_opportunity: "Build a retainer or subscription offer around ongoing improvement, quality assurance, or system maintenance",
+    fix_first:
+      "Launch your current offer now — improvement happens in the market, not before it",
+    stop_doing:
+      "Refining your offer, content, or systems in private while delaying revenue",
+    start_doing:
+      "Documenting your best client result and using it as social proof immediately",
+    monetization_opportunity:
+      "Build a retainer or subscription offer around ongoing improvement, quality assurance, or system maintenance",
   },
 };
 
@@ -365,8 +500,8 @@ const ROLE_CONTENT: Record<
     in_team:
       "In a team context, you are the engine. Teams need you when momentum is at risk or deadlines are being missed. Your urgency is valuable – but ensure your pace doesn't leave key voices behind.",
   },
-  Preparer: {
-    name: "Preparer",
+  Architect: {
+    name: "Architect",
     summary:
       "You create the structure that makes change possible. Your strongest contribution is ensuring that good ideas don't collapse in execution.",
     detailed:
@@ -385,8 +520,8 @@ const ROLE_CONTENT: Record<
     in_team:
       "In a team context, you are the architect of execution. Teams need you to translate ambition into workable plans. Your structure prevents chaos – but ensure the plan stays flexible enough to adapt.",
   },
-  Unifier: {
-    name: "Unifier",
+  Connector: {
+    name: "Connector",
     summary:
       "You build the trust that change requires. Your strongest contribution is keeping people connected during disruption.",
     detailed:
@@ -410,7 +545,7 @@ const ROLE_CONTENT: Record<
     summary:
       "You connect strategy to execution. Your strongest contribution is ensuring that decisions translate into operational reality.",
     detailed:
-      "The Genius of Building involves bridging the gap between high‑level strategy and day‑to‑day operations. People with this gift derive real joy and energy from aligning resources, defining roles, and ensuring that everyone understands how their work contributes to the bigger picture. They are naturally skilled at translating abstract goals into concrete actions. Builders are the linchpin that prevents strategic drift.",
+      "The Activator Genius involves bridging the gap between high‑level strategy and day‑to‑day operations. People with this gift derive real joy and energy from aligning resources, defining roles, and ensuring that everyone understands how their work contributes to the bigger picture. They are naturally skilled at translating abstract goals into concrete actions. Activators are the linchpin that prevents strategic drift.",
     benefits: [
       "Aligns team work with organisational priorities",
       "Clarifies roles and responsibilities",
@@ -430,7 +565,7 @@ const ROLE_CONTENT: Record<
     summary:
       "You make change last. Your strongest contribution is continuous improvement – learning from what happened and strengthening what works.",
     detailed:
-      "The Genius of Refinement is about sustaining and improving systems over time. People with this gift derive real joy and energy from analysing outcomes, capturing lessons learned, and making incremental improvements. They are naturally skilled at identifying what’s working, what’s not, and what could be better. Refiners ensure that change initiatives don’t just succeed once but become embedded in the organisation’s DNA.",
+      "The Stabilizer Genius is about sustaining and improving systems over time. People with this gift derive real joy and energy from analysing outcomes, capturing lessons learned, and making incremental improvements. They are naturally skilled at identifying what’s working, what’s not, and what could be better. Stabilizers ensure that change initiatives don’t just succeed once but become embedded in the organisation’s DNA.",
     benefits: [
       "Captures and institutionalises learning",
       "Prevents repeated mistakes",
@@ -458,12 +593,12 @@ const ENERGY_CONTENT: Record<
     watchouts: string[];
   }
 > = {
-  Spark: {
-    name: "Spark",
+  Innovator: {
+    name: "Innovator",
     summary:
-      "Your primary energy is Spark – the energy of initiation, creativity, and disruption. You bring excitement and possibility to change.",
+      "Your primary energy is Innovator – the energy of initiation, creativity, and disruption. You bring excitement and possibility to change.",
     detailed:
-      "Spark energy is about generating heat and light at the beginning of a change journey. People with Spark energy are most alive when something new is being born – a strategy, a project, a movement. They excel at creating urgency, painting compelling visions, and rallying people around a fresh direction. However, Spark energy naturally diminishes as the work becomes more routine. Leaders with Spark energy need partners who can carry the flame forward after the initial ignition.",
+      "Innovator energy is about generating heat and light at the beginning of a change journey. People with Innovator energy are most alive when something new is being born – a strategy, a project, a movement. They excel at creating urgency, painting compelling visions, and rallying people around a fresh direction. However, Innovator energy naturally diminishes as the work becomes more routine. Leaders with Innovator energy need partners who can carry the flame forward after the initial ignition.",
     benefits: [
       "Creates urgency and excitement around change",
       "Generates innovative ideas and fresh perspectives",
@@ -476,12 +611,12 @@ const ENERGY_CONTENT: Record<
       "Risk of burning out without sustained support",
     ],
   },
-  Drive: {
-    name: "Drive",
+  Achiever: {
+    name: "Achiever",
     summary:
-      "Your primary energy is Build – the energy of construction, progress, and momentum. You bring drive and discipline to change.",
+      "Your primary energy is Achiever – the energy of construction, progress, and momentum. You bring drive and discipline to change.",
     detailed:
-      "Build energy is about turning vision into reality. People with Build energy are most alive when tangible progress is being made – checking off tasks, hitting milestones, and moving initiatives forward. They excel at converting plans into action, overcoming obstacles, and maintaining momentum. Build energy is essential during the middle stages of change, when the initial excitement has faded but results are not yet visible. Leaders with Build energy need partners who can help them see the bigger picture and avoid burnout.",
+      "Achiever energy is about turning vision into reality. People with Achiever energy are most alive when tangible progress is being made – checking off tasks, hitting milestones, and moving initiatives forward. They excel at converting plans into action, overcoming obstacles, and maintaining momentum. Achiever energy is essential during the middle stages of change, when the initial excitement has faded but results are not yet visible. Leaders with Achiever energy need partners who can help them see the bigger picture and avoid burnout.",
     benefits: [
       "Drives consistent progress toward goals",
       "Overcomes obstacles and resistance",
@@ -494,12 +629,12 @@ const ENERGY_CONTENT: Record<
       "Risk of burnout from constant forward motion",
     ],
   },
-  Shape: {
-    name: "Shape",
+  Organizer: {
+    name: "Organizer",
     summary:
-      "Your primary energy is Shape – the energy of refinement, quality, and precision. You bring rigor and improvement to change.",
+      "Your primary energy is Organizer – the energy of refinement, quality, and precision. You bring rigor and improvement to change.",
     detailed:
-      "Shape energy is about making good things great. People with Shape energy are most alive when systems can be made better – optimising processes, catching errors, and elevating quality. They excel at the final stages of change, when the focus shifts from deployment to refinement. Shape energy ensures that initiatives don’t just work, but work well. Leaders with Shape energy need partners who can help them balance perfectionism with progress.",
+      "Organizer energy is about making good things great. People with Organizer energy are most alive when systems can be made better – optimising processes, catching errors, and elevating quality. They excel at the final stages of change, when the focus shifts from deployment to refinement. Organizer energy ensures that initiatives don’t just work, but work well. Leaders with Organizer energy need partners who can help them balance perfectionism with progress.",
     benefits: [
       "Elevates quality and attention to detail",
       "Identifies and corrects errors before they become problems",
@@ -512,12 +647,12 @@ const ENERGY_CONTENT: Record<
       "Risk of slowing momentum with excessive refinement",
     ],
   },
-  Bond: {
-    name: "Bond",
+  Unifier: {
+    name: "Unifier",
     summary:
-      "Your primary energy is Bond – the energy of connection, trust, and collaboration. You bring relational intelligence to change.",
+      "Your primary energy is Unifier – the energy of connection, trust, and collaboration. You bring relational intelligence to change.",
     detailed:
-      "Bond energy is about keeping people connected during disruption. People with Bond energy are most alive when teams are unified – facilitating dialogue, building trust, and resolving conflict. They excel at the human side of change, ensuring that no one is left behind. Bond energy is essential when alignment is breaking down or resistance is rising. Leaders with Bond energy need partners who can help them make tough decisions and maintain momentum.",
+      "Unifier energy is about keeping people connected during disruption. People with Unifier energy are most alive when teams are unified – facilitating dialogue, building trust, and resolving conflict. They excel at the human side of change, ensuring that no one is left behind. Unifier energy is essential when alignment is breaking down or resistance is rising. Leaders with Unifier energy need partners who can help them make tough decisions and maintain momentum.",
     benefits: [
       "Builds trust and psychological safety",
       "Surfaces and resolves conflict early",
@@ -601,7 +736,7 @@ const PAIRING_CONTENT: Record<
       "Risk of burnout from constant high intensity",
     ],
   },
-  "Spotter+Preparer": {
+  "Spotter+Architect": {
     name: "The Strategic Architect",
     description:
       "A rare combination of creative vision and structural discipline. You not only imagine what could be – you design the blueprint to get there. You excel at translating abstract ideas into actionable plans.",
@@ -616,7 +751,7 @@ const PAIRING_CONTENT: Record<
       "Risk of analysis paralysis",
     ],
   },
-  "Spotter+Unifier": {
+  "Spotter+Connector": {
     name: "The Empathetic Visionary",
     description:
       "A compelling combination of future-thinking and people-centeredness. You not only see where the world needs to go – you bring people along on the journey. You excel at creating change that people actually want.",
@@ -676,7 +811,7 @@ const PAIRING_CONTENT: Record<
       "Risk of losing focus on long-term goals",
     ],
   },
-  "Driver+Preparer": {
+  "Driver+Architect": {
     name: "The Execution Specialist",
     description:
       "A formidable combination of drive and discipline. You not only push for results – you structure the path to get there. You excel at turning plans into completed projects on time and on budget.",
@@ -691,7 +826,7 @@ const PAIRING_CONTENT: Record<
       "Risk of burnout from constant pressure",
     ],
   },
-  "Driver+Unifier": {
+  "Driver+Connector": {
     name: "The People-Driven Leader",
     description:
       "A compelling combination of results and relationships. You not only drive progress – you bring people with you. You excel at achieving ambitious goals while building trust and engagement.",
@@ -736,7 +871,7 @@ const PAIRING_CONTENT: Record<
       "Risk of burnout from never being satisfied",
     ],
   },
-  "Preparer+Spotter": {
+  "Architect+Spotter": {
     name: "The Structured Strategist",
     description:
       "A rare combination of discipline and creativity. You not only create structure – you know when to break it. You excel at building systems that enable, not constrain, innovation.",
@@ -751,7 +886,7 @@ const PAIRING_CONTENT: Record<
       "Risk of analysis paralysis",
     ],
   },
-  "Preparer+Driver": {
+  "Architect+Driver": {
     name: "The Delivery Architect",
     description:
       "A formidable combination of planning and execution. You not only design the path – you walk it. You excel at delivering complex initiatives with precision and pace.",
@@ -766,8 +901,8 @@ const PAIRING_CONTENT: Record<
       "Risk of burnout from constant delivery pressure",
     ],
   },
-  "Preparer+Unifier": {
-    name: "The Systems Unifier",
+  "Architect+Connector": {
+    name: "The Systems Connector",
     description:
       "A powerful combination of structure and connection. You not only design systems – you ensure people can thrive within them. You excel at creating processes that build trust, not bureaucracy.",
     benefits: [
@@ -781,7 +916,7 @@ const PAIRING_CONTENT: Record<
       "Risk of being seen as process-heavy",
     ],
   },
-  "Preparer+Activator": {
+  "Architect+Activator": {
     name: "The Master Planner",
     description:
       "A rare combination of structure and alignment. You not only plan – you ensure plans connect to reality. You excel at creating roadmaps that actually get followed.",
@@ -796,7 +931,7 @@ const PAIRING_CONTENT: Record<
       "Risk of over-planning at expense of speed",
     ],
   },
-  "Preparer+Stabilizer": {
+  "Architect+Stabilizer": {
     name: "The Precision Operator",
     description:
       "A unique combination of structure and improvement. You not only create order – you make that order better over time. You excel at building systems that continuously improve.",
@@ -811,7 +946,7 @@ const PAIRING_CONTENT: Record<
       "Risk of perfectionism blocking progress",
     ],
   },
-  "Unifier+Spotter": {
+  "Connector+Spotter": {
     name: "The Empathetic Visionary",
     description:
       "A compelling combination of connection and creativity. You not only bring people together – you imagine where they could go. You excel at creating change that people actually want.",
@@ -826,7 +961,7 @@ const PAIRING_CONTENT: Record<
       "Risk of being seen as overly idealistic",
     ],
   },
-  "Unifier+Driver": {
+  "Connector+Driver": {
     name: "The Relationship Driver",
     description:
       "A powerful combination of connection and momentum. You not only build trust – you get things done. You excel at achieving results while keeping teams engaged.",
@@ -841,8 +976,8 @@ const PAIRING_CONTENT: Record<
       "Risk of spreading focus too thin",
     ],
   },
-  "Unifier+Preparer": {
-    name: "The Collaborative Preparer",
+  "Connector+Architect": {
+    name: "The Collaborative Architect",
     description:
       "A rare combination of connection and structure. You not only bring people together – you create systems that help them work better together. You excel at designing collaborative processes.",
     benefits: [
@@ -856,7 +991,7 @@ const PAIRING_CONTENT: Record<
       "Risk of being seen as process-heavy",
     ],
   },
-  "Unifier+Activator": {
+  "Connector+Activator": {
     name: "The Trust Builder",
     description:
       "A powerful combination of connection and alignment. You not only build relationships – you ensure those relationships serve a purpose. You excel at creating aligned, trusting teams.",
@@ -871,7 +1006,7 @@ const PAIRING_CONTENT: Record<
       "Risk of being pulled in too many directions",
     ],
   },
-  "Unifier+Stabilizer": {
+  "Connector+Stabilizer": {
     name: "The Inclusive Improver",
     description:
       "A unique combination of connection and improvement. You not only bring people together – you make things better for everyone. You excel at creating inclusive systems that continuously improve.",
@@ -916,7 +1051,7 @@ const PAIRING_CONTENT: Record<
       "Risk of over-indexing on alignment at expense of speed",
     ],
   },
-  "Activator+Preparer": {
+  "Activator+Architect": {
     name: "The Systems Architect",
     description:
       "A rare combination of alignment and structure. You not only connect strategy to action – you design the systems that make it happen. You excel at creating aligned, executable plans.",
@@ -931,7 +1066,7 @@ const PAIRING_CONTENT: Record<
       "Risk of over-planning at expense of speed",
     ],
   },
-  "Activator+Unifier": {
+  "Activator+Connector": {
     name: "The Alignment Champion",
     description:
       "A powerful combination of alignment and connection. You not only connect work to purpose – you bring people along. You excel at creating aligned, trusting teams that execute effectively.",
@@ -991,7 +1126,7 @@ const PAIRING_CONTENT: Record<
       "Risk of burnout from never being satisfied",
     ],
   },
-  "Stabilizer+Preparer": {
+  "Stabilizer+Architect": {
     name: "The Systems Perfectionist",
     description:
       "A rare combination of improvement and structure. You not only make things better – you systematise that improvement. You excel at building self-improving systems.",
@@ -1006,7 +1141,7 @@ const PAIRING_CONTENT: Record<
       "Risk of perfectionism blocking progress",
     ],
   },
-  "Stabilizer+Unifier": {
+  "Stabilizer+Connector": {
     name: "The Culture Steward",
     description:
       "A powerful combination of improvement and connection. You not only make things better – you make them better for everyone. You excel at creating inclusive, continuously improving cultures.",
@@ -1068,8 +1203,9 @@ export function buildNarrative(input: NarrativeInput): Narrative {
     ...input.energy_profile,
     dominant: mappedDominant,
   };
-  const role = ROLE_CONTENT[primary_role];
-  const energy = ENERGY_CONTENT[mappedEnergyProfile.dominant];
+  const role = ROLE_CONTENT[primary_role] || ROLE_CONTENT["Spotter"];
+  const energy =
+    ENERGY_CONTENT[mappedEnergyProfile.dominant] || ENERGY_CONTENT["Innovator"];
   const pairingKey = getPairingKey(primary_role, secondary_role);
   const pairing = PAIRING_CONTENT[pairingKey] || {
     name: role_pair_title,
@@ -1099,18 +1235,18 @@ export function buildNarrative(input: NarrativeInput): Narrative {
   const secondStageGrowth = secondBottom
     ? STAGE_CONTENT[secondBottom]?.growth
     : "";
-  
+
   // ── Entrepreneur Application ───────────────────────────────
-  const weakestStage  = bottom_adapts_stages[0];
+  const weakestStage = bottom_adapts_stages[0];
   const strongestStage = top_adapts_stages[0];
 
   const entrepreneur_growth_pattern = ROLE_GROWTH_PATTERN[primary_role];
-  const revenue_leakage_pattern     = STAGE_REVENUE_LEAKAGE[weakestStage];
-  const best_business_focus         = STAGE_BUSINESS_FOCUS[weakestStage];
-  const offer_feedback              = ROLE_OFFER_FEEDBACK[primary_role];
-  const content_direction           = ROLE_CONTENT_DIRECTION[primary_role];
-  const execution_recommendations   = ROLE_EXECUTION[primary_role];
-  const next_best_move              = ROLE_NEXT_MOVE[primary_role];
+  const revenue_leakage_pattern = STAGE_REVENUE_LEAKAGE[weakestStage];
+  const best_business_focus = STAGE_BUSINESS_FOCUS[weakestStage];
+  const offer_feedback = ROLE_OFFER_FEEDBACK[primary_role];
+  const content_direction = ROLE_CONTENT_DIRECTION[primary_role];
+  const execution_recommendations = ROLE_EXECUTION[primary_role];
+  const next_best_move = ROLE_NEXT_MOVE[primary_role];
 
   return {
     executive_summary: `Your Change Genius™ profile reveals that you are a ${role_pair_title} — a ${primary_role} with a strong ${secondary_role} dimension. ${role.summary} Your ${secondary_role} secondary role adds ${ROLE_CONTENT[secondary_role]?.summary.split(".")[0].toLowerCase() || "additional strengths"} to your change leadership approach.`,
