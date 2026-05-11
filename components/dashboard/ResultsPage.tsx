@@ -11,7 +11,7 @@ interface RoleScores {
   Unifier: number;
   Driver: number;
   Spotter: number;
-  Preparer: number;
+  Architect: number;
 }
 
 interface StageScores {
@@ -24,10 +24,10 @@ interface StageScores {
 }
 
 interface EnergyScores {
-  Bond: number;
-  Drive: number;
-  Spark: number;
-  Shape: number;
+  Unifier: number;
+  Achiever: number;
+  Innovator: number;
+  Organizer: number;
 }
 
 // interface EnergyProfile {

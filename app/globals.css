@@ -1252,6 +1252,9 @@ nav {
   background: #e6edfc;
   z-index: -2;
 }
+.resources-section .section-header > h2 {
+  margin-bottom: 10px;
+}
 .bg-squiggly {
   position: absolute;
   inset: 0;
@@ -1291,6 +1294,7 @@ nav {
   gap: 28px;
   position: relative;
   z-index: 2;
+  margin-top: 20px;
 }
 .resource-card {
   background: #fff;
