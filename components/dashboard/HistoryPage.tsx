@@ -28,23 +28,88 @@ export default function HistoryPage() {
       .catch(() => setLoading(false));
   }, []);
 
-  const handleDownloadPDF = async (assessmentId: string) => {
-    setDownloadingId(assessmentId);
-    try {
-      const res = await fetch(`/api/pdf/individual?aid=${assessmentId}`);
-      if (!res.ok) throw new Error("PDF generation failed");
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `change-genius-report.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("PDF download failed:", err);
-    } finally {
-      setDownloadingId(null);
+  const generatePDFBlob = async (assessmentId: string): Promise<{ blob: Blob; base64: string } | null> => {
+    const res = await fetch(`/api/pdf/individual?aid=${assessmentId}`, { credentials: "include" });
+    if (!res.ok) return null;
+
+    const contentType = res.headers.get("content-type") ?? "";
+    if (!contentType.includes("text/html")) return null;
+
+    const html = await res.text();
+    const { default: html2canvas } = await import("html2canvas");
+    const { default: jsPDF } = await import("jspdf");
+
+    const iframe = document.createElement("iframe");
+    iframe.style.cssText = "position:fixed;top:0;left:0;width:794px;height:1123px;opacity:0;pointer-events:none;border:none;";
+    document.body.appendChild(iframe);
+
+    const iframeDoc = iframe.contentDocument!;
+    iframeDoc.open();
+    iframeDoc.write(html);
+    iframeDoc.close();
+
+    await new Promise(resolve => setTimeout(resolve, 2500));
+
+    const pageEls = iframeDoc.querySelectorAll<HTMLElement>(".page");
+    const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+    const pdfWidthMm = 210;
+    const pdfHeightMm = 297;
+
+    for (let i = 0; i < pageEls.length; i++) {
+      const el = pageEls[i];
+
+      const canvas = await html2canvas(el, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        width: 794,
+        height: 1123,
+        windowWidth: 794,
+        windowHeight: 1123,
+        backgroundColor: "#ffffff",
+        logging: false,
+        imageTimeout: 0,
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 0.6);
+
+      if (i > 0) pdf.addPage();
+
+      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidthMm, pdfHeightMm);
     }
+
+    document.body.removeChild(iframe);
+
+    const blob = pdf.output("blob");
+    const base64 = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve((reader.result as string).split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+
+    return { blob, base64 };
+  };
+
+  const handleDownloadPDF = async (assessmentId: string) => {
+      setDownloadingId(assessmentId);
+      try {
+        const result = await generatePDFBlob(assessmentId);
+        if (!result) throw new Error("Failed to generate PDF Report");
+
+        const blob = result.blob;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "change-genius-report.pdf";
+        a.click();
+        URL.revokeObjectURL(url);
+
+      } catch (err) {
+        console.error("PDF download failed:", err);
+      } finally {
+        setDownloadingId(null);
+      }
   };
 
   if (loading) {

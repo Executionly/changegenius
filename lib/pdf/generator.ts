@@ -538,28 +538,6 @@ export function buildIndividualReportHTML(
         .join("")}
     </div>
 
-    <!-- Energy bar chart -->
-    <h3 style="margin-bottom:14px">ENERGY SCORE BREAKDOWN</h3>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
-      ${Object.entries(role_scores as Record<string, number>)
-        .sort(([, a], [, b]) => (b as number) - (a as number))
-        .map(([e, score]) => {
-          const color =
-            e === energy_profile.dominant
-              ? C.purple
-              : e === energy_profile.secondary
-                ? C.gold
-                : e === energy_profile.strain
-                  ? C.amber
-                  : C.red;
-          return `<div>
-            <div style="font-size:13px;font-weight:600;margin-bottom:4px">${e}</div>
-            ${scoreBar(Number(score), color)}
-          </div>`;
-        })
-        .join("")}
-    </div>
-
     <h3 style="margin-bottom:12px">${energy_profile.dominant.toUpperCase()} ENERGY</h3>
     <p style="margin-bottom:16px">${narrative.energy_detailed}</p>
 
@@ -614,11 +592,6 @@ export function buildIndividualReportHTML(
             <span style="font-size:20px;font-weight:800;color:${color}">${score}</span>
           </div>
           ${scoreBar(Number(score), color)}
-          <div style="display:flex;gap:16px;margin-top:8px">
-            <span style="font-size:11px;color:${C.gray}">Stability: <strong>${detail.stability}/100</strong></span>
-            <span style="font-size:11px;color:${C.gray}">Integrity: <strong>${detail.integrity}/100</strong></span>
-            <span style="font-size:11px;color:${detail.risk > 50 ? C.red : C.gray}">Risk: <strong>${detail.risk}/100</strong></span>
-          </div>
         </div>`;
         })
         .join("")}
