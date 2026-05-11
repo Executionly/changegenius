@@ -74,20 +74,20 @@ function detectFrictionPatterns(
 ): string[] {
   const patterns: string[] = [];
 
-  // Too many Drivers + no Unifiers → execution without alignment
+  // Too many Drivers + no Connectors → execution without alignment
   if (
     (roleDistribution["Driver"] ?? 0) > 2 &&
-    (roleDistribution["Unifier"] ?? 0) === 0
+    (roleDistribution["Connector"] ?? 0) === 0
   ) {
     patterns.push(
       "Execution without alignment — high action drive but no trust-building presence. Risk of team fracture under pressure.",
     );
   }
 
-  // Too many Spotters + no Preparers → ideas without structure
+  // Too many Spotters + no Architects → ideas without structure
   if (
     (roleDistribution["Spotter"] ?? 0) > 2 &&
-    (roleDistribution["Preparer"] ?? 0) === 0
+    (roleDistribution["Architect"] ?? 0) === 0
   ) {
     patterns.push(
       "Ideas without structure — creative energy with no planning foundation. Initiatives likely to stall before launch.",
@@ -113,7 +113,7 @@ function detectFrictionPatterns(
     stageHealth["Participate Through Dialogue"] === "Critical" ||
     stageHealth["Participate Through Dialogue"] === "At Risk"
   ) {
-    if (dominantEnergy === "Spark" || dominantEnergy === "Drive") {
+    if (dominantEnergy === "Innovator" || dominantEnergy === "Achiever") {
       patterns.push(
         "Ignored voices — the team moves fast but critical concerns are not being surfaced. Resistance likely to emerge later.",
       );

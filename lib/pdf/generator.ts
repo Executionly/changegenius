@@ -252,7 +252,7 @@ export function buildIndividualReportHTML(
 
     <h3 style="margin-bottom:16px">THE SIX CHANGE ROLES</h3>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px">
-      ${["Spotter", "Driver", "Preparer", "Unifier", "Activator", "Stabilizer"]
+      ${["Spotter", "Driver", "Architect", "Connector", "Activator", "Stabilizer"]
         .map(
           (r) => `
         <div style="background:${C.grayLight};border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:12px">
@@ -1152,10 +1152,10 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
       ${Object.entries(energyScores)
         .map(([energy, avg]) => {
           const colors: Record<string, string> = {
-            Spark: C.gold,
+            Innovator: C.gold,
             Build: C.purple,
-            Polish: C.green,
-            Bond: "#E84393",
+            Organizer: C.green,
+            Unifier: "#E84393",
           };
 
           const color = colors[energy] ?? C.purple;

@@ -2,6 +2,7 @@ import { Resend } from 'resend'
 import { render } from '@react-email/render'
 import React from 'react'
 import { TeamInviteEmail } from './email-templates/team-invite'
+import { ReportReadyEmail } from './email-templates/report-readt'
 
 if (!process.env.RESEND_API_KEY || !process.env.NEXT_PUBLIC_MAIL_FORM) {
   throw new Error('RESEND_API_KEY environment variable is required')
@@ -15,6 +16,61 @@ interface SendTeamInviteParams {
   invitedByEmail: string
   teamName: string
   inviteLink: string
+}
+
+interface SendReportEmailParams {
+  to: string
+  fullName: string
+  primaryRole: string
+  secondaryRole: string
+  rolePairTitle: string
+  pdfBase64: string
+  fileName: string
+}
+
+export async function sendReportEmail({
+  to,
+  fullName,
+  primaryRole,
+  secondaryRole,
+  rolePairTitle,
+  pdfBase64,
+  fileName,
+}: SendReportEmailParams) {
+  try {
+    const emailHtml = await render(
+      React.createElement(ReportReadyEmail, {
+        fullName,
+        primaryRole,
+        secondaryRole,
+        rolePairTitle,
+      })
+    )
+
+    const { data, error } = await resend.emails.send({
+      from: process.env.NEXT_PUBLIC_MAIL_FORM!,
+      to:   [to],
+      subject: `Your Change Genius™ Report — ${rolePairTitle}`,
+      html: emailHtml,
+      attachments: [
+        {
+          filename: fileName,
+          content:  pdfBase64,
+        },
+      ],
+    })
+
+    if (error) throw new Error(error.message)
+
+    console.log('[Email] Report sent:', data?.id)
+    return { success: true, id: data?.id }
+  } catch (error) {
+    console.error('[Email] Error sending report:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
 }
 
 export async function sendTeamInviteEmail({

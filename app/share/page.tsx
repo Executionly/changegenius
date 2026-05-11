@@ -153,10 +153,10 @@ function ShareCardInner() {
 
   const energyProfile = {
     dominant: primary_energy,
-    secondary: primary_energy,
-    strain: primary_energy,
-    depleted: primary_energy,
-    scores: { Innovator: 0, Achiever: 0, Organizer: 0, Unifier: 0 },
+    secondary: primary_energy, // placeholder – same as dominant
+    strain: primary_energy, // placeholder
+    depleted: primary_energy, // placeholder
+    scores: { Innovator: 0, Achiever: 0, Organizer: 0, Unifier: 0 }, // dummy scores (not used in share card)
   };
 
   const narrativeInput = {
