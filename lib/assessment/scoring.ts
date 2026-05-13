@@ -1,13 +1,15 @@
 /**
- * Change Genius™ — Scoring Engine v2
+ * Change Genius™ — Scoring Engine v3
  *
- * Implements the full premium scoring spec:
- * - Weighted stage scores by item_type (preference/behavior/pressure/reverse)
- * - Stage interpretation bands (6 levels)
- * - Advanced metrics: stability, integrity, risk per stage
- * - Full energy profile: dominant, secondary, depleted, strain
- * - Change Capacity Score™ (CCS)
- * - Primary + secondary role from top role scores
+ * FINAL ROLES (4): Driver, Connector, Architect, Spotter
+ * FINAL ENERGIES (4): Achiever, Unifier, Organizer, Innovator
+ * FINAL ADAPTS STAGES (6): Alert, Diagnose, Prepare, Align, Transform, Sustain
+ *
+ * Role → Energy connections (tendencies, not fixed rules):
+ *   Driver    → Achiever
+ *   Connector → Unifier
+ *   Architect → Organizer
+ *   Spotter   → Innovator
  */
 
 import {
@@ -31,25 +33,25 @@ export interface EnergyScores extends Record<Energy, number> {}
 
 export type StageBand =
   | "Strategic Signature Strength" // 90–100
-  | "Strong Functional Strength" // 75–89
-  | "Solid Capacity" // 60–74
-  | "Situational Capacity" // 45–59
-  | "Fragile Capacity" // 30–44
-  | "High-Risk Breakdown Zone"; // 0–29
+  | "Strong Functional Strength"   // 75–89
+  | "Solid Capacity"               // 60–74
+  | "Situational Capacity"         // 45–59
+  | "Fragile Capacity"             // 30–44
+  | "High-Risk Breakdown Zone";    // 0–29
 
 export interface StageDetail {
   score: number;
   band: StageBand;
-  stability: number; // 0–100: how consistent under pressure vs preference
-  integrity: number; // 0–100: how consistent reverse vs normal items
-  risk: number; // 0–100: composite breakdown risk (higher = more risk)
+  stability: number; // 0–100
+  integrity: number; // 0–100
+  risk: number;      // 0–100
 }
 
 export interface EnergyProfile {
   dominant: Energy;
   secondary: Energy;
   depleted: Energy;
-  strain: Energy; // second-lowest — functions at hidden cost
+  strain: Energy;
   scores: EnergyScores;
 }
 
@@ -58,9 +60,9 @@ export interface DerivedResults {
   secondary_role: Role;
   role_pair_title: string;
   energy_profile: EnergyProfile;
-  top_adapts_stages: AdaptsStage[]; // top 2
+  top_adapts_stages: AdaptsStage[];   // top 2
   bottom_adapts_stages: AdaptsStage[]; // bottom 2
-  change_capacity_score: number; // CCS 0–100
+  change_capacity_score: number;       // CCS 0–100
 }
 
 export interface ScoreResult {
@@ -74,36 +76,22 @@ export interface ScoreResult {
 // ── Role pair titles ───────────────────────────────────────────
 
 const ROLE_PAIR_TITLES: Partial<Record<string, string>> = {
-  "Spotter+Driver": "The Change Driver",
-  "Spotter+Architect": "The Strategic Inventor",
-  "Spotter+Connector": "The Visionary Connector",
-  "Spotter+Activator": "The Architect of Change",
-  "Spotter+Stabilizer": "The Creative Improver",
-  "Driver+Spotter": "The Momentum Builder",
-  "Driver+Architect": "The Execution Specialist",
+  // Driver combinations
   "Driver+Connector": "The People-Driven Leader",
-  "Driver+Activator": "The Strategic Executor",
-  "Driver+Stabilizer": "The Results-Focused Optimizer",
-  "Architect+Spotter": "The Structured Strategist",
-  "Architect+Driver": "The Delivery Architect",
-  "Architect+Connector": "The Systems Connector",
-  "Architect+Activator": "The Master Planner",
-  "Architect+Stabilizer": "The Precision Operator",
-  "Connector+Spotter": "The Empathetic Visionary",
-  "Connector+Driver": "The Relationship Driver",
+  "Driver+Architect": "The Execution Specialist",
+  "Driver+Spotter":   "The Momentum Builder",
+  // Connector combinations
+  "Connector+Driver":    "The Relationship Driver",
   "Connector+Architect": "The Collaborative Architect",
-  "Connector+Activator": "The Trust Builder",
-  "Connector+Stabilizer": "The Inclusive Improver",
-  "Activator+Spotter": "The Bridge Builder",
-  "Activator+Driver": "The Strategic Activator",
-  "Activator+Architect": "The Systems Architect",
-  "Activator+Connector": "The Alignment Champion",
-  "Activator+Stabilizer": "The Operational Excellence Leader",
-  "Stabilizer+Spotter": "The Continuous Stabilizer",
-  "Stabilizer+Driver": "The Performance Optimizer",
-  "Stabilizer+Architect": "The Systems Perfectionist",
-  "Stabilizer+Connector": "The Culture Steward",
-  "Stabilizer+Activator": "The Sustainable Change Leader",
+  "Connector+Spotter":   "The Empathetic Visionary",
+  // Architect combinations
+  "Architect+Driver":    "The Delivery Architect",
+  "Architect+Connector": "The Systems Connector",
+  "Architect+Spotter":   "The Structured Strategist",
+  // Spotter combinations
+  "Spotter+Driver":    "The Visionary Driver",
+  "Spotter+Connector": "The Visionary Connector",
+  "Spotter+Architect": "The Strategic Architect",
 };
 
 function getRolePairTitle(primary: Role, secondary: Role): string {
@@ -118,7 +106,6 @@ function applyPolarity(value: number, reverse: boolean): number {
   return reverse ? 6 - value : value;
 }
 
-/** Normalize a raw 1–5 average to 0–100 */
 function normalize(avg: number): number {
   return Math.round(((avg - 1) / 4) * 100);
 }
@@ -134,7 +121,6 @@ function variance(arr: number[]): number {
   return arr.reduce((s, v) => s + (v - m) ** 2, 0) / arr.length;
 }
 
-/** Sort keys of a score map descending, ties broken alphabetically */
 function rankKeys<T extends string>(scores: Record<T, number>): T[] {
   return (Object.keys(scores) as T[]).sort((a, b) => {
     const diff = scores[b] - scores[a];
@@ -154,26 +140,19 @@ export function getStageBand(score: number): StageBand {
 }
 
 // ── Weighted stage scoring ─────────────────────────────────────
-//
-// Stage Score = (preference_avg × 0.25)
-//             + (behavior_avg  × 0.30)
-//             + (pressure_avg  × 0.25)
-//             + (reverse_avg   × 0.20)   ← reverse items already polarity-adjusted
-//
-// Each sub-average is on a 1–5 scale. Final weighted avg is then normalized to 0–100.
 
 const STAGE_WEIGHTS: Record<ItemType, number> = {
   preference: 0.25,
-  behavior: 0.3,
-  pressure: 0.25,
-  reverse: 0.2,
+  behavior:   0.30,
+  pressure:   0.25,
+  reverse:    0.20,
 };
 
 interface StageRaw {
   preference: number[];
-  behavior: number[];
-  pressure: number[];
-  reverse: number[];
+  behavior:   number[];
+  pressure:   number[];
+  reverse:    number[];
 }
 
 function computeWeightedStageScore(raw: StageRaw): number {
@@ -188,18 +167,12 @@ function computeWeightedStageScore(raw: StageRaw): number {
   }
 
   if (weightTotal === 0) return 0;
-  // Re-normalize to account for missing item types
   const weightedAvg = weightedSum / weightTotal;
   return normalize(weightedAvg);
 }
 
 // ── Advanced stage metrics ─────────────────────────────────────
 
-/**
- * Stability: how well pressure behavior matches preference
- * High variance between the two → lower stability
- * Returns 0–100 (100 = fully stable)
- */
 function computeStability(raw: StageRaw): number {
   if (raw.preference.length === 0 || raw.pressure.length === 0) {
     const all = [...raw.behavior];
@@ -207,84 +180,47 @@ function computeStability(raw: StageRaw): number {
     return Math.round(Math.max(0, 100 - (variance(all) / 4) * 100));
   }
   const gap = Math.abs(mean(raw.preference) - mean(raw.pressure));
-  // Same sensitivity tightening — a gap of 1.5 on a 1-5 scale is meaningful
   const sensitivity = 2.5;
   return Math.round(Math.max(0, Math.min(100, (1 - gap / sensitivity) * 100)));
 }
 
-/**
- * Integrity: consistency between normal items and reverse-coded items
- * If reverse scores (after polarity flip) are close to normal scores → high integrity
- * Returns 0–100 (100 = fully consistent)
- */
 function computeIntegrity(raw: StageRaw): number {
   const normalItems = [...raw.preference, ...raw.behavior, ...raw.pressure];
   const reverseItems = raw.reverse;
 
   if (normalItems.length === 0 || reverseItems.length === 0) {
-    // Not enough data — measure internal consistency of what we have
     const all = normalItems.length > 0 ? normalItems : reverseItems;
     if (all.length < 2) return 75;
     const v = variance(all);
     return Math.round(Math.max(0, 100 - (v / 4) * 100));
   }
 
-  const normalAvg = mean(normalItems);
-  const reverseAvg = mean(reverseItems);
-  const gap = Math.abs(normalAvg - reverseAvg);
-
-  // Gap of 0 = perfect integrity (consistent answers)
-  // Gap of 4 = maximum inconsistency
-  // Use a tighter sensitivity curve: gap of 2 already signals real inconsistency
-  const sensitivity = 2.5; // instead of 4, makes score more responsive
+  const gap = Math.abs(mean(normalItems) - mean(reverseItems));
+  const sensitivity = 2.5;
   return Math.round(Math.max(0, Math.min(100, (1 - gap / sensitivity) * 100)));
 }
 
-/**
- * Risk: composite of low score + high variance + integrity gap
- * Returns 0–100 (100 = highest risk)
- */
-function computeRisk(
-  score: number,
-  stability: number,
-  integrity: number,
-): number {
-  const scorePenalty = (100 - score) * 0.5;
+function computeRisk(score: number, stability: number, integrity: number): number {
+  const scorePenalty     = (100 - score)     * 0.5;
   const stabilityPenalty = (100 - stability) * 0.25;
   const integrityPenalty = (100 - integrity) * 0.25;
-  return Math.round(
-    Math.min(100, scorePenalty + stabilityPenalty + integrityPenalty),
-  );
+  return Math.round(Math.min(100, scorePenalty + stabilityPenalty + integrityPenalty));
 }
 
-// ── Energy score calculation ───────────────────────────────────
-//
-// The questions bank maps each question to an energy.
-// We compute a simple normalized average per energy (same as before).
-// For a future v3, split energy questions into preference/sustainability/effectiveness
-// sub-types and apply:
-//   Energy Score = (preference × 0.45) + (sustainability × 0.25) + (effectiveness × 0.20)
-//                + (forced_choice × 0.10)
+// ── Energy profile ─────────────────────────────────────────────
 
 function computeEnergyProfile(energy_scores: EnergyScores): EnergyProfile {
   const ranked = rankKeys(energy_scores);
   return {
-    dominant: ranked[0] as Energy,
+    dominant:  ranked[0] as Energy,
     secondary: ranked[1] as Energy,
-    strain: ranked[2] as Energy, // functions but at hidden cost
-    depleted: ranked[3] as Energy, // lowest
-    scores: energy_scores,
+    strain:    ranked[2] as Energy,
+    depleted:  ranked[3] as Energy,
+    scores:    energy_scores,
   };
 }
 
 // ── Change Capacity Score™ (CCS) ───────────────────────────────
-//
-// CCS = (mean_stage_score × 0.35)
-//     + (balance_index    × 0.20)
-//     + (stability_mean   × 0.15)
-//     + (energy_alignment × 0.10)
-//     - (risk_penalty     × 0.10)
-//     + (confidence       × 0.10)   ← confidence fixed at 1.0 until response quality scoring added
 
 function computeCCS(
   stage_scores: StageScores,
@@ -293,38 +229,26 @@ function computeCCS(
 ): number {
   const scores = STAGES.map((s) => stage_scores[s]);
 
-  // Mean stage score (0–100)
-  const meanStage = mean(scores);
-
-  // Balance index: penalizes high variance between stages
+  const meanStage    = mean(scores);
   const stageVariance = variance(scores);
-  const maxVariance = (100 / 2) ** 2; // rough upper bound
-  const balanceIndex = Math.max(0, 100 - (stageVariance / maxVariance) * 100);
-
-  // Stability: mean of all stage stabilities
+  const maxVariance   = (100 / 2) ** 2;
+  const balanceIndex  = Math.max(0, 100 - (stageVariance / maxVariance) * 100);
   const stabilityMean = mean(STAGES.map((s) => stage_detail[s].stability));
 
-  // Energy alignment: how balanced the top energy is relative to all
-  const energyValues = ENERGIES.map((e) => energy_scores[e]);
+  const energyValues   = ENERGIES.map((e) => energy_scores[e]);
   const energyVariance = variance(energyValues);
-  const energyAlignment = Math.max(
-    0,
-    100 - (energyVariance / maxVariance) * 100,
-  );
+  const energyAlignment = Math.max(0, 100 - (energyVariance / maxVariance) * 100);
 
-  // Risk penalty: mean of all stage risks
-  const riskMean = mean(STAGES.map((s) => stage_detail[s].risk));
-
-  // Confidence placeholder — replace with real response quality score later
+  const riskMean   = mean(STAGES.map((s) => stage_detail[s].risk));
   const confidence = 100;
 
   const ccs =
-    meanStage * 0.35 +
-    balanceIndex * 0.2 +
+    meanStage     * 0.35 +
+    balanceIndex  * 0.20 +
     stabilityMean * 0.15 +
-    energyAlignment * 0.1 -
-    riskMean * 0.1 +
-    confidence * 0.1;
+    energyAlignment * 0.10 -
+    riskMean      * 0.10 +
+    confidence    * 0.10;
 
   return Math.round(Math.max(0, Math.min(100, ccs)));
 }
@@ -332,13 +256,11 @@ function computeCCS(
 // ── Main export ────────────────────────────────────────────────
 
 export function calculateScores(responses: Responses): ScoreResult {
-  // ── Step 1: bucket raw scores by role, stage (with item_type), energy ──
-
-  const roleRaw = {} as Record<Role, number[]>;
+  const roleRaw  = {} as Record<Role, number[]>;
   const stageRaw = {} as Record<AdaptsStage, StageRaw>;
   const energyRaw = {} as Record<Energy, number[]>;
 
-  for (const r of ROLES) roleRaw[r] = [];
+  for (const r of ROLES)   roleRaw[r]  = [];
   for (const e of ENERGIES) energyRaw[e] = [];
   for (const s of STAGES) {
     stageRaw[s] = { preference: [], behavior: [], pressure: [], reverse: [] };
@@ -355,59 +277,42 @@ export function calculateScores(responses: Responses): ScoreResult {
     energyRaw[q.energy].push(adjusted);
   }
 
-  // ── Step 2: compute role scores (simple normalized average) ──
-
+  // Role scores
   const role_scores = Object.fromEntries(
     ROLES.map((r) => [r, normalize(mean(roleRaw[r]))]),
   ) as RoleScores;
 
-  // ── Step 3: compute weighted stage scores + advanced metrics ──
-
+  // Stage scores + metrics
   const stage_scores = {} as StageScores;
   const stage_detail = {} as Record<AdaptsStage, StageDetail>;
 
   for (const s of STAGES) {
-    const raw = stageRaw[s];
-    const score = computeWeightedStageScore(raw);
+    const raw       = stageRaw[s];
+    const score     = computeWeightedStageScore(raw);
     const stability = computeStability(raw);
     const integrity = computeIntegrity(raw);
-    const risk = computeRisk(score, stability, integrity);
+    const risk      = computeRisk(score, stability, integrity);
 
     stage_scores[s] = score;
-    stage_detail[s] = {
-      score,
-      band: getStageBand(score),
-      stability,
-      integrity,
-      risk,
-    };
+    stage_detail[s] = { score, band: getStageBand(score), stability, integrity, risk };
   }
 
-  // ── Step 4: compute energy scores ────────────────────────────
-
+  // Energy scores
   const energy_scores = Object.fromEntries(
     ENERGIES.map((e) => [e, normalize(mean(energyRaw[e]))]),
   ) as EnergyScores;
 
-  // ── Step 5: derive results ────────────────────────────────────
+  // Derive results
+  const rankedRoles        = rankKeys(role_scores);
+  const primary_role       = rankedRoles[0] as Role;
+  const secondary_role     = rankedRoles[1] as Role;
 
-  const rankedRoles = rankKeys(role_scores);
-  const primary_role = rankedRoles[0] as Role;
-  const secondary_role = rankedRoles[1] as Role;
+  const rankedStages       = rankKeys(stage_scores);
+  const top_adapts_stages  = rankedStages.slice(0, 2) as AdaptsStage[];
+  const bottom_adapts_stages = [...rankedStages].reverse().slice(0, 2) as AdaptsStage[];
 
-  const rankedStages = rankKeys(stage_scores);
-  const top_adapts_stages = rankedStages.slice(0, 2) as AdaptsStage[];
-  const bottom_adapts_stages = [...rankedStages]
-    .reverse()
-    .slice(0, 2) as AdaptsStage[];
-
-  const energy_profile = computeEnergyProfile(energy_scores);
-
-  const change_capacity_score = computeCCS(
-    stage_scores,
-    stage_detail,
-    energy_scores,
-  );
+  const energy_profile         = computeEnergyProfile(energy_scores);
+  const change_capacity_score  = computeCCS(stage_scores, stage_detail, energy_scores);
 
   const derived: DerivedResults = {
     primary_role,

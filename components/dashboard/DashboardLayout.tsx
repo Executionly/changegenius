@@ -60,6 +60,7 @@ export default function DashboardLayout({
 
   const generatePDFBlob = async (): Promise<{ blob: Blob; base64: string } | null> => {
     const res = await fetch("/api/pdf/individual", { credentials: "include" });
+
     if (!res.ok) return null;
 
     const contentType = res.headers.get("content-type") ?? "";

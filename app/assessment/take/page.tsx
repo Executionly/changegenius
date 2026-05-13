@@ -165,12 +165,13 @@ function AssessmentTakePageContent() {
         throw new Error(d.error ?? "Submission failed");
       }
       try {
-        handleEmailPDF()
+        await handleEmailPDF()
       }catch(err) {
         console.error("Failed to email PDF:", err)
+      }finally{
+        setLoadingState("done");
+        window.location.href = "/results";
       }
-      setLoadingState("done");
-      window.location.href = "/results";
     } catch (err) {
       setError(
         err instanceof Error
@@ -212,7 +213,7 @@ function AssessmentTakePageContent() {
       const el = pageEls[i];
 
       const canvas = await html2canvas(el, {
-        scale: 1,
+        scale: 2,
         useCORS: true,
         allowTaint: true,
         width: 794,
@@ -273,8 +274,6 @@ function AssessmentTakePageContent() {
       }
   
       await supabase.storage.from("reports").remove([filePath]);
-  
-      alert("Your report has been sent to your email!");
     } catch (err) {
       console.error("Email PDF failed:", err);
       alert("Failed to send email. Please try downloading instead.");
@@ -351,6 +350,53 @@ function AssessmentTakePageContent() {
           <div style={{ fontSize: 13, color: "var(--text-3)" }}>
             This takes just a moment.
           </div>
+          {emailLoading && (
+            <>
+              <div className="pdf-spinner">
+                <svg
+                  width="64"
+                  height="64"
+                  viewBox="0 0 64 64"
+                  style={{ animation: "spin 1.2s linear infinite" }}
+                >
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="26"
+                    fill="none"
+                    stroke="rgba(255,255,255,0.08)"
+                    strokeWidth="4"
+                  />
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="26"
+                    fill="none"
+                    stroke="#12A74C"
+                    strokeWidth="4"
+                    strokeDasharray="40 124"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="pdf-icon">✉️</div>
+              </div>
+              <div className="pdf-title">Sending your report</div>
+              <div className="pdf-desc">
+                Compiling your results and sending them to your email.
+                <br />
+                This usually takes 20–30 seconds.
+              </div>
+              <div className="pdf-dots">
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="pdf-dot"
+                    style={{ animationDelay: `${i * 0.2}s` }}
+                  />
+                ))}
+              </div>
+            </>
+      )}
         </div>
       </div>
     );

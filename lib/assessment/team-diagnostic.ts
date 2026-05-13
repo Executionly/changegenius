@@ -94,24 +94,24 @@ function detectFrictionPatterns(
     );
   }
 
-  // No Stabilizer → change won't sustain
-  if ((roleDistribution["Stabilizer"] ?? 0) === 0 && memberCount >= 5) {
+  // No Architect → change won't sustain or scale
+  if ((roleDistribution["Architect"] ?? 0) === 0 && memberCount >= 5) {
     patterns.push(
-      "No sustainability anchor — without a Stabilizer, improvements are unlikely to be institutionalized after the change sprint.",
+      "No sustainability anchor — without an Architect, improvements are unlikely to be institutionalised after the change sprint.",
     );
   }
 
-  // No Activator → strategy-execution gap
-  if ((roleDistribution["Activator"] ?? 0) === 0 && memberCount >= 5) {
+  // No Driver → strategy-execution gap
+  if ((roleDistribution["Driver"] ?? 0) === 0 && memberCount >= 5) {
     patterns.push(
-      "Strategy-execution gap — no one is translating decisions into operational plans. Alignment is at risk.",
+      "Strategy-execution gap — no one is converting decisions into momentum. Delivery is at risk.",
     );
   }
 
-  // Weak dialogue stage + Spark dominant energy → ignored voices
+  // Weak Align stage + Innovator or Achiever dominant energy → ignored voices
   if (
-    stageHealth["Participate Through Dialogue"] === "Critical" ||
-    stageHealth["Participate Through Dialogue"] === "At Risk"
+    stageHealth["Align"] === "Critical" ||
+    stageHealth["Align"] === "At Risk"
   ) {
     if (dominantEnergy === "Innovator" || dominantEnergy === "Achiever") {
       patterns.push(
@@ -121,7 +121,7 @@ function detectFrictionPatterns(
   }
 
   // Critical Alert stage → blind spots
-  if (stageHealth["Alert the System"] === "Critical") {
+  if (stageHealth["Alert"] === "Critical") {
     patterns.push(
       "Disruption blind spot — the team is not scanning for early warning signals. May be caught off-guard by external change.",
     );
@@ -163,23 +163,22 @@ function suggestChangePods(
     });
   }
 
-  // Execution pod — top Activators + Drivers
+  // Execution pod — top Drivers
   const executors = members
     .filter(
       (m) =>
-        m.primaryRole === "Activator" ||
         m.primaryRole === "Driver" ||
-        m.secondaryRole === "Activator",
+        m.secondaryRole === "Driver",
     )
     .slice(0, 4);
 
   if (executors.length >= 2) {
     pods.push({
       name: "Execution Pod",
-      focus: "Transform Through Alignment",
+      focus: "Transform",
       members: executors.map((m) => m.userId),
       reason:
-        "Activators and Drivers drive operational alignment. This pod should own initiative execution and cross-team coordination.",
+        "Drivers convert decisions into momentum. This pod should own initiative execution and cross-team coordination.",
     });
   }
 
@@ -240,7 +239,7 @@ export function computeTeamDiagnostic(members: MemberScore[]): TeamDiagnostic {
   const n = members.length;
   const sn = scoredMembers.length;
 
-  // ── Role distribution (top 2 roles per member) 
+  // ── Role distribution (top 2 roles per member)
   const roleDistribution = Object.fromEntries(
     ROLES.map((r) => [r, 0]),
   ) as Record<Role, number>;
@@ -259,7 +258,7 @@ export function computeTeamDiagnostic(members: MemberScore[]): TeamDiagnostic {
     (r) => n > 0 && roleDistribution[r] / (n * 2) > 0.4,
   );
 
-  // ── Stage means 
+  // ── Stage means
   const stageScores = Object.fromEntries(
     STAGES.map((s) => [s, 0]),
   ) as Record<AdaptsStage, number>;
@@ -278,7 +277,7 @@ export function computeTeamDiagnostic(members: MemberScore[]): TeamDiagnostic {
     STAGES.map((s) => [s, getStageHealth(stageScores[s])]),
   ) as Record<AdaptsStage, StageHealth>;
 
-  // ── Energy means 
+  // ── Energy means
   const energyScores = Object.fromEntries(
     ENERGIES.map((e) => [e, 0]),
   ) as Record<Energy, number>;
@@ -297,7 +296,7 @@ export function computeTeamDiagnostic(members: MemberScore[]): TeamDiagnostic {
     (a, b) => energyScores[b] - energyScores[a],
   )[0];
 
-  // ── Risk score 
+  // ── Risk score
   let riskScore = 0;
   riskScore += missingRoles.length * 12;
   riskScore += overweightRoles.length * 8;

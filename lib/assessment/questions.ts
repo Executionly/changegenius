@@ -1,31 +1,44 @@
 /**
- * Change Genius™ — Question Bank v2
+ * Change Genius™ — Question Bank v3
  *
  * 72 questions across 6 ADAPTS stages (12 each)
  * Each stage has: 3 Preference + 4 Behavior + 3 Pressure + 2 Reverse
  *
- * Role and Energy are derived from question mappings.
+ * FINAL ROLES (4): Driver, Connector, Architect, Spotter
+ * FINAL ENERGIES (4): Achiever, Unifier, Organizer, Innovator
+ * FINAL ADAPTS STAGES (6): Alert, Diagnose, Prepare, Align, Transform, Sustain
+ *
+ * Role → Energy connections (tendencies, not fixed rules):
+ *   Driver    → Achiever
+ *   Connector → Unifier
+ *   Architect → Organizer
+ *   Spotter   → Innovator
+ *
+ * Role → Strong ADAPTS stages:
+ *   Driver    → Transform, Prepare
+ *   Connector → Align, Sustain
+ *   Architect → Diagnose, Prepare
+ *   Spotter   → Alert, Diagnose
+ *
  * Response scale: 1=Strongly Disagree … 5=Strongly Agree
  * reverse: true → score = 6 - value before use
+ *
+ * Remapping notes:
+ *   Former Activator questions → Driver (both execution-focused)
+ *   Former Stabilizer questions → Architect (both structure/systems-focused)
  */
 
-export type Role =
-  | "Spotter"
-  | "Driver"
-  | "Architect"
-  | "Connector"
-  | "Activator"
-  | "Stabilizer";
+export type Role = "Driver" | "Connector" | "Architect" | "Spotter";
 
 export type AdaptsStage =
-  | "Alert the System"
-  | "Diagnose the Gaps"
-  | "Access Readiness"
-  | "Participate Through Dialogue"
-  | "Transform Through Alignment"
-  | "Scale and Sustain";
+  | "Alert"
+  | "Diagnose"
+  | "Prepare"
+  | "Align"
+  | "Transform"
+  | "Sustain";
 
-export type Energy = "Innovator" | "Achiever" | "Organizer" | "Unifier";
+export type Energy = "Achiever" | "Unifier" | "Organizer" | "Innovator";
 
 export type ItemType = "preference" | "behavior" | "pressure" | "reverse";
 
@@ -36,13 +49,15 @@ export interface Question {
   stage: AdaptsStage;
   energy: Energy;
   item_type: ItemType;
-  reverse: boolean; // always true when item_type === 'reverse'
+  reverse: boolean;
   order: number;
 }
 
 export const QUESTIONS: Question[] = [
   // ══════════════════════════════════════════════════════════
-  // STAGE 1: ALERT THE SYSTEM (12 items)
+  // STAGE 1: ALERT (12 items)
+  // Role: Spotter | Energy: Innovator
+  // Spotters are naturally strong in Alert — they see patterns early
   // ══════════════════════════════════════════════════════════
 
   // Preference (3)
@@ -51,7 +66,7 @@ export const QUESTIONS: Question[] = [
     order: 1,
     text: "I naturally pay attention to early signals, patterns, and subtle changes in my environment, even before others begin to notice them.",
     role: "Spotter",
-    stage: "Alert the System",
+    stage: "Alert",
     energy: "Innovator",
     item_type: "preference",
     reverse: false,
@@ -61,7 +76,7 @@ export const QUESTIONS: Question[] = [
     order: 2,
     text: "I enjoy thinking ahead about what could shift in the future and how those changes might affect outcomes.",
     role: "Spotter",
-    stage: "Alert the System",
+    stage: "Alert",
     energy: "Innovator",
     item_type: "preference",
     reverse: false,
@@ -71,7 +86,7 @@ export const QUESTIONS: Question[] = [
     order: 3,
     text: "I find it energizing to observe trends, behaviors, and signals that may indicate upcoming opportunities or risks.",
     role: "Spotter",
-    stage: "Alert the System",
+    stage: "Alert",
     energy: "Innovator",
     item_type: "preference",
     reverse: false,
@@ -83,7 +98,7 @@ export const QUESTIONS: Question[] = [
     order: 4,
     text: "I consistently monitor my environment for emerging patterns that could impact decisions, performance, or direction.",
     role: "Spotter",
-    stage: "Alert the System",
+    stage: "Alert",
     energy: "Innovator",
     item_type: "behavior",
     reverse: false,
@@ -93,7 +108,7 @@ export const QUESTIONS: Question[] = [
     order: 5,
     text: "I speak up when I notice early warning signs, even when others are not yet convinced there is an issue.",
     role: "Spotter",
-    stage: "Alert the System",
+    stage: "Alert",
     energy: "Innovator",
     item_type: "behavior",
     reverse: false,
@@ -103,7 +118,7 @@ export const QUESTIONS: Question[] = [
     order: 6,
     text: "I connect information from different sources to identify possible future developments or disruptions.",
     role: "Spotter",
-    stage: "Alert the System",
+    stage: "Alert",
     energy: "Innovator",
     item_type: "behavior",
     reverse: false,
@@ -113,7 +128,7 @@ export const QUESTIONS: Question[] = [
     order: 7,
     text: "I regularly question current assumptions to ensure we are not overlooking important signals.",
     role: "Spotter",
-    stage: "Alert the System",
+    stage: "Alert",
     energy: "Innovator",
     item_type: "behavior",
     reverse: false,
@@ -125,7 +140,7 @@ export const QUESTIONS: Question[] = [
     order: 8,
     text: "When situations become uncertain or high-pressure, I remain attentive to early indicators that others may miss.",
     role: "Spotter",
-    stage: "Alert the System",
+    stage: "Alert",
     energy: "Innovator",
     item_type: "pressure",
     reverse: false,
@@ -135,7 +150,7 @@ export const QUESTIONS: Question[] = [
     order: 9,
     text: "Under pressure, I continue to scan for risks and opportunities rather than focusing only on immediate tasks.",
     role: "Spotter",
-    stage: "Alert the System",
+    stage: "Alert",
     energy: "Innovator",
     item_type: "pressure",
     reverse: false,
@@ -145,7 +160,7 @@ export const QUESTIONS: Question[] = [
     order: 10,
     text: "In fast-changing situations, I maintain awareness of both visible and hidden signals that could affect outcomes.",
     role: "Spotter",
-    stage: "Alert the System",
+    stage: "Alert",
     energy: "Innovator",
     item_type: "pressure",
     reverse: false,
@@ -157,7 +172,7 @@ export const QUESTIONS: Question[] = [
     order: 11,
     text: "I usually wait until a problem becomes obvious before I begin to pay attention to it.",
     role: "Spotter",
-    stage: "Alert the System",
+    stage: "Alert",
     energy: "Innovator",
     item_type: "reverse",
     reverse: true,
@@ -167,14 +182,17 @@ export const QUESTIONS: Question[] = [
     order: 12,
     text: "I tend to focus only on what is directly in front of me rather than thinking about what may change in the future.",
     role: "Spotter",
-    stage: "Alert the System",
+    stage: "Alert",
     energy: "Innovator",
     item_type: "reverse",
     reverse: true,
   },
 
   // ══════════════════════════════════════════════════════════
-  // STAGE 2: DIAGNOSE THE GAPS (12 items)
+  // STAGE 2: DIAGNOSE (12 items)
+  // Role: Architect | Energy: Organizer
+  // Architects and Spotters are both strong in Diagnose.
+  // Architect mapped here as they identify root causes and design solutions.
   // ══════════════════════════════════════════════════════════
 
   // Preference (3)
@@ -182,8 +200,8 @@ export const QUESTIONS: Question[] = [
     id: "DIAG_P1",
     order: 13,
     text: "I am naturally inclined to analyze situations deeply in order to understand the root causes behind problems or outcomes.",
-    role: "Stabilizer",
-    stage: "Diagnose the Gaps",
+    role: "Architect",
+    stage: "Diagnose",
     energy: "Organizer",
     item_type: "preference",
     reverse: false,
@@ -192,8 +210,8 @@ export const QUESTIONS: Question[] = [
     id: "DIAG_P2",
     order: 14,
     text: "I enjoy breaking down complex issues into smaller components so that they can be clearly understood.",
-    role: "Stabilizer",
-    stage: "Diagnose the Gaps",
+    role: "Architect",
+    stage: "Diagnose",
     energy: "Organizer",
     item_type: "preference",
     reverse: false,
@@ -202,8 +220,8 @@ export const QUESTIONS: Question[] = [
     id: "DIAG_P3",
     order: 15,
     text: "I prefer to gain clarity and insight before taking action, even if it requires additional time and effort.",
-    role: "Stabilizer",
-    stage: "Diagnose the Gaps",
+    role: "Architect",
+    stage: "Diagnose",
     energy: "Organizer",
     item_type: "preference",
     reverse: false,
@@ -214,8 +232,8 @@ export const QUESTIONS: Question[] = [
     id: "DIAG_B1",
     order: 16,
     text: "I ask thoughtful and probing questions to uncover what is really happening beneath the surface of a situation.",
-    role: "Stabilizer",
-    stage: "Diagnose the Gaps",
+    role: "Architect",
+    stage: "Diagnose",
     energy: "Organizer",
     item_type: "behavior",
     reverse: false,
@@ -224,8 +242,8 @@ export const QUESTIONS: Question[] = [
     id: "DIAG_B2",
     order: 17,
     text: "I examine patterns, data, and evidence to ensure that conclusions are based on accurate understanding.",
-    role: "Stabilizer",
-    stage: "Diagnose the Gaps",
+    role: "Architect",
+    stage: "Diagnose",
     energy: "Organizer",
     item_type: "behavior",
     reverse: false,
@@ -234,8 +252,8 @@ export const QUESTIONS: Question[] = [
     id: "DIAG_B3",
     order: 18,
     text: "I challenge assumptions when they appear incomplete, unclear, or unsupported by evidence.",
-    role: "Stabilizer",
-    stage: "Diagnose the Gaps",
+    role: "Architect",
+    stage: "Diagnose",
     energy: "Organizer",
     item_type: "behavior",
     reverse: false,
@@ -244,8 +262,8 @@ export const QUESTIONS: Question[] = [
     id: "DIAG_B4",
     order: 19,
     text: "I take time to verify information before making recommendations or decisions.",
-    role: "Stabilizer",
-    stage: "Diagnose the Gaps",
+    role: "Architect",
+    stage: "Diagnose",
     energy: "Organizer",
     item_type: "behavior",
     reverse: false,
@@ -256,8 +274,8 @@ export const QUESTIONS: Question[] = [
     id: "DIAG_PR1",
     order: 20,
     text: "When under pressure, I remain committed to understanding the problem fully rather than rushing into action.",
-    role: "Stabilizer",
-    stage: "Diagnose the Gaps",
+    role: "Architect",
+    stage: "Diagnose",
     energy: "Organizer",
     item_type: "pressure",
     reverse: false,
@@ -266,8 +284,8 @@ export const QUESTIONS: Question[] = [
     id: "DIAG_PR2",
     order: 21,
     text: "In high-stakes situations, I continue to ask clarifying questions to avoid making incorrect assumptions.",
-    role: "Stabilizer",
-    stage: "Diagnose the Gaps",
+    role: "Architect",
+    stage: "Diagnose",
     energy: "Organizer",
     item_type: "pressure",
     reverse: false,
@@ -276,8 +294,8 @@ export const QUESTIONS: Question[] = [
     id: "DIAG_PR3",
     order: 22,
     text: "Even when urgency increases, I maintain focus on identifying the real issue instead of reacting quickly.",
-    role: "Stabilizer",
-    stage: "Diagnose the Gaps",
+    role: "Architect",
+    stage: "Diagnose",
     energy: "Organizer",
     item_type: "pressure",
     reverse: false,
@@ -288,8 +306,8 @@ export const QUESTIONS: Question[] = [
     id: "DIAG_R1",
     order: 23,
     text: "I often take action before I fully understand the underlying cause of a problem.",
-    role: "Stabilizer",
-    stage: "Diagnose the Gaps",
+    role: "Architect",
+    stage: "Diagnose",
     energy: "Organizer",
     item_type: "reverse",
     reverse: true,
@@ -298,15 +316,18 @@ export const QUESTIONS: Question[] = [
     id: "DIAG_R2",
     order: 24,
     text: "I rely more on instinct or quick judgment than careful analysis when making decisions.",
-    role: "Stabilizer",
-    stage: "Diagnose the Gaps",
+    role: "Architect",
+    stage: "Diagnose",
     energy: "Organizer",
     item_type: "reverse",
     reverse: true,
   },
 
   // ══════════════════════════════════════════════════════════
-  // STAGE 3: ACCESS READINESS (12 items)
+  // STAGE 3: PREPARE (12 items)
+  // Role: Architect | Energy: Organizer
+  // Architects are naturally strong in Prepare — they build structure
+  // and readiness before execution begins.
   // ══════════════════════════════════════════════════════════
 
   // Preference (3)
@@ -315,8 +336,8 @@ export const QUESTIONS: Question[] = [
     order: 25,
     text: "I naturally focus on ensuring that people, systems, and resources are prepared before execution begins.",
     role: "Architect",
-    stage: "Access Readiness",
-    energy: "Achiever",
+    stage: "Prepare",
+    energy: "Organizer",
     item_type: "preference",
     reverse: false,
   },
@@ -325,8 +346,8 @@ export const QUESTIONS: Question[] = [
     order: 26,
     text: "I believe that proper preparation significantly increases the likelihood of successful outcomes.",
     role: "Architect",
-    stage: "Access Readiness",
-    energy: "Achiever",
+    stage: "Prepare",
+    energy: "Organizer",
     item_type: "preference",
     reverse: false,
   },
@@ -335,8 +356,8 @@ export const QUESTIONS: Question[] = [
     order: 27,
     text: "I enjoy organizing people, processes, and tools so that execution can happen smoothly.",
     role: "Architect",
-    stage: "Access Readiness",
-    energy: "Achiever",
+    stage: "Prepare",
+    energy: "Organizer",
     item_type: "preference",
     reverse: false,
   },
@@ -347,8 +368,8 @@ export const QUESTIONS: Question[] = [
     order: 28,
     text: "I ensure that individuals clearly understand their roles and responsibilities before starting any initiative.",
     role: "Architect",
-    stage: "Access Readiness",
-    energy: "Achiever",
+    stage: "Prepare",
+    energy: "Organizer",
     item_type: "behavior",
     reverse: false,
   },
@@ -357,8 +378,8 @@ export const QUESTIONS: Question[] = [
     order: 29,
     text: "I identify gaps in skills, resources, or systems that could prevent successful execution.",
     role: "Architect",
-    stage: "Access Readiness",
-    energy: "Achiever",
+    stage: "Prepare",
+    energy: "Organizer",
     item_type: "behavior",
     reverse: false,
   },
@@ -367,8 +388,8 @@ export const QUESTIONS: Question[] = [
     order: 30,
     text: "I create structure, plans, and frameworks to support effective implementation.",
     role: "Architect",
-    stage: "Access Readiness",
-    energy: "Achiever",
+    stage: "Prepare",
+    energy: "Organizer",
     item_type: "behavior",
     reverse: false,
   },
@@ -377,8 +398,8 @@ export const QUESTIONS: Question[] = [
     order: 31,
     text: "I evaluate whether conditions are suitable before committing to action.",
     role: "Architect",
-    stage: "Access Readiness",
-    energy: "Achiever",
+    stage: "Prepare",
+    energy: "Organizer",
     item_type: "behavior",
     reverse: false,
   },
@@ -389,8 +410,8 @@ export const QUESTIONS: Question[] = [
     order: 32,
     text: "Under pressure, I still prioritize preparation rather than rushing into execution prematurely.",
     role: "Architect",
-    stage: "Access Readiness",
-    energy: "Achiever",
+    stage: "Prepare",
+    energy: "Organizer",
     item_type: "pressure",
     reverse: false,
   },
@@ -399,8 +420,8 @@ export const QUESTIONS: Question[] = [
     order: 33,
     text: "When timelines are tight, I focus on ensuring that key elements are in place before proceeding.",
     role: "Architect",
-    stage: "Access Readiness",
-    energy: "Achiever",
+    stage: "Prepare",
+    energy: "Organizer",
     item_type: "pressure",
     reverse: false,
   },
@@ -409,8 +430,8 @@ export const QUESTIONS: Question[] = [
     order: 34,
     text: "Even in urgent situations, I assess readiness to avoid unnecessary failure.",
     role: "Architect",
-    stage: "Access Readiness",
-    energy: "Achiever",
+    stage: "Prepare",
+    energy: "Organizer",
     item_type: "pressure",
     reverse: false,
   },
@@ -421,8 +442,8 @@ export const QUESTIONS: Question[] = [
     order: 35,
     text: "I believe it is better to start quickly and figure things out later rather than spend time preparing.",
     role: "Architect",
-    stage: "Access Readiness",
-    energy: "Achiever",
+    stage: "Prepare",
+    energy: "Organizer",
     item_type: "reverse",
     reverse: true,
   },
@@ -431,14 +452,17 @@ export const QUESTIONS: Question[] = [
     order: 36,
     text: "I often move into action without ensuring that the necessary structures are in place.",
     role: "Architect",
-    stage: "Access Readiness",
-    energy: "Achiever",
+    stage: "Prepare",
+    energy: "Organizer",
     item_type: "reverse",
     reverse: true,
   },
 
   // ══════════════════════════════════════════════════════════
-  // STAGE 4: PARTICIPATE THROUGH DIALOGUE (12 items)
+  // STAGE 4: ALIGN (12 items)
+  // Role: Connector | Energy: Unifier
+  // Connectors are naturally strong in Align — they build trust,
+  // communication, and shared direction.
   // ══════════════════════════════════════════════════════════
 
   // Preference (3)
@@ -447,7 +471,7 @@ export const QUESTIONS: Question[] = [
     order: 37,
     text: "I naturally focus on ensuring that people are aligned, engaged, and working toward a shared direction.",
     role: "Connector",
-    stage: "Participate Through Dialogue",
+    stage: "Align",
     energy: "Unifier",
     item_type: "preference",
     reverse: false,
@@ -457,7 +481,7 @@ export const QUESTIONS: Question[] = [
     order: 38,
     text: "I value clarity, trust, and mutual understanding within teams and organizations.",
     role: "Connector",
-    stage: "Participate Through Dialogue",
+    stage: "Align",
     energy: "Unifier",
     item_type: "preference",
     reverse: false,
@@ -467,7 +491,7 @@ export const QUESTIONS: Question[] = [
     order: 39,
     text: "I am drawn to facilitating conversations that bring people together around common goals.",
     role: "Connector",
-    stage: "Participate Through Dialogue",
+    stage: "Align",
     energy: "Unifier",
     item_type: "preference",
     reverse: false,
@@ -479,7 +503,7 @@ export const QUESTIONS: Question[] = [
     order: 40,
     text: "I actively ensure that expectations, roles, and objectives are clearly communicated to everyone involved.",
     role: "Connector",
-    stage: "Participate Through Dialogue",
+    stage: "Align",
     energy: "Unifier",
     item_type: "behavior",
     reverse: false,
@@ -489,7 +513,7 @@ export const QUESTIONS: Question[] = [
     order: 41,
     text: "I address misunderstandings or misalignment before they become larger issues.",
     role: "Connector",
-    stage: "Participate Through Dialogue",
+    stage: "Align",
     energy: "Unifier",
     item_type: "behavior",
     reverse: false,
@@ -499,7 +523,7 @@ export const QUESTIONS: Question[] = [
     order: 42,
     text: "I create opportunities for dialogue so that people can contribute and feel included.",
     role: "Connector",
-    stage: "Participate Through Dialogue",
+    stage: "Align",
     energy: "Unifier",
     item_type: "behavior",
     reverse: false,
@@ -509,7 +533,7 @@ export const QUESTIONS: Question[] = [
     order: 43,
     text: "I ensure that decisions are understood and supported by the people responsible for execution.",
     role: "Connector",
-    stage: "Participate Through Dialogue",
+    stage: "Align",
     energy: "Unifier",
     item_type: "behavior",
     reverse: false,
@@ -521,7 +545,7 @@ export const QUESTIONS: Question[] = [
     order: 44,
     text: "Under pressure, I prioritize alignment and communication rather than forcing quick decisions without clarity.",
     role: "Connector",
-    stage: "Participate Through Dialogue",
+    stage: "Align",
     energy: "Unifier",
     item_type: "pressure",
     reverse: false,
@@ -531,7 +555,7 @@ export const QUESTIONS: Question[] = [
     order: 45,
     text: "In tense situations, I address conflict directly to maintain trust and cohesion.",
     role: "Connector",
-    stage: "Participate Through Dialogue",
+    stage: "Align",
     energy: "Unifier",
     item_type: "pressure",
     reverse: false,
@@ -541,7 +565,7 @@ export const QUESTIONS: Question[] = [
     order: 46,
     text: "When challenges arise, I ensure that people remain connected and focused on shared outcomes.",
     role: "Connector",
-    stage: "Participate Through Dialogue",
+    stage: "Align",
     energy: "Unifier",
     item_type: "pressure",
     reverse: false,
@@ -553,7 +577,7 @@ export const QUESTIONS: Question[] = [
     order: 47,
     text: "I avoid difficult conversations, even when misalignment is affecting results.",
     role: "Connector",
-    stage: "Participate Through Dialogue",
+    stage: "Align",
     energy: "Unifier",
     item_type: "reverse",
     reverse: true,
@@ -563,14 +587,18 @@ export const QUESTIONS: Question[] = [
     order: 48,
     text: "I assume that people understand expectations without verifying alignment.",
     role: "Connector",
-    stage: "Participate Through Dialogue",
+    stage: "Align",
     energy: "Unifier",
     item_type: "reverse",
     reverse: true,
   },
 
   // ══════════════════════════════════════════════════════════
-  // STAGE 5: TRANSFORM THROUGH ALIGNMENT (12 items)
+  // STAGE 5: TRANSFORM (12 items)
+  // Role: Driver | Energy: Achiever
+  // Drivers are naturally strong in Transform — they convert plans
+  // into execution and measurable movement.
+  // Former Activator questions (TRANS_B4, TRANS_PR3) remapped to Driver.
   // ══════════════════════════════════════════════════════════
 
   // Preference (3)
@@ -579,7 +607,7 @@ export const QUESTIONS: Question[] = [
     order: 49,
     text: "I am naturally energized by turning ideas, plans, and strategies into tangible results.",
     role: "Driver",
-    stage: "Transform Through Alignment",
+    stage: "Transform",
     energy: "Achiever",
     item_type: "preference",
     reverse: false,
@@ -589,7 +617,7 @@ export const QUESTIONS: Question[] = [
     order: 50,
     text: "I enjoy driving progress and ensuring that work moves forward consistently.",
     role: "Driver",
-    stage: "Transform Through Alignment",
+    stage: "Transform",
     energy: "Achiever",
     item_type: "preference",
     reverse: false,
@@ -599,7 +627,7 @@ export const QUESTIONS: Question[] = [
     order: 51,
     text: "I focus on achieving outcomes and delivering measurable impact.",
     role: "Driver",
-    stage: "Transform Through Alignment",
+    stage: "Transform",
     energy: "Achiever",
     item_type: "preference",
     reverse: false,
@@ -611,7 +639,7 @@ export const QUESTIONS: Question[] = [
     order: 52,
     text: "I take ownership of moving initiatives from planning into execution.",
     role: "Driver",
-    stage: "Transform Through Alignment",
+    stage: "Transform",
     energy: "Achiever",
     item_type: "behavior",
     reverse: false,
@@ -621,7 +649,7 @@ export const QUESTIONS: Question[] = [
     order: 53,
     text: "I maintain momentum and ensure that progress continues despite obstacles.",
     role: "Driver",
-    stage: "Transform Through Alignment",
+    stage: "Transform",
     energy: "Achiever",
     item_type: "behavior",
     reverse: false,
@@ -631,7 +659,7 @@ export const QUESTIONS: Question[] = [
     order: 54,
     text: "I hold myself and others accountable for delivering results.",
     role: "Driver",
-    stage: "Transform Through Alignment",
+    stage: "Transform",
     energy: "Achiever",
     item_type: "behavior",
     reverse: false,
@@ -640,8 +668,8 @@ export const QUESTIONS: Question[] = [
     id: "TRANS_B4",
     order: 55,
     text: "I track progress and adjust actions to ensure goals are achieved.",
-    role: "Activator",
-    stage: "Transform Through Alignment",
+    role: "Driver", // formerly Activator — remapped to Driver (execution-focused)
+    stage: "Transform",
     energy: "Achiever",
     item_type: "behavior",
     reverse: false,
@@ -653,7 +681,7 @@ export const QUESTIONS: Question[] = [
     order: 56,
     text: "Under pressure, I increase focus and effort to ensure that results are delivered.",
     role: "Driver",
-    stage: "Transform Through Alignment",
+    stage: "Transform",
     energy: "Achiever",
     item_type: "pressure",
     reverse: false,
@@ -663,7 +691,7 @@ export const QUESTIONS: Question[] = [
     order: 57,
     text: "In demanding situations, I remain committed to execution rather than withdrawing or delaying.",
     role: "Driver",
-    stage: "Transform Through Alignment",
+    stage: "Transform",
     energy: "Achiever",
     item_type: "pressure",
     reverse: false,
@@ -672,8 +700,8 @@ export const QUESTIONS: Question[] = [
     id: "TRANS_PR3",
     order: 58,
     text: "When challenges arise, I adapt quickly to keep progress moving forward.",
-    role: "Activator",
-    stage: "Transform Through Alignment",
+    role: "Driver", // formerly Activator — remapped to Driver (execution-focused)
+    stage: "Transform",
     energy: "Achiever",
     item_type: "pressure",
     reverse: false,
@@ -685,7 +713,7 @@ export const QUESTIONS: Question[] = [
     order: 59,
     text: "I often struggle to follow through on plans once execution becomes difficult.",
     role: "Driver",
-    stage: "Transform Through Alignment",
+    stage: "Transform",
     energy: "Achiever",
     item_type: "reverse",
     reverse: true,
@@ -695,14 +723,19 @@ export const QUESTIONS: Question[] = [
     order: 60,
     text: "I lose momentum when obstacles or resistance appear during implementation.",
     role: "Driver",
-    stage: "Transform Through Alignment",
+    stage: "Transform",
     energy: "Achiever",
     item_type: "reverse",
     reverse: true,
   },
 
   // ══════════════════════════════════════════════════════════
-  // STAGE 6: SCALE AND SUSTAIN (12 items)
+  // STAGE 6: SUSTAIN (12 items)
+  // Role: Connector | Energy: Unifier
+  // Connectors are strong in Sustain — they maintain consistency,
+  // relationships, and long-term culture.
+  // Former Stabilizer questions remapped to Connector (sustaining
+  // systems and culture aligns with Connector's trust-building nature).
   // ══════════════════════════════════════════════════════════
 
   // Preference (3)
@@ -710,9 +743,9 @@ export const QUESTIONS: Question[] = [
     id: "SUST_P1",
     order: 61,
     text: "I naturally focus on maintaining systems, processes, and results over the long term.",
-    role: "Stabilizer",
-    stage: "Scale and Sustain",
-    energy: "Organizer",
+    role: "Connector", // formerly Stabilizer — remapped; sustaining culture fits Connector
+    stage: "Sustain",
+    energy: "Unifier",
     item_type: "preference",
     reverse: false,
   },
@@ -720,9 +753,9 @@ export const QUESTIONS: Question[] = [
     id: "SUST_P2",
     order: 62,
     text: "I value consistency, discipline, and long-term impact over short-term success.",
-    role: "Stabilizer",
-    stage: "Scale and Sustain",
-    energy: "Organizer",
+    role: "Connector",
+    stage: "Sustain",
+    energy: "Unifier",
     item_type: "preference",
     reverse: false,
   },
@@ -730,9 +763,9 @@ export const QUESTIONS: Question[] = [
     id: "SUST_P3",
     order: 63,
     text: "I enjoy ensuring that what is built continues to function effectively over time.",
-    role: "Stabilizer",
-    stage: "Scale and Sustain",
-    energy: "Organizer",
+    role: "Connector",
+    stage: "Sustain",
+    energy: "Unifier",
     item_type: "preference",
     reverse: false,
   },
@@ -742,9 +775,9 @@ export const QUESTIONS: Question[] = [
     id: "SUST_B1",
     order: 64,
     text: "I monitor performance to ensure that systems continue to deliver expected results.",
-    role: "Stabilizer",
-    stage: "Scale and Sustain",
-    energy: "Organizer",
+    role: "Connector",
+    stage: "Sustain",
+    energy: "Unifier",
     item_type: "behavior",
     reverse: false,
   },
@@ -752,9 +785,9 @@ export const QUESTIONS: Question[] = [
     id: "SUST_B2",
     order: 65,
     text: "I reinforce habits, standards, and processes that support sustainability.",
-    role: "Stabilizer",
-    stage: "Scale and Sustain",
-    energy: "Organizer",
+    role: "Connector",
+    stage: "Sustain",
+    energy: "Unifier",
     item_type: "behavior",
     reverse: false,
   },
@@ -762,9 +795,9 @@ export const QUESTIONS: Question[] = [
     id: "SUST_B3",
     order: 66,
     text: "I identify risks that could weaken long-term stability.",
-    role: "Stabilizer",
-    stage: "Scale and Sustain",
-    energy: "Organizer",
+    role: "Connector",
+    stage: "Sustain",
+    energy: "Unifier",
     item_type: "behavior",
     reverse: false,
   },
@@ -772,9 +805,9 @@ export const QUESTIONS: Question[] = [
     id: "SUST_B4",
     order: 67,
     text: "I maintain discipline to ensure consistency over time.",
-    role: "Stabilizer",
-    stage: "Scale and Sustain",
-    energy: "Organizer",
+    role: "Connector",
+    stage: "Sustain",
+    energy: "Unifier",
     item_type: "behavior",
     reverse: false,
   },
@@ -784,9 +817,9 @@ export const QUESTIONS: Question[] = [
     id: "SUST_PR1",
     order: 68,
     text: "Under pressure, I protect long-term outcomes rather than sacrificing them for short-term gains.",
-    role: "Stabilizer",
-    stage: "Scale and Sustain",
-    energy: "Organizer",
+    role: "Connector",
+    stage: "Sustain",
+    energy: "Unifier",
     item_type: "pressure",
     reverse: false,
   },
@@ -794,9 +827,9 @@ export const QUESTIONS: Question[] = [
     id: "SUST_PR2",
     order: 69,
     text: "In difficult situations, I remain committed to maintaining systems and structures.",
-    role: "Stabilizer",
-    stage: "Scale and Sustain",
-    energy: "Organizer",
+    role: "Connector",
+    stage: "Sustain",
+    energy: "Unifier",
     item_type: "pressure",
     reverse: false,
   },
@@ -804,9 +837,9 @@ export const QUESTIONS: Question[] = [
     id: "SUST_PR3",
     order: 70,
     text: "When faced with trade-offs, I prioritize sustainability and long-term value.",
-    role: "Stabilizer",
-    stage: "Scale and Sustain",
-    energy: "Organizer",
+    role: "Connector",
+    stage: "Sustain",
+    energy: "Unifier",
     item_type: "pressure",
     reverse: false,
   },
@@ -816,9 +849,9 @@ export const QUESTIONS: Question[] = [
     id: "SUST_R1",
     order: 71,
     text: "I tend to lose interest once something has been successfully launched.",
-    role: "Stabilizer",
-    stage: "Scale and Sustain",
-    energy: "Organizer",
+    role: "Connector",
+    stage: "Sustain",
+    energy: "Unifier",
     item_type: "reverse",
     reverse: true,
   },
@@ -826,9 +859,9 @@ export const QUESTIONS: Question[] = [
     id: "SUST_R2",
     order: 72,
     text: "I focus more on starting new initiatives than maintaining existing ones.",
-    role: "Stabilizer",
-    stage: "Scale and Sustain",
-    energy: "Organizer",
+    role: "Connector",
+    stage: "Sustain",
+    energy: "Unifier",
     item_type: "reverse",
     reverse: true,
   },
@@ -840,29 +873,22 @@ export const ORDERED_QUESTIONS = [...QUESTIONS].sort(
 
 export const TOTAL_QUESTIONS = QUESTIONS.length; // 72
 
-export const ROLES: Role[] = [
-  "Spotter",
-  "Driver",
-  "Architect",
-  "Connector",
-  "Activator",
-  "Stabilizer",
-];
+export const ROLES: Role[] = ["Driver", "Connector", "Architect", "Spotter"];
 
 export const STAGES: AdaptsStage[] = [
-  "Alert the System",
-  "Diagnose the Gaps",
-  "Access Readiness",
-  "Participate Through Dialogue",
-  "Transform Through Alignment",
-  "Scale and Sustain",
+  "Alert",
+  "Diagnose",
+  "Prepare",
+  "Align",
+  "Transform",
+  "Sustain",
 ];
 
 export const ENERGIES: Energy[] = [
-  "Innovator",
   "Achiever",
-  "Organizer",
   "Unifier",
+  "Organizer",
+  "Innovator",
 ];
 
 /** Items per stage broken down by type — useful for weighted scoring */
