@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { buildIndividualReportHTML, generatePDF } from '@/lib/pdf/generator'
-import { buildNarrative } from '@/lib/assessment/narratives'
+import { buildNarrative, normalizeStageName } from '@/lib/assessment/narratives'
 import { type Role, type AdaptsStage, type Energy, STAGES } from '@/lib/assessment/questions'
 import type { ScoreResult, StageDetail } from '@/lib/assessment/scoring'
 import { getStageBand } from '@/lib/assessment/scoring'
@@ -52,13 +52,25 @@ export async function GET(req: NextRequest) {
     .eq('id', session.user.id)
     .single()
 
-  const stage_scores = scoresRow.stage_scores as Record<AdaptsStage, number>
+  const rawStageScores = scoresRow.stage_scores as Record<string, number>
+  const stage_scores = Object.fromEntries(
+    Object.entries(rawStageScores).map(([stage, score]) => [
+      normalizeStageName(stage),
+      score,
+    ])
+  ) as Record<AdaptsStage, number>
+  const rawDerived = scoresRow.derived as ScoreResult['derived']
+  const derived = {
+    ...rawDerived,
+    top_adapts_stages:    rawDerived.top_adapts_stages.map(s => normalizeStageName(s)) as AdaptsStage[],
+    bottom_adapts_stages: rawDerived.bottom_adapts_stages.map(s => normalizeStageName(s)) as AdaptsStage[],
+  }
 
     const scores: ScoreResult = {
       role_scores:   scoresRow.role_scores   as Record<Role, number>,
       stage_scores,
       energy_scores: scoresRow.energy_scores as Record<Energy, number>,
-      derived: scoresRow.derived       as ScoreResult['derived'],
+      derived,
       // Reconstruct stage_detail from stored scores (stability/integrity/risk not stored,
       // so default to neutral values — full detail only available at calculation time)
       stage_detail: Object.fromEntries(
