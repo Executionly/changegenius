@@ -2837,3 +2837,262 @@ nav {
 .payment-secure span:last-child {
   color: white;
 }
+/* =========================================================
+   PRODUCTIVITY ENERGY SECTION
+   ========================================================= */
+.productivity-energy-section {
+  background: linear-gradient(135deg, #0101ee 0%, #1a1aff 60%, #2d2dff 100%);
+  padding: 80px 40px;
+  width: 100%;
+}
+
+.pe-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Header */
+.pe-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+/* Body: square left + details right */
+.pe-body {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+/* ── AIOU Square ── */
+.pe-square-wrap {
+  position: sticky;
+  top: 40px;
+}
+
+.pe-square {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pe-quadrant {
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 28px 24px;
+  transition: background 0.2s ease;
+}
+
+.pe-quadrant:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.pe-letter {
+  font-family: "Questrial", sans-serif;
+  font-size: clamp(52px, 6vw, 80px);
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.pe-quad-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgb(255, 255, 255);
+}
+
+.pe-square-caption {
+  margin-top: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgb(255, 255, 255);
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+/* ── Details column ── */
+.pe-details {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.pe-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 40px;
+}
+
+.pe-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* Item heading row */
+.pe-item-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.pe-item-letter {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Questrial", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.pe-item-name {
+  font-family: "Questrial", sans-serif;
+  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+  font-weight: 700;
+  color: white;
+  margin: 0 0 3px;
+  letter-spacing: -0.3px;
+}
+
+.pe-item-tagline {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgb(255, 255, 255);
+  margin: 0;
+}
+
+/* Two-column list layout inside each item */
+.pe-item-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.pe-col-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgb(0, 0, 0);
+  margin: 0 0 10px;
+  background-color: greenyellow;
+  padding: 10px;
+}
+.pe-col-label.drain {
+  background-color: var(--red);
+  color: rgb(255, 255, 255);
+}
+
+.pe-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pe-list li {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(255, 255, 255);
+  line-height: 1.4;
+  padding-left: 14px;
+  position: relative;
+}
+
+.pe-list--alive li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.pe-list--drain li {
+  color: rgb(255, 255, 255);
+}
+
+.pe-list--drain li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 5px;
+  height: 1.5px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .pe-body {
+    grid-template-columns: 300px 1fr;
+    gap: 48px;
+  }
+}
+
+@media (max-width: 900px) {
+  .productivity-energy-section {
+    padding: 64px 24px;
+  }
+  .pe-body {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+  .pe-square-wrap {
+    position: static;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .productivity-energy-section {
+    padding: 48px 16px;
+  }
+  .pe-header {
+    margin-bottom: 40px;
+  }
+  .pe-square {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+  .pe-quadrant {
+    padding: 20px 16px;
+  }
+  .pe-letter {
+    font-size: 44px;
+  }
+  .pe-item-body {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .pe-details {
+    gap: 32px;
+  }
+  .pe-item {
+    padding-bottom: 32px;
+  }
+}

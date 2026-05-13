@@ -9,12 +9,12 @@ import { PRICING, formatPrice, getTeamTotalPrice } from "@/lib/config/pricing";
 // Data for interactive sections
 // ------------------------------
 const stages = [
-  "Alert — The Spotter",
-  "Diagnose — The Activator",
-  "Prepare — The Architect",
-  "Align — The Connector",
-  "Transform — The Driver",
-  "Sustain — The Stabilizer",
+  "Alert",
+  "Diagnose",
+  "Prepare",
+  "Align",
+  "Transform",
+  "Sustain",
 ];
 
 const stageDetails: Record<
@@ -22,52 +22,52 @@ const stageDetails: Record<
   { preview: string; title: string; description: string; insight: string }
 > = {
   alert: {
-    preview: "Sees early signs of what needs to change",
-    title: "Alert — The Spotter",
+    preview: "Recognizes signals, opportunities, risks, and changing realities",
+    title: "Alert",
     description:
-      "Quickly notices what others overlook and recognizes the early signs of what needs to change.",
+      "Recognizes signals, opportunities, risks, and changing realities before others notice them.",
     insight:
-      "The Spotter sees disruption before others do. They read weak signals in the market, culture, and operations — giving organizations the crucial head‑start needed to respond rather than react. They get frustrated when obvious issues are ignored and naturally look for better ways forward.",
+      "Strong users are aware, proactive, and observant — they give organizations the crucial head-start needed to respond rather than react. Weak users tend to be reactive and slow to notice problems, leaving teams blindsided by changes that were visible long before they became crises.",
   },
   diagnose: {
-    preview: "Breaks problems down to the root cause",
-    title: "Diagnose — The Activator",
+    preview: "Understands root causes and identifies real problems",
+    title: "Diagnose",
     description:
-      "Represents people who naturally initiate movement, energize action, and help teams move from ideas into momentum.",
+      "Understands root causes and identifies the real problems beneath the surface.",
     insight:
-      "The activator focuses on activation, urgency, and driving forward motion.",
+      "Strong users are analytical, thoughtful, and strategic — they ensure teams solve the right problem, not just the visible symptom. Weak users diagnose incorrectly or treat symptoms only, leading to recurring issues and wasted effort on solutions that never fully land.",
   },
   access: {
-    preview: "Sets people and systems up for success",
-    title: "Prepare — The Architect",
+    preview: "Builds structure, readiness, planning, and systems",
+    title: "Prepare",
     description:
-      "Sets people, systems, and structures up so execution can succeed.",
+      "Builds the structure, readiness, planning, and systems needed before execution begins.",
     insight:
-      "The Architect ensures the organization is genuinely prepared before change is deployed. They identify gaps in capability, capacity, and confidence — reducing execution risk. They get frustrated when things start without proper planning and work to ensure everything is ready.",
+      "Strong users are organized, intentional, and prepared — they reduce execution risk by ensuring people, systems, and structures are ready before change is deployed. Weak users rush into execution without clarity, leading to confusion, rework, and capability gaps that surface mid-delivery.",
   },
   participate: {
-    preview: "Brings people together around a clear direction",
-    title: "Align — The Connector",
+    preview: "Creates trust, communication, and shared direction",
+    title: "Align",
     description:
-      "Brings people together around a clear direction and builds trust within the team.",
+      "Creates trust, communication, and shared direction so teams move as one.",
     insight:
-      "The Connector prevents silent failures. They create environments where it is safe to surface problems early — keeping communication flowing and course-correcting in real time. They feel the tension when people are not on the same page and work to create unity and clarity.",
+      "Strong users are collaborative, clear communicators, and trust builders — they create environments where it is safe to surface problems early and keep teams connected through disruption. Weak users leave teams disconnected, with poor buy-in and confusion that causes silent failures to grow undetected.",
   },
   transform: {
-    preview: "Turns plans into action and keeps momentum moving",
-    title: "Transform — The Driver",
+    preview: "Turns plans into execution and measurable movement",
+    title: "Transform",
     description:
-      "Turns plans into action and keeps momentum moving toward results.",
+      "Turns plans into execution and drives measurable movement toward outcomes.",
     insight:
-      "The Driver eliminates competing agendas. They build shared understanding that allows large, complex organizations to pull in one direction — even through ambiguity. They get frustrated when progress stalls and push things forward until outcomes are achieved.",
+      "Strong users are action-oriented, decisive, and execution-focused — they keep momentum moving and push initiatives through to completion. Weak users produce inconsistent execution and stalled progress, where plans look good on paper but never fully convert into real results.",
   },
   scale: {
-    preview: "Ensures what is built continues to work over time",
-    title: "Sustain — The Stabilizer",
+    preview: "Maintains consistency, systems, rhythm, and long-term growth",
+    title: "Sustain",
     description:
-      "Ensures what is built continues to work and improves over time.",
+      "Maintains consistency, systems, rhythm, and the foundations for long-term growth.",
     insight:
-      "The Stabilizer ensures transformation goes beyond the initial pilot. They institutionalize new behaviors, expand impact, and build systems that make change self-sustaining. They get frustrated when things are abandoned too quickly and focus on consistency and long-term impact.",
+      "Strong users are disciplined, scalable, and sustainable — they institutionalize new behaviors and build systems that make change self-sustaining beyond the initial push. Weak users rely on short-term momentum only, leading to burnout, inconsistency, and initiatives that fade once the initial energy dissipates.",
   },
 };
 
@@ -115,6 +115,57 @@ const energyCards = [
       "Relationship-led",
       "Empathy-driven",
     ],
+  },
+];
+
+const productivityEnergies = [
+  {
+    key: "A",
+    name: "Achiever",
+    tagline: "Energized by progress and results.",
+    alive: [
+      "Completing goals",
+      "Seeing momentum",
+      "Producing measurable outcomes",
+      "Achieving targets",
+    ],
+    drain: ["Inactivity", "Slow movement", "Lack of visible progress"],
+  },
+  {
+    key: "I",
+    name: "Innovator",
+    tagline: "Energized by ideas and possibilities.",
+    alive: [
+      "Creating new ideas",
+      "Solving complex problems",
+      "Exploring possibilities",
+      "Thinking creatively",
+    ],
+    drain: ["Repetitive work", "Rigid environments", "Lack of creativity"],
+  },
+  {
+    key: "O",
+    name: "Organizer",
+    tagline: "Energized by structure and order.",
+    alive: [
+      "Creating systems",
+      "Organizing complexity",
+      "Improving workflows",
+      "Building clarity",
+    ],
+    drain: ["Chaos", "Inconsistency", "Lack of direction"],
+  },
+  {
+    key: "U",
+    name: "Unifier",
+    tagline: "Energized by people and connection.",
+    alive: [
+      "Building relationships",
+      "Helping people succeed",
+      "Strengthening trust",
+      "Creating harmony",
+    ],
+    drain: ["Conflict", "Isolation", "Emotionally disconnected environments"],
   },
 ];
 
@@ -1094,6 +1145,78 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/*========== PRODUCTIVITY ENERGY INTO============= */}
+      <section className="productivity-energy-section">
+        <div className="pe-inner">
+          <div className="pe-header">
+            <div className="framework-subtitle" style={{ marginBottom: 12 }}>
+              Productivity Energy
+            </div>
+            <h2 className="framework-title" style={{ color: "white" }}>
+              Know Your Energy Type
+            </h2>
+            <p className="framework-description">
+              Every person carries a dominant productivity energy. Understanding
+              yours reveals where you thrive, what fuels your best work, and how
+              to build teams that complement each other.
+            </p>
+          </div>
+
+          <div className="pe-body">
+            {/* LEFT — AIOU square */}
+            <div className="pe-square-wrap">
+              <div
+                className="pe-square"
+                aria-label="AIOU Productivity Energies"
+              >
+                {productivityEnergies.map((e) => (
+                  <div key={e.key} className="pe-quadrant">
+                    <span className="pe-letter">{e.key}</span>
+                    <span className="pe-quad-name">{e.name}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="pe-square-caption">
+                A · I · O · U — four distinct productivity energies
+              </p>
+            </div>
+
+            {/* RIGHT — plain text grid */}
+            <div className="pe-details">
+              {productivityEnergies.map((e) => (
+                <div key={e.key} className="pe-item">
+                  <div className="pe-item-head">
+                    <span className="pe-item-letter">{e.key}</span>
+                    <div>
+                      <h3 className="pe-item-name">{e.name}</h3>
+                      <p className="pe-item-tagline">{e.tagline}</p>
+                    </div>
+                  </div>
+
+                  <div className="pe-item-body">
+                    <div className="pe-col">
+                      <p className="pe-col-label">Feels most alive when</p>
+                      <ul className="pe-list pe-list--alive">
+                        {e.alive.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="pe-col">
+                      <p className="pe-col-label drain">Drain factors</p>
+                      <ul className="pe-list pe-list--drain">
+                        {e.drain.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
       {/* ========== PROMISE SECTION ========== */}
       <section className="promise-section">
         <div className="promise-container">
@@ -1356,7 +1479,7 @@ export default function HomePage() {
           </svg>
         </div>
         <div className="energy-header">
-          <h2>Know Your Productivity Energy</h2>
+          <h2> Productivity Energy</h2>
           <p>How you show up during change</p>
         </div>
         <div className="stack-container">
