@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { computeTeamDiagnostic, type MemberScore } from '@/lib/assessment/team-diagnostic'
 import type { Role, AdaptsStage, Energy } from '@/lib/assessment/questions'
+import { normalizeStageName } from '@/lib/assessment/narratives'
 
 interface IMemberScore {
   userId:      string
@@ -90,7 +91,14 @@ export async function GET(req: NextRequest) {
         .maybeSingle()
 
       if (scores) {
-        stageScores = scores.stage_scores as Record<AdaptsStage, number>
+        // Normalize old long stage names → new short names
+        const rawStageScores = scores.stage_scores as Record<string, number>
+        const normalizedStageScores = {} as Record<AdaptsStage, number>
+        for (const [stage, score] of Object.entries(rawStageScores)) {
+          const normalized = normalizeStageName(stage) as AdaptsStage
+          normalizedStageScores[normalized] = score
+        }
+        stageScores = normalizedStageScores
         energyScores = scores.energy_scores as Record<Energy, number>
       }
     }
