@@ -34,13 +34,13 @@ const ENERGY_COLORS: Record<string, string> = {
 };
 
 const ADAPTS_ORDER = [
-  "Adapt",
+  "Alert",
   "Diagnose",
-  "Align",
   "Prepare",
+  "Align",
   "Transform",
   "Sustain",
-];
+] as const;
 
 // ── Band → colour ──────────────────────────────────────────────
 function bandColor(band: StageBand): string {
@@ -524,10 +524,10 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
 
     <div style="display:flex;flex-direction:column;gap:12px">
       ${ADAPTS_ORDER.map((stage) => {
-        const score = stage_scores[stage as keyof typeof stage_scores];
+        const score  = stage_scores[stage as keyof typeof stage_scores] ?? 0;
         const detail = stage_detail[stage as keyof typeof stage_detail];
-
-        const color = bandColor(detail.band);
+        if (!detail) return ''; // guard against missing stage
+        const color  = bandColor(detail.band);
 
         return `
           <div style="background:${C.grayLight};border-radius:10px;padding:16px 20px">
@@ -538,12 +538,8 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
                   ${detail.band}
                 </span>
               </div>
-
-              <span style="font-size:20px;font-weight:800;color:${color}">
-                ${score}
-              </span>
+              <span style="font-size:20px;font-weight:800;color:${color}">${score}</span>
             </div>
-
             ${scoreBar(Number(score), color)}
           </div>
         `;
