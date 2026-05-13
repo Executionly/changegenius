@@ -445,7 +445,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
         </ul>
       </div>
     </div>
-  `, 7));
+  `, 6));
 
   // ── Page 8: Energy profile (Part 1) — cards + score breakdown ─
   pages.push(page(`
@@ -483,7 +483,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
 
     <h3 style="margin-bottom:12px">${energy_profile.dominant.toUpperCase()} ENERGY</h3>
     <p style="margin-bottom:24px">${narrative.energy_detailed}</p>
-  `, 8));
+  `, 7));
 
   // ── Page 9: Energy profile (Part 2) — dominant energy detail ──
   pages.push(page(`
@@ -505,7 +505,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
         </ul>
       </div>
     </div>
-  `, 9));
+  `, 8));
 
   // ── Page 10: ADAPTS full profile ──────────────────────────
   pages.push(page(`
@@ -530,7 +530,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
         </div>`;
       }).join("")}
     </div>
-  `, 10));
+  `, 9));
 
   // ── Page 11: ADAPTS strengths & growth ────────────────────
   pages.push(page(`
@@ -551,7 +551,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       <div class="label" style="color:${C.amber};margin-bottom:8px">NOTE ON DEVELOPMENT AREAS</div>
       <p style="font-size:13px">Development areas are not permanent limitations — they are growth opportunities and delegation signals. Some people become highly capable in their weaker stages through experience or focused development. However, sustained effort in these areas without support may lead to fatigue. Seek partners with complementary strengths to cover these stages.</p>
     </div>
-  `, 11));
+  `, 10));
 
   // ── Page 12: Application (Part 1) — work from genius + team ──
   pages.push(page(`
@@ -568,7 +568,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
     <ul class="bullets">
       ${narrative.how_to_apply_as_team.map(a => `<li>${a}</li>`).join("")}
     </ul>
-  `, 12));
+  `, 11));
 
   // ── Page 13: Application (Part 2) — 30-day action plan ────
   pages.push(page(`
@@ -583,7 +583,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
           <p style="font-size:14px;margin:0;line-height:1.7">${action}</p>
         </div>`).join("")}
     </div>
-  `, 13));
+  `, 12));
 
   // ── Pages 14–16: Entrepreneur Application (3 pages) ───────
   const weakestStage  = derived.bottom_adapts_stages[0];
@@ -618,7 +618,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       </div>
       <span class="chip" style="background:${C.green}20;color:${C.green};font-size:10px;white-space:nowrap;margin-left:20px">LEVERAGE THIS</span>
     </div>
-  `, 14));
+  `, 13));
 
   // Entrepreneur Part 2: best focus + offer feedback + content direction
   pages.push(page(`
@@ -669,7 +669,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
         </div>
       </div>
     </div>
-  `, 15));
+  `, 14));
 
   // Entrepreneur Part 3: execution support + next best move + CTA
   pages.push(page(`
@@ -714,7 +714,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       <div style="font-size:15px;font-weight:700;color:${C.navy};margin-bottom:6px">Build from your genius.</div>
       <p style="font-size:13px;color:${C.gray};margin:0;line-height:1.6">Your Change Genius™ is not just about self-awareness. It is a guide for turning your value into clear offers, consistent execution, and sustainable income.</p>
     </div>
-  `, 16));
+  `, 15));
 
   // ── Page 17: What's next ───────────────────────────────────
   pages.push(page(`
@@ -748,7 +748,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       <div style="font-size:16px;font-weight:700;color:${C.navy}">Reach us at</div>
       <a href="mailto:info@changegeniusai.com" style="display:inline-block;margin-top:8px;font-size:18px;font-weight:800;color:${C.purple};text-decoration:none">info@changegeniusai.com</a>
     </div>
-  `, 12));
+  `, 16));
 
   return `<!DOCTYPE html>
 <html lang="en">
