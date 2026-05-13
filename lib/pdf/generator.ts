@@ -33,6 +33,15 @@ const ENERGY_COLORS: Record<string, string> = {
   Innovator: C.gold,
 };
 
+const ADAPTS_ORDER = [
+  "Adapt",
+  "Diagnose",
+  "Align",
+  "Prepare",
+  "Transform",
+  "Sustain",
+];
+
 // ── Band → colour ──────────────────────────────────────────────
 function bandColor(band: StageBand): string {
   switch (band) {
@@ -160,7 +169,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       <div>
         <div class="label" style="color:${C.purple};margin-bottom:24px">ASSESSMENT REPORT</div>
         <h1 style="color:${C.navy};font-size:48px;line-height:1.1;margin-bottom:8px">
-          CHANGE<br>GENIUS™
+          CHANGE GENIUS™
         </h1>
         <div style="width:60px;height:4px;background:${C.gold};margin:20px 0 28px"></div>
         <p style="font-size:18px;color:${C.gray};font-weight:300">${name}'s Change Genius™ Revealed</p>
@@ -514,20 +523,30 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
     <div class="divider"></div>
 
     <div style="display:flex;flex-direction:column;gap:12px">
-      ${Object.entries(stage_scores).map(([stage, score]) => {
+      ${ADAPTS_ORDER.map((stage) => {
+        const score = stage_scores[stage as keyof typeof stage_scores];
         const detail = stage_detail[stage as keyof typeof stage_detail];
-        const color  = bandColor(detail.band);
+
+        const color = bandColor(detail.band);
+
         return `
-        <div style="background:${C.grayLight};border-radius:10px;padding:16px 20px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <div>
-              <span style="font-size:14px;font-weight:700">${stage}</span>
-              <span class="chip" style="background:${color}20;color:${color};margin-left:10px">${detail.band}</span>
+          <div style="background:${C.grayLight};border-radius:10px;padding:16px 20px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div>
+                <span style="font-size:14px;font-weight:700">${stage}</span>
+                <span class="chip" style="background:${color}20;color:${color};margin-left:10px">
+                  ${detail.band}
+                </span>
+              </div>
+
+              <span style="font-size:20px;font-weight:800;color:${color}">
+                ${score}
+              </span>
             </div>
-            <span style="font-size:20px;font-weight:800;color:${color}">${score}</span>
+
+            ${scoreBar(Number(score), color)}
           </div>
-          ${scoreBar(Number(score), color)}
-        </div>`;
+        `;
       }).join("")}
     </div>
   `, 9));

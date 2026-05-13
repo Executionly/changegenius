@@ -98,6 +98,12 @@ export async function GET(req: NextRequest) {
   try {
     const pdfBuffer = await generatePDF(html)
     const slug = team.name.toLowerCase().replace(/\s+/g, '-')
+    return new NextResponse(html, {
+      headers: {
+        'Content-Type':        'text/html',
+        'Content-Disposition': 'inline',
+      },
+    })
     return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
         'Content-Type':        'application/pdf',
