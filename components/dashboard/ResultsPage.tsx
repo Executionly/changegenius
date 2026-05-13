@@ -1,6 +1,6 @@
 "use client";
 
-import { buildNarrative } from "@/lib/assessment/narratives";
+import { buildNarrative, normalizeStageName } from "@/lib/assessment/narratives";
 import { AdaptsStage, Role } from "@/lib/assessment/questions";
 import { EnergyProfile } from "@/lib/assessment/scoring";
 import Link from "next/link";
@@ -380,12 +380,16 @@ export default function ResultsPage({
     })),
   ];
 
+  const normalizedStageScores = Object.fromEntries(
+    Object.entries(stageScores).map(([k, v]) => [normalizeStageName(k), v])
+  ) as Record<AdaptsStage, number>;
+
   const narrative = buildNarrative({
     primary_role: derived.primary_role as Role,
     secondary_role: derived.secondary_role as Role,
     role_pair_title: derived.role_pair_title,
     energy_profile: derived.energy_profile,
-    stage_scores: stageScores as Record<AdaptsStage, number>,
+    stage_scores: normalizedStageScores,
     top_adapts_stages: derived.top_adapts_stages as AdaptsStage[],
     bottom_adapts_stages: derived.bottom_adapts_stages as AdaptsStage[],
   });
