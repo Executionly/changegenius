@@ -64,7 +64,7 @@ function ShareCardInner() {
     if (!data) return;
     const { primary_role, secondary_role, role_pair_title, top_adapts_stages } =
       data.derived;
-    const text = `I just discovered my Change Genius™ role: ${primary_role} + ${secondary_role} — The ${role_pair_title}.\n\nMy top ADAPTS stage: ${top_adapts_stages[0]}.\n\nDiscover yours at changegeniussuite.com`;
+    const text = `I just discovered my Change Genius™ role: ${primary_role} + ${secondary_role} — The ${role_pair_title}.\n\nMy top ADAPTS™ stage: ${top_adapts_stages[0]}.\n\nDiscover yours at changegeniussuite.com`;
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);

@@ -29,51 +29,51 @@ export interface NarrativeInput {
 
 const ROLE_NAME_MAP: Record<string, Role> = {
   // Legacy 6-role names → new 4-role names
-  Spotter:    "Spotter",
-  Driver:     "Driver",
-  Architect:  "Architect",
-  Connector:  "Connector",
-  Activator:  "Driver",     // remapped to Driver
-  Stabilizer: "Architect",  // remapped to Architect
+  Spotter: "Spotter",
+  Driver: "Driver",
+  Architect: "Architect",
+  Connector: "Connector",
+  Activator: "Driver", // remapped to Driver
+  Stabilizer: "Architect", // remapped to Architect
   // Old display names
-  Innovator:  "Spotter",
-  Achiever:   "Driver",
-  Organizer:  "Architect",
-  Builder:    "Driver",
-  Refiner:    "Architect",
-  Unifier:    "Connector",
-  Preparer:   "Architect",
+  Innovator: "Spotter",
+  Achiever: "Driver",
+  Organizer: "Architect",
+  Builder: "Driver",
+  Refiner: "Architect",
+  Unifier: "Connector",
+  Preparer: "Architect",
 };
 
 const ENERGY_NAME_MAP: Record<string, Energy> = {
   // Legacy names → current names
-  Spark:     "Innovator",
-  Drive:     "Achiever",
-  Shape:     "Organizer",
-  Bond:      "Unifier",
+  Spark: "Innovator",
+  Drive: "Achiever",
+  Shape: "Organizer",
+  Bond: "Unifier",
   // Current names pass-through
   Innovator: "Innovator",
-  Achiever:  "Achiever",
+  Achiever: "Achiever",
   Organizer: "Organizer",
-  Unifier:   "Unifier",
+  Unifier: "Unifier",
 };
 
 // ── Legacy stage name map (for old DB data) ────────────────────
 
 const STAGE_NAME_MAP: Record<string, AdaptsStage> = {
-  "Alert the System":            "Alert",
-  "Diagnose the Gaps":           "Diagnose",
-  "Access Readiness":            "Prepare",
+  "Alert the System": "Alert",
+  "Diagnose the Gaps": "Diagnose",
+  "Access Readiness": "Prepare",
   "Participate Through Dialogue": "Align",
   "Transform Through Alignment": "Transform",
-  "Scale and Sustain":           "Sustain",
+  "Scale and Sustain": "Sustain",
   // Current names pass-through
-  Alert:     "Alert",
-  Diagnose:  "Diagnose",
-  Prepare:   "Prepare",
-  Align:     "Align",
+  Alert: "Alert",
+  Diagnose: "Diagnose",
+  Prepare: "Prepare",
+  Align: "Align",
   Transform: "Transform",
-  Sustain:   "Sustain",
+  Sustain: "Sustain",
 };
 
 export function normalizeStageName(stage: string): AdaptsStage {
@@ -392,12 +392,15 @@ const ENERGY_CONTENT: Record<
 
 // ── ADAPTS stage content ───────────────────────────────────────
 
-const STAGE_CONTENT: Record<AdaptsStage, { strengths: string; growth: string }> = {
+const STAGE_CONTENT: Record<
+  AdaptsStage,
+  { strengths: string; growth: string }
+> = {
   Alert: {
     strengths:
       "You are naturally strong at sensing disruption early. You read signals others miss and create the urgency that opens organizations to change. This strength helps your team avoid being caught off-guard by market shifts, competitive threats, or internal decay.",
     growth:
-      'Sensing disruption early is an area for development. You may benefit from deliberately seeking weak signals, challenging current assumptions, and spending time with people outside your immediate function. Consider setting up a regular environmental scan practice to catch what you might otherwise miss.',
+      "Sensing disruption early is an area for development. You may benefit from deliberately seeking weak signals, challenging current assumptions, and spending time with people outside your immediate function. Consider setting up a regular environmental scan practice to catch what you might otherwise miss.",
   },
   Diagnose: {
     strengths:
@@ -415,7 +418,7 @@ const STAGE_CONTENT: Record<AdaptsStage, { strengths: string; growth: string }> 
     strengths:
       "You are naturally strong at building shared understanding. You surface hidden concerns and create the conversations that transform resistance into alignment. This strength prevents silent failures and builds buy-in.",
     growth:
-      'Facilitated alignment is an area for development. You may benefit from creating more structured space for dissenting voices and building stronger habits around listening before deciding. Consider using techniques like pre-mortems or structured dialogue sessions.',
+      "Facilitated alignment is an area for development. You may benefit from creating more structured space for dissenting voices and building stronger habits around listening before deciding. Consider using techniques like pre-mortems or structured dialogue sessions.",
   },
   Transform: {
     strengths:
@@ -427,7 +430,7 @@ const STAGE_CONTENT: Record<AdaptsStage, { strengths: string; growth: string }> 
     strengths:
       "You are naturally strong at making change last. You embed new behaviors, build sustaining systems, and ensure transformation survives beyond the initial push. This strength creates lasting impact.",
     growth:
-      'Sustainability discipline is an area for development. You may benefit from building explicit review processes after initiatives and creating systems that institutionalize new behaviors. Consider establishing regular retrospectives and documenting lessons learned.',
+      "Sustainability discipline is an area for development. You may benefit from building explicit review processes after initiatives and creating systems that institutionalize new behaviors. Consider establishing regular retrospectives and documenting lessons learned.",
   },
 };
 
@@ -668,69 +671,135 @@ const STAGE_BUSINESS_FOCUS: Record<AdaptsStage, string> = {
 
 const ROLE_OFFER_FEEDBACK: Record<
   Role,
-  { problem: string; audience: string; outcome: string; simplify: string; stop: string }
+  {
+    problem: string;
+    audience: string;
+    outcome: string;
+    simplify: string;
+    stop: string;
+  }
 > = {
   Driver: {
-    problem:  "A problem that requires faster execution, more accountability, or better measurable results",
-    audience: "Founders or professionals who know what to do but struggle to do it consistently",
-    outcome:  "Measurable progress on a specific goal within a defined timeframe",
-    simplify: "Remove any deliverable that doesn't directly drive action or accountability",
-    stop:     "Taking on clients who aren't ready to execute — they will drain your energy",
+    problem:
+      "A problem that requires faster execution, more accountability, or better measurable results",
+    audience:
+      "Founders or professionals who know what to do but struggle to do it consistently",
+    outcome:
+      "Measurable progress on a specific goal within a defined timeframe",
+    simplify:
+      "Remove any deliverable that doesn't directly drive action or accountability",
+    stop: "Taking on clients who aren't ready to execute — they will drain your energy",
   },
   Connector: {
-    problem:  "A problem rooted in disconnection — team conflict, low trust, unclear culture, or weak client relationships",
-    audience: "Leaders, teams, or communities that want deeper connection, alignment, or trust",
-    outcome:  "A stronger relationship, culture, or community that people actively choose to stay in",
-    simplify: "Remove any deliverable that doesn't directly build connection or trust",
-    stop:     "Undercharging for relational work — connection is hard to build and highly valuable",
+    problem:
+      "A problem rooted in disconnection — team conflict, low trust, unclear culture, or weak client relationships",
+    audience:
+      "Leaders, teams, or communities that want deeper connection, alignment, or trust",
+    outcome:
+      "A stronger relationship, culture, or community that people actively choose to stay in",
+    simplify:
+      "Remove any deliverable that doesn't directly build connection or trust",
+    stop: "Undercharging for relational work — connection is hard to build and highly valuable",
   },
   Architect: {
-    problem:  "A problem that requires better structure, clearer process, or more reliable and scalable systems",
-    audience: "Entrepreneurs or teams doing good work but losing time and clients to disorganization",
-    outcome:  "A system, process, or framework they can use repeatedly without reinventing it",
-    simplify: "Package your process into a fixed-scope offer rather than open-ended consulting",
-    stop:     "Custom work that can't be replicated — it limits your revenue ceiling",
+    problem:
+      "A problem that requires better structure, clearer process, or more reliable and scalable systems",
+    audience:
+      "Entrepreneurs or teams doing good work but losing time and clients to disorganization",
+    outcome:
+      "A system, process, or framework they can use repeatedly without reinventing it",
+    simplify:
+      "Package your process into a fixed-scope offer rather than open-ended consulting",
+    stop: "Custom work that can't be replicated — it limits your revenue ceiling",
   },
   Spotter: {
-    problem:  "A problem that requires fresh thinking, trend awareness, or strategic reframing",
-    audience: "Leaders or entrepreneurs who feel stuck in outdated thinking or missing the next opportunity",
-    outcome:  "A new direction, strategy, or framework that gives them clarity on where to move next",
-    simplify: "Remove every deliverable that isn't directly tied to insight or strategic clarity",
-    stop:     "Selling broad consulting or general advisory without a specific, named outcome",
+    problem:
+      "A problem that requires fresh thinking, trend awareness, or strategic reframing",
+    audience:
+      "Leaders or entrepreneurs who feel stuck in outdated thinking or missing the next opportunity",
+    outcome:
+      "A new direction, strategy, or framework that gives them clarity on where to move next",
+    simplify:
+      "Remove every deliverable that isn't directly tied to insight or strategic clarity",
+    stop: "Selling broad consulting or general advisory without a specific, named outcome",
   },
 };
 
 const ROLE_CONTENT_DIRECTION: Record<
   Role,
-  { style: string; topics: string[]; pain_points: string[]; frequency: string; cta: string }
+  {
+    style: string;
+    topics: string[];
+    pain_points: string[];
+    frequency: string;
+    cta: string;
+  }
 > = {
   Driver: {
-    style:       "Action-oriented and results-focused — share what works and what you have built",
-    topics:      ["Execution case studies", "Practical action steps", "How you overcame specific obstacles"],
-    pain_points: ["Inconsistent execution", "Slow progress", "Getting stuck in planning"],
-    frequency:   "Daily or 5x per week — volume and consistency are your advantage",
-    cta:         "Join an accountability programme or book a results audit",
+    style:
+      "Action-oriented and results-focused — share what works and what you have built",
+    topics: [
+      "Execution case studies",
+      "Practical action steps",
+      "How you overcame specific obstacles",
+    ],
+    pain_points: [
+      "Inconsistent execution",
+      "Slow progress",
+      "Getting stuck in planning",
+    ],
+    frequency:
+      "Daily or 5x per week — volume and consistency are your advantage",
+    cta: "Join an accountability programme or book a results audit",
   },
   Connector: {
-    style:       "Relational and empathetic — share stories, lessons, and human insight",
-    topics:      ["Community and belonging", "Trust and relationships in business", "Stories of connection and collaboration"],
-    pain_points: ["Feeling isolated in business", "Team conflict or low trust", "Disconnected from clients or community"],
-    frequency:   "3–4x per week — focus on conversation and engagement over broadcast",
-    cta:         "Join the community or book a trust-building session",
+    style:
+      "Relational and empathetic — share stories, lessons, and human insight",
+    topics: [
+      "Community and belonging",
+      "Trust and relationships in business",
+      "Stories of connection and collaboration",
+    ],
+    pain_points: [
+      "Feeling isolated in business",
+      "Team conflict or low trust",
+      "Disconnected from clients or community",
+    ],
+    frequency:
+      "3–4x per week — focus on conversation and engagement over broadcast",
+    cta: "Join the community or book a trust-building session",
   },
   Architect: {
-    style:       "Structured and educational — share frameworks, checklists, and processes",
-    topics:      ["Step-by-step guides", "Systems and templates", "How to avoid common execution mistakes"],
-    pain_points: ["Chaotic workflows", "Repeated mistakes", "Wasted time on disorganized work"],
-    frequency:   "3x per week — prioritise practical, repeatable content",
-    cta:         "Download a template or book a systems audit",
+    style:
+      "Structured and educational — share frameworks, checklists, and processes",
+    topics: [
+      "Step-by-step guides",
+      "Systems and templates",
+      "How to avoid common execution mistakes",
+    ],
+    pain_points: [
+      "Chaotic workflows",
+      "Repeated mistakes",
+      "Wasted time on disorganized work",
+    ],
+    frequency: "3x per week — prioritise practical, repeatable content",
+    cta: "Download a template or book a systems audit",
   },
   Spotter: {
-    style:       "Insight-led and forward-looking — share what others haven't seen yet",
-    topics:      ["Emerging trends in your industry", "Reframes of common assumptions", "Strategic questions worth asking"],
-    pain_points: ["Feeling stuck in outdated thinking", "Missing the next opportunity", "Unclear on where the market is moving"],
-    frequency:   "3x per week — prioritise depth and insight over volume",
-    cta:         "Book a strategy session or download a strategic framework",
+    style:
+      "Insight-led and forward-looking — share what others haven't seen yet",
+    topics: [
+      "Emerging trends in your industry",
+      "Reframes of common assumptions",
+      "Strategic questions worth asking",
+    ],
+    pain_points: [
+      "Feeling stuck in outdated thinking",
+      "Missing the next opportunity",
+      "Unclear on where the market is moving",
+    ],
+    frequency: "3x per week — prioritise depth and insight over volume",
+    cta: "Book a strategy session or download a strategic framework",
   },
 };
 
@@ -759,40 +828,60 @@ const ROLE_EXECUTION: Record<Role, string[]> = {
 
 const ROLE_NEXT_MOVE: Record<
   Role,
-  { fix_first: string; stop_doing: string; start_doing: string; monetization_opportunity: string }
+  {
+    fix_first: string;
+    stop_doing: string;
+    start_doing: string;
+    monetization_opportunity: string;
+  }
 > = {
   Driver: {
-    fix_first:                "Create a weekly sales rhythm and protect it from other work",
-    stop_doing:               "Waiting for perfect conditions before making offers or following up",
-    start_doing:              "Tracking one revenue-driving action every day without exception",
-    monetization_opportunity: "Create a results-based offer with a clear outcome and timeline — clients pay more for certainty",
+    fix_first: "Create a weekly sales rhythm and protect it from other work",
+    stop_doing:
+      "Waiting for perfect conditions before making offers or following up",
+    start_doing:
+      "Tracking one revenue-driving action every day without exception",
+    monetization_opportunity:
+      "Create a results-based offer with a clear outcome and timeline — clients pay more for certainty",
   },
   Connector: {
-    fix_first:                "Write one clear, direct offer and send it to three people this week",
-    stop_doing:               "Giving away value through free advice without converting it into a paid engagement",
-    start_doing:              "Asking every satisfied client for one introduction or referral",
-    monetization_opportunity: "Build a community, membership, or cohort offer that monetises your ability to bring people together",
+    fix_first:
+      "Write one clear, direct offer and send it to three people this week",
+    stop_doing:
+      "Giving away value through free advice without converting it into a paid engagement",
+    start_doing:
+      "Asking every satisfied client for one introduction or referral",
+    monetization_opportunity:
+      "Build a community, membership, or cohort offer that monetises your ability to bring people together",
   },
   Architect: {
-    fix_first:                "Set a launch date for your current offer and commit to it publicly",
-    stop_doing:               "Adding more structure or features to an offer that hasn't been sold yet",
-    start_doing:              "Selling your offer before it's complete — validate first, then build",
-    monetization_opportunity: "Package your process into a group programme or productised service that can run without you",
+    fix_first:
+      "Set a launch date for your current offer and commit to it publicly",
+    stop_doing:
+      "Adding more structure or features to an offer that hasn't been sold yet",
+    start_doing:
+      "Selling your offer before it's complete — validate first, then build",
+    monetization_opportunity:
+      "Package your process into a group programme or productised service that can run without you",
   },
   Spotter: {
-    fix_first:                "Narrow your positioning to one specific problem for one specific audience",
-    stop_doing:               "Starting new ideas before your current offer has been fully tested and sold",
-    start_doing:              "Booking one discovery conversation per week to validate your current offer",
-    monetization_opportunity: "Package your insight into a paid workshop, advisory session, or strategic framework",
+    fix_first:
+      "Narrow your positioning to one specific problem for one specific audience",
+    stop_doing:
+      "Starting new ideas before your current offer has been fully tested and sold",
+    start_doing:
+      "Booking one discovery conversation per week to validate your current offer",
+    monetization_opportunity:
+      "Package your insight into a paid workshop, advisory session, or strategic framework",
   },
 };
 
 // ── Pairing key helper ─────────────────────────────────────────
 
 function getPairingKey(primary: Role, secondary: Role): string {
-  const direct  = `${primary}+${secondary}`;
+  const direct = `${primary}+${secondary}`;
   const reverse = `${secondary}+${primary}`;
-  if (PAIRING_CONTENT[direct])  return direct;
+  if (PAIRING_CONTENT[direct]) return direct;
   if (PAIRING_CONTENT[reverse]) return reverse;
   return direct;
 }
@@ -803,38 +892,58 @@ export function buildNarrative(input: NarrativeInput): Narrative {
   const { role_pair_title, top_adapts_stages, bottom_adapts_stages } = input;
 
   // Normalize roles (handle legacy names from DB)
-  const primary_role   = (ROLE_NAME_MAP[input.primary_role]   || input.primary_role) as Role;
-  const secondary_role = (ROLE_NAME_MAP[input.secondary_role] || input.secondary_role) as Role;
+  const primary_role = (ROLE_NAME_MAP[input.primary_role] ||
+    input.primary_role) as Role;
+  const secondary_role = (ROLE_NAME_MAP[input.secondary_role] ||
+    input.secondary_role) as Role;
 
   // Normalize energy
-  const mappedDominant = (ENERGY_NAME_MAP[input.energy_profile.dominant] || input.energy_profile.dominant) as Energy;
-  const mappedEnergyProfile = { ...input.energy_profile, dominant: mappedDominant };
-
-  // Normalize stage names (handle legacy long names from DB)
-  const normalizedTop    = top_adapts_stages.map(normalizeStageName);
-  const normalizedBottom = bottom_adapts_stages.map(normalizeStageName);
-
-  const primaryRole   = ROLE_CONTENT[primary_role]   || ROLE_CONTENT["Driver"];
-  const secondaryRole = ROLE_CONTENT[secondary_role] || ROLE_CONTENT["Connector"];
-  const energy        = ENERGY_CONTENT[mappedEnergyProfile.dominant] || ENERGY_CONTENT["Achiever"];
-
-  const pairingKey = getPairingKey(primary_role, secondary_role);
-  const pairing    = PAIRING_CONTENT[pairingKey] || {
-    name:        role_pair_title,
-    description: `A unique combination of ${primary_role} and ${secondary_role} strengths. You bring both ${primaryRole.summary.toLowerCase()} and the complementary strengths of your adaptive role.`,
-    benefits:    ["Balances multiple contribution styles", "Adaptable to different team contexts", "Brings a unique problem-solving approach"],
-    watchouts:   ["May experience tension between contribution styles", "Can be pulled in conflicting directions", "Risk of over-extending across both roles"],
+  const mappedDominant = (ENERGY_NAME_MAP[input.energy_profile.dominant] ||
+    input.energy_profile.dominant) as Energy;
+  const mappedEnergyProfile = {
+    ...input.energy_profile,
+    dominant: mappedDominant,
   };
 
-  const topStage     = normalizedTop[0];
-  const secondStage  = normalizedTop[1];
-  const bottomStage  = normalizedBottom[0];
+  // Normalize stage names (handle legacy long names from DB)
+  const normalizedTop = top_adapts_stages.map(normalizeStageName);
+  const normalizedBottom = bottom_adapts_stages.map(normalizeStageName);
+
+  const primaryRole = ROLE_CONTENT[primary_role] || ROLE_CONTENT["Driver"];
+  const secondaryRole =
+    ROLE_CONTENT[secondary_role] || ROLE_CONTENT["Connector"];
+  const energy =
+    ENERGY_CONTENT[mappedEnergyProfile.dominant] || ENERGY_CONTENT["Achiever"];
+
+  const pairingKey = getPairingKey(primary_role, secondary_role);
+  const pairing = PAIRING_CONTENT[pairingKey] || {
+    name: role_pair_title,
+    description: `A unique combination of ${primary_role} and ${secondary_role} strengths. You bring both ${primaryRole.summary.toLowerCase()} and the complementary strengths of your adaptive role.`,
+    benefits: [
+      "Balances multiple contribution styles",
+      "Adaptable to different team contexts",
+      "Brings a unique problem-solving approach",
+    ],
+    watchouts: [
+      "May experience tension between contribution styles",
+      "Can be pulled in conflicting directions",
+      "Risk of over-extending across both roles",
+    ],
+  };
+
+  const topStage = normalizedTop[0];
+  const secondStage = normalizedTop[1];
+  const bottomStage = normalizedBottom[0];
   const secondBottom = normalizedBottom[1];
 
-  const stageStrengths      = STAGE_CONTENT[topStage]?.strengths || "";
-  const secondStageStrength = secondStage ? STAGE_CONTENT[secondStage]?.strengths : "";
-  const stageGrowth         = STAGE_CONTENT[bottomStage]?.growth || "";
-  const secondStageGrowth   = secondBottom ? STAGE_CONTENT[secondBottom]?.growth : "";
+  const stageStrengths = STAGE_CONTENT[topStage]?.strengths || "";
+  const secondStageStrength = secondStage
+    ? STAGE_CONTENT[secondStage]?.strengths
+    : "";
+  const stageGrowth = STAGE_CONTENT[bottomStage]?.growth || "";
+  const secondStageGrowth = secondBottom
+    ? STAGE_CONTENT[secondBottom]?.growth
+    : "";
 
   // Entrepreneur fields
   const weakest = bottomStage;
@@ -843,37 +952,37 @@ export function buildNarrative(input: NarrativeInput): Narrative {
     executive_summary: `Your Change Genius™ profile reveals that you are a ${role_pair_title} — a ${primary_role} with a strong ${secondary_role} dimension. ${primaryRole.summary} Your ${secondary_role} adaptive strength adds ${secondaryRole.summary.split(".")[0].toLowerCase()}.`,
 
     // Primary role
-    role_name:     primaryRole.name,
-    role_summary:  primaryRole.summary,
+    role_name: primaryRole.name,
+    role_summary: primaryRole.summary,
     role_detailed: primaryRole.detailed,
     role_benefits: primaryRole.benefits,
     role_watchouts: primaryRole.watchouts,
 
     // Secondary role — full content, not a weak fallback
-    secondary_role_name:      secondaryRole.name,
-    secondary_role_summary:   secondaryRole.summary,
-    secondary_role_detailed:  secondaryRole.detailed,
-    secondary_role_benefits:  secondaryRole.benefits,
+    secondary_role_name: secondaryRole.name,
+    secondary_role_summary: secondaryRole.summary,
+    secondary_role_detailed: secondaryRole.detailed,
+    secondary_role_benefits: secondaryRole.benefits,
     secondary_role_watchouts: secondaryRole.watchouts,
 
     // Energy
-    energy_name:     energy.name,
-    energy_summary:  energy.summary,
+    energy_name: energy.name,
+    energy_summary: energy.summary,
     energy_detailed: energy.detailed,
     energy_benefits: energy.benefits,
     energy_watchouts: energy.watchouts,
 
     // ADAPTS
-    adapts_strengths_summary:  `Your strongest ADAPTS stages are ${topStage}${secondStage ? ` and ${secondStage}` : ""}.`,
+    adapts_strengths_summary: `Your strongest ADAPTS™ stages are ${topStage}${secondStage ? ` and ${secondStage}` : ""}.`,
     adapts_strengths_detailed: `${stageStrengths}${secondStageStrength ? ` You are also strong in the ${secondStage} stage. ${secondStageStrength}` : ""}`,
-    adapts_growth_summary:     `Your development areas are ${bottomStage}${secondBottom ? ` and ${secondBottom}` : ""}.`,
-    adapts_growth_detailed:    `${stageGrowth}${secondStageGrowth ? ` The ${secondBottom} stage is also an area to develop. ${secondStageGrowth}` : ""}`,
+    adapts_growth_summary: `Your development areas are ${bottomStage}${secondBottom ? ` and ${secondBottom}` : ""}.`,
+    adapts_growth_detailed: `${stageGrowth}${secondStageGrowth ? ` The ${secondBottom} stage is also an area to develop. ${secondStageGrowth}` : ""}`,
 
     // Pairing
-    pairing_name:        pairing.name,
+    pairing_name: pairing.name,
     pairing_description: pairing.description,
-    pairing_benefits:    pairing.benefits,
-    pairing_watchouts:   pairing.watchouts,
+    pairing_benefits: pairing.benefits,
+    pairing_watchouts: pairing.watchouts,
 
     individual_in_team: primaryRole.in_team,
 
@@ -896,19 +1005,19 @@ export function buildNarrative(input: NarrativeInput): Narrative {
 
     how_to_apply_as_team: [
       "Have every team member take the Change Genius™ assessment and share their results in a team session.",
-      "Create a Team Change Map™ that visualizes everyone's primary roles, energies, and ADAPTS strengths.",
-      "Identify gaps in your team's coverage — which ADAPTS stages are weak and which roles are missing?",
+      "Create a Team Change Map™ that visualizes everyone's primary roles, energies, and ADAPTS™ strengths.",
+      "Identify gaps in your team's coverage — which ADAPTS™ stages are weak and which roles are missing?",
       "Realign responsibilities to better match each person's contribution strength and energy.",
       "Use the Weekly Change Pulse™ to track team momentum and alignment over time.",
     ],
 
     // Entrepreneur
-    entrepreneur_growth_pattern:  ROLE_GROWTH_PATTERN[primary_role],
-    revenue_leakage_pattern:      STAGE_REVENUE_LEAKAGE[weakest],
-    best_business_focus:          STAGE_BUSINESS_FOCUS[weakest],
-    offer_feedback:               ROLE_OFFER_FEEDBACK[primary_role],
-    content_direction:            ROLE_CONTENT_DIRECTION[primary_role],
-    execution_recommendations:    ROLE_EXECUTION[primary_role],
-    next_best_move:               ROLE_NEXT_MOVE[primary_role],
+    entrepreneur_growth_pattern: ROLE_GROWTH_PATTERN[primary_role],
+    revenue_leakage_pattern: STAGE_REVENUE_LEAKAGE[weakest],
+    best_business_focus: STAGE_BUSINESS_FOCUS[weakest],
+    offer_feedback: ROLE_OFFER_FEEDBACK[primary_role],
+    content_direction: ROLE_CONTENT_DIRECTION[primary_role],
+    execution_recommendations: ROLE_EXECUTION[primary_role],
+    next_best_move: ROLE_NEXT_MOVE[primary_role],
   };
 }

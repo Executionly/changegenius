@@ -3096,3 +3096,346 @@ nav {
     padding-bottom: 32px;
   }
 }
+/* Hero Section - Corporate Redesign */
+.hero {
+  position: relative;
+  background: linear-gradient(145deg, #0a0f1a 0%, #0d1422 30%, #0b1120 100%);
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Remove grid overlay - keeping only what's needed */
+.grid-overlay {
+  display: none;
+}
+
+/* Hero Trust Badge */
+.hero-trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(77, 142, 248, 0.12);
+  backdrop-filter: blur(8px);
+  padding: 6px 14px;
+  border-radius: 40px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4d8ef8;
+  margin-bottom: 28px;
+  letter-spacing: 0.3px;
+  border: 1px solid rgba(77, 142, 248, 0.2);
+}
+
+.trust-dot {
+  width: 6px;
+  height: 6px;
+  background: #4d8ef8;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Hero Headline - Bold, max 2 lines */
+.hero-headline {
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: white;
+  letter-spacing: -1.5px;
+  margin-bottom: 20px;
+  font-family: "Manrope", sans-serif;
+}
+
+.hero-headline .highlight-text {
+  background: linear-gradient(135deg, #4d8ef8 0%, #7bb0ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+  display: inline-block;
+}
+
+/* Hero Description */
+.hero-description {
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 32px;
+  max-width: 500px;
+}
+
+/* Hero CTA Button */
+.btn-hero-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 32px;
+  background: #4d8ef8;
+  border-radius: 8px;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  margin-bottom: 20px;
+}
+
+.btn-hero-primary:hover {
+  background: #3b7ce6;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(77, 142, 248, 0.3);
+}
+
+.btn-hero-primary .arrow {
+  font-size: 16px;
+  transition: transform 0.2s ease;
+}
+
+.btn-hero-primary:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* Hero Footnote */
+.hero-footnote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.footnote-icon {
+  color: #4d8ef8;
+}
+
+/* Hero Slider */
+.hero-visual {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-slider {
+  width: 100%;
+  max-width: 380px;
+  overflow: hidden;
+  position: relative;
+}
+
+.hero-slider-track {
+  display: flex;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 300%;
+}
+
+.hero-card {
+  background: rgba(18, 25, 40, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(77, 142, 248, 0.15);
+  border-radius: 16px;
+  width: 100%;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.hero-card:hover {
+  border-color: rgba(77, 142, 248, 0.3);
+  transform: translateY(-4px);
+}
+
+.hero-card-header {
+  padding: 16px 20px;
+  background: rgba(77, 142, 248, 0.05);
+  border-bottom: 1px solid rgba(77, 142, 248, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hero-card-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4d8ef8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hero-card-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.hero-card-dots span {
+  width: 6px;
+  height: 6px;
+  background: rgba(77, 142, 248, 0.3);
+  border-radius: 50%;
+}
+
+.hero-card-content {
+  padding: 24px 20px;
+}
+
+.hero-card-role {
+  margin-bottom: 24px;
+}
+
+.role-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.role-value {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.role-primary {
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #fff, #4d8ef8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.role-plus {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.role-secondary {
+  font-size: 20px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.hero-card-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hero-card-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-card-stat .stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+}
+
+.hero-card-stat .stat-label {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 4px;
+}
+
+.hero-card-stages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stage-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.stage-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.stage-bar div {
+  height: 100%;
+  background: linear-gradient(90deg, #4d8ef8, #7bb0ff);
+  border-radius: 2px;
+}
+
+/* Slider Dots */
+.hero-slider-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.hero-slider-dots span {
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hero-slider-dots span.active {
+  width: 20px;
+  background: #4d8ef8;
+  border-radius: 3px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .hero-inner {
+    flex-direction: column;
+    text-align: center;
+    padding: 40px 24px 64px;
+  }
+
+  .hero-copy {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .hero-description {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-visual {
+    width: 100%;
+    margin-top: 48px;
+  }
+
+  .hero-slider {
+    max-width: 340px;
+    margin: 0 auto;
+  }
+}

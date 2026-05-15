@@ -14,7 +14,7 @@ import {
 const INDIVIDUAL_FEATURES = [
   "Full 72-question assessment",
   "Primary & secondary Change Genius™ role",
-  "Complete ADAPTS stage profile",
+  "Complete ADAPTS™ stage profile",
   "Personal narrative interpretation",
   "Productivity Energy",
   "30-day action plan",
