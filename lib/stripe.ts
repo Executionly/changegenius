@@ -33,7 +33,7 @@ export async function createStripeCheckoutSession(
   params: CreateStripeSessionParams,
 ) {
   const stripe = getStripe();
-  const priceUSD = 24;
+  const priceUSD = 27;
   const quantity = params.plan === "team" ? (params.teamSize ?? 1) : 1;
 
   const session = await stripe.checkout.sessions.create({

@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
 
   const { data: teamMemberships } = await supabase
   .from("team_members")
-  .select("team_id, status, teams(id, name)")
+  .select("team_id, status, assessment_status, teams(id, name)")
   .eq("user_id", session.user.id)
 
   // Find teams where member hasn't started an assessment yet
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
   )
 
   const notStarted = (teamMemberships ?? [])
-    .filter((m: any) => m.teams && !assessedTeamIds.has(m.team_id) && m.status !== "completed")
+    .filter((m: any) => m.teams && !assessedTeamIds.has(m.team_id) && m.assessment_status !== "completed")
     .map((m: any) => ({
       teamId:   m.teams.id,
       teamName: m.teams.name,

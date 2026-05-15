@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
-import { sendReportEmail } from '@/lib/email'
+import { sendReportEmail, sendTeamReportEmail } from '@/lib/email'
 
 export const maxDuration = 60
 export const dynamic = 'force-dynamic'
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const { filePath } = await req.json()
+    const { filePath, teamFilePath, teamOEmail,teamOName, teamName, totalMembers, teamId } = await req.json()
     if (!filePath) return NextResponse.json({ error: 'Missing filePath' }, { status: 400 })
 
     // Verify the file belongs to the requesting user
@@ -70,6 +70,33 @@ export async function POST(req: NextRequest) {
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 })
+    }
+
+    if(teamFilePath){
+      const { data: teamFileData, error: downloadError } = await supabase.storage
+      .from('reports')
+      .download(teamFilePath)
+
+      if (downloadError || !teamFileData) {
+        console.error('[pdf/email] download error:', downloadError)
+        throw new Error("Failed to retrieve PDF")
+      }
+
+    const teamPdfBuffer = Buffer.from(await teamFileData.arrayBuffer())
+    const teamPdfBase64 = teamPdfBuffer.toString('base64')
+      try {
+        sendTeamReportEmail({
+          to: teamOEmail ?? '',
+          ownerName: teamOName ?? 'there',
+          teamName: teamName,
+          memberCount: totalMembers ?? 0,
+          teamId: teamId,
+          pdfBase64: teamPdfBase64,
+        })
+        
+      } catch (error) {
+        console.log("Failed to send team report")
+      }
     }
 
     return NextResponse.json({ success: true })

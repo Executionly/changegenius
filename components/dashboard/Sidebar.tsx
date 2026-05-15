@@ -166,7 +166,7 @@ export default function Sidebar({
         <div
           className={`nav-item ${activePage === "my-teams" ? "active" : ""}`}
           onClick={() =>
-            handleClick({ id: "my-teams", href: "/teams/my-teams" })
+            handleClick({ id: "my-teams", href: "/teams" })
           }
         >
           <span className="nav-icon">{IconTeams()}</span>

@@ -56,14 +56,16 @@ export async function GET(req: NextRequest) {
   // Get all members + their scores
 
   const { data: members } = await supabase
-    .from('team_members')
-    .select(`
-      user_id, status,
-      profiles(full_name, email, change_genius_role, change_genius_role_2)
-    `)
-    .eq('team_id', teamId)
+  .from('team_members')
+  .select(`
+    user_id, status, assessment_status, completed_at,
+    primary_role, secondary_role, role_pair_title,
+    primary_energy, top_adapts_stages, bottom_adapts_stages,
+    profiles(full_name, email)
+  `)
+  .eq('team_id', teamId)
 
-  const completedMembers = (members ?? []).filter(m => m.status === 'completed')
+  const completedMembers = (members ?? []).filter(m => m.assessment_status === 'completed')
   const memberScores: IMemberScore[] = []
 
   for (const member of members ?? []) {
@@ -105,9 +107,9 @@ export async function GET(req: NextRequest) {
 
     memberScores.push({
       userId:       member.user_id,
-      fullName:     profile?.full_name ?? profile?.email ?? 'Member',
-      primaryRole:  (profile?.change_genius_role ?? null) as Role | null,
-      secondaryRole:(profile?.change_genius_role_2 ?? null) as Role | null,
+      fullName:     (member.profiles as any)?.full_name ?? (member.profiles as any)?.email ?? 'Member',
+      primaryRole:  (member.primary_role ?? null) as Role | null,
+      secondaryRole:(member.secondary_role ?? null) as Role | null,
       stageScores,
       energyScores,
     })
@@ -148,12 +150,19 @@ export async function GET(req: NextRequest) {
       isOwner,
     },
     members: (members ?? []).map(m => ({
-      userId:   m.user_id,
-      status:   m.status,
-      isOwner:  m.user_id === team.owner_id,
-      fullName: (m.profiles as any)?.full_name ?? (m.profiles as any)?.email ?? 'Member',
+      userId: m.user_id,
+      status: m.status,
+      assessmentStatus: m.assessment_status ?? 'not_started',
       role: m.user_id === team.owner_id ? "Admin" : "Member",
-      energy_profile: (m.profiles as any)?.change_genius_role ?? null,
+      completedAt: m.completed_at,
+      isOwner: m.user_id === team.owner_id,
+      fullName: (m.profiles as any)?.full_name ?? (m.profiles as any)?.email ?? 'Member',
+      primaryRole: m.primary_role ?? null,
+      secondaryRole: m.secondary_role ?? null,
+      rolePairTitle:       m.role_pair_title ?? null,
+      energy_profile:       m.primary_energy ?? null,
+      topAdaptsStages:     m.top_adapts_stages ?? [],
+      bottomAdaptsStages:  m.bottom_adapts_stages ?? [],
     })),
     totalMembers,
     completedCount,

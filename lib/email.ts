@@ -3,6 +3,7 @@ import { render } from '@react-email/render'
 import React from 'react'
 import { TeamInviteEmail } from './email-templates/team-invite'
 import { ReportReadyEmail } from './email-templates/report-readt'
+import { TeamReportReadyEmail } from './email-templates/team.report-ready'
 
 if (!process.env.RESEND_API_KEY || !process.env.NEXT_PUBLIC_MAIL_FORM) {
   throw new Error('RESEND_API_KEY environment variable is required')
@@ -26,6 +27,62 @@ interface SendReportEmailParams {
   rolePairTitle: string
   pdfBase64: string
   fileName: string
+}
+
+interface SendTeamReportEmailParams {
+  to: string
+  ownerName: string
+  teamName: string
+  memberCount: number
+  teamId: string
+  pdfBase64: string
+}
+
+export async function sendTeamReportEmail({
+  to,
+  ownerName,
+  teamName,
+  memberCount,
+  teamId,
+  pdfBase64,
+}: SendTeamReportEmailParams) {
+  try {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://changegeniusai.com'
+    const teamUrl = `${appUrl}/teams/${teamId}`
+
+    const emailHtml = await render(
+      React.createElement(TeamReportReadyEmail, {
+        ownerName,
+        teamName,
+        memberCount,
+        teamUrl,
+      })
+    )
+
+    const { data, error } = await resend.emails.send({
+      from: process.env.NEXT_PUBLIC_MAIL_FORM!,
+      to:   [to],
+      subject: `Your ${teamName} Team Change Map™ is Ready`,
+      html: emailHtml,
+      attachments: [
+        {
+          filename: `${teamName.toLowerCase().replace(/\s+/g, '-')}-team-report.pdf`,
+          content:  pdfBase64,
+        },
+      ],
+    })
+
+    if (error) throw new Error(error.message)
+
+    console.log('[Email] Team report sent:', data?.id)
+    return { success: true, id: data?.id }
+  } catch (error) {
+    console.error('[Email] Error sending team report:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
 }
 
 export async function sendReportEmail({

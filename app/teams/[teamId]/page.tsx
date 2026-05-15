@@ -9,7 +9,13 @@ interface Member {
   userId: string;
   fullName: string;
   status: string;
+  assessmentStatus: string;
   role: string | null;
+  primaryRole: string;
+  secondaryRole: string;
+  rolePairTitle: string;
+  topAdaptsStages: string;
+  bottomAdaptsStages: string;
   energy_profile: string | null;
 }
 
@@ -38,44 +44,48 @@ export default function TeamDetailPage() {
   const router = useRouter();
   const [team, setTeam] = useState<TeamDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingTeam, setLoadingTeam] = useState(false)
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviting, setInviting] = useState(false);
   const [inviteMessage, setInviteMessage] = useState("");
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfError, setPdfError] = useState("");
 
+  async function loadTeam() {
+    if (!isAuthenticated) return;
+    setLoadingTeam(true)
+    try {
+      const res = await fetch(`/api/teams/report?teamId=${teamId}`);
+      if (!res.ok) {
+        if (res.status === 404) router.push("/teams");
+        return;
+      }
+      const data = await res.json();
+      // Flatten the response
+      const flattened: TeamDetail = {
+        id: data.team?.id,
+        name: data.team?.name || "Unnamed Team",
+        organization: data.team?.organization || null,
+        inviteCode: data.team?.inviteCode,
+        inviteLink: data.team?.inviteLink,
+        isOwner: data.team?.isOwner || false,
+        totalMembers: data.totalMembers ?? 0,
+        completedCount: data.completedCount ?? 0,
+        unlocked: data.unlocked ?? false,
+        fullUnlocked: data.fullUnlocked ?? false,
+        members: data.members || [],
+        diagnostic: data.diagnostic || null,
+      };
+      setTeam(flattened);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+      setLoadingTeam(false)
+    }
+  }
   useEffect(() => {
     if (!isAuthenticated) return;
-    async function loadTeam() {
-      try {
-        const res = await fetch(`/api/teams/report?teamId=${teamId}`);
-        if (!res.ok) {
-          if (res.status === 404) router.push("/teams");
-          return;
-        }
-        const data = await res.json();
-        // Flatten the response
-        const flattened: TeamDetail = {
-          id: data.team?.id,
-          name: data.team?.name || "Unnamed Team",
-          organization: data.team?.organization || null,
-          inviteCode: data.team?.inviteCode,
-          inviteLink: data.team?.inviteLink,
-          isOwner: data.team?.isOwner || false,
-          totalMembers: data.totalMembers ?? 0,
-          completedCount: data.completedCount ?? 0,
-          unlocked: data.unlocked ?? false,
-          fullUnlocked: data.fullUnlocked ?? false,
-          members: data.members || [],
-          diagnostic: data.diagnostic || null,
-        };
-        setTeam(flattened);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
     loadTeam();
   }, [teamId, isAuthenticated, router]);
 
@@ -328,8 +338,53 @@ export default function TeamDetailPage() {
 
           {/* Members list */}
           <div style={{ marginBottom: 24 }}>
-            <div style={{ fontWeight: 600, marginBottom: 12 }}>
-              Members ({team.totalMembers})
+            <div style={{ 
+              fontWeight: 600, 
+              marginBottom: 12,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}>
+              <h2 style={{
+                fontSize: 17
+              }}>
+                Members ({team.totalMembers})
+              </h2>
+              <button 
+              disabled={loadingTeam}
+              onClick={loadTeam}
+              style={{
+                border: 'none',
+                borderRadius: '50px',
+                display: 'flex',
+                alignItems:'center',
+                justifyContent:'center',
+                padding: 3,
+                cursor: 'pointer'
+              }}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width={20}
+                  height={20}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M20 12A8 8 0 1 1 17.66 6.34"
+                    stroke={"#000"}
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M20 4V10H14"
+                    stroke={"#000"}
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
             </div>
             <div
               style={{
@@ -346,6 +401,9 @@ export default function TeamDetailPage() {
                     </th>
                     <th style={{ padding: "10px 12px", textAlign: "left" }}>
                       Status
+                    </th>
+                    <th style={{ padding: "10px 12px", textAlign: "left" }}>
+                      Assessment Status
                     </th>
                     <th style={{ padding: "10px 12px", textAlign: "left" }}>
                       Role
@@ -376,6 +434,18 @@ export default function TeamDetailPage() {
                           className={`badge ${member.status === "completed" ? "badge-green" : "badge-gray"}`}
                         >
                           {member.status}
+                        </span>
+                      </td>
+                      <td
+                        style={{
+                          padding: "8px 12px",
+                          borderTop: "1px solid var(--border)",
+                        }}
+                      >
+                        <span
+                          className={`badge ${member.assessmentStatus === "not_started" ? "badge-gray" : "badge-green"}`}
+                        >
+                          {member.assessmentStatus}
                         </span>
                       </td>
                       <td

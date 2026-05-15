@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     // Verify membership
     const { data: membership } = await supabase
       .from("team_members")
-      .select("id, status")
+      .select("id, status, assessment_status")
       .eq("team_id", teamId)
       .eq("user_id", userId)
       .maybeSingle();
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Already completed — no retakes for team assessments
-    if (membership.status === "completed") {
+    if (membership.assessment_status === "completed") {
       return NextResponse.json(
         { error: "You have already completed this team assessment." },
         { status: 409 },

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { calculateScores } from "@/lib/assessment/scoring";
 import { TOTAL_QUESTIONS } from "@/lib/assessment/questions";
 import { z } from "zod";
+import { createClient } from "@supabase/supabase-js";
 
 const schema = z.object({ assessmentId: z.string().uuid() });
 
@@ -16,25 +17,25 @@ export async function POST(req: NextRequest) {
   const { assessmentId } = parsed.data;
 
   const cookieStore = await cookies();
-  const supabase = createServerClient(
+  const supabaseAuth = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll: () => cookieStore.getAll(),
-        setAll: (s) =>
-          s.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options),
-          ),
+        setAll: (s) => s.forEach(({ name, value, options }) => cookieStore.set(name, value, options)),
       },
-    },
-  );
+    }
+  )
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (!session)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { data: { session } } = await supabaseAuth.auth.getSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
 
   // Verify ownership
   const { data: assessment } = await supabase
@@ -109,22 +110,84 @@ export async function POST(req: NextRequest) {
   // Update member/profile
   const { derived } = scores;
   const isTeamAssessment = !!assessment.team_id;
+  let html = null
+  let teamName = ''
+  let teamOEmail = ''
+  let teamOName =''
+  let totalMembers = 0
 
+  console.log("isTeamAssessment",isTeamAssessment)
+  
   if (isTeamAssessment) {
-    // Mark team member as completed
-    const { error: memberError } = await supabase
-      .from("team_members")
-      .update({ status: "completed" })
-      .eq("team_id", assessment.team_id)
-      .eq("user_id", session.user.id);
+      const { data: updatedMember, error: memberError } = await supabase
+        .from("team_members")
+        .update({
+          status: "joined",
+          assessment_status: "completed",
+          completed_at:      new Date().toISOString(),
+          primary_role:      derived.primary_role,
+          secondary_role:    derived.secondary_role,
+          role_pair_title:   derived.role_pair_title,
+          primary_energy:    derived.energy_profile.dominant,
+          top_adapts_stages:    derived.top_adapts_stages,
+          bottom_adapts_stages: derived.bottom_adapts_stages,
+        })
+        .eq("team_id", assessment.team_id)
+        .eq("user_id", session.user.id)
+        .select()
 
-    if (memberError) {
-      console.error("[assessment/complete] team_members update error:", memberError);
-      return NextResponse.json(
-        { error: "Failed to update team membership" },
-        { status: 500 },
-      );
+      console.log("[complete] member update result:", { updatedMember, memberError })
+
+      if (memberError) {
+        console.error("[assessment/complete] team_members update error:", memberError)
+        return NextResponse.json(
+          { error: "Failed to update team membership" },
+          { status: 500 },
+        )
+      }
+
+    // Check if this was the last member to complete
+    const { data: allMembers } = await supabase
+      .from("team_members")
+      .select("status, assessment_status")
+      .eq("team_id", assessment.team_id)
+
+    const allCompleted = allMembers?.every(m => m.assessment_status === "completed") ?? false
+
+    if (allCompleted) {
+      totalMembers = allMembers?.length!
+      // Get team + owner details
+      const { data: team } = await supabase
+        .from("teams")
+        .select("name, owner_id")
+        .eq("id", assessment.team_id)
+        .single()
+
+      if(team){
+        teamName = team.name
+        const { data: ownerProfile } = await supabase
+          .from("profiles")
+          .select("email, full_name")
+          .eq("id", team.owner_id)
+          .single()
+
+        if(ownerProfile){
+          teamOEmail = ownerProfile.email
+          teamOName = ownerProfile.full_name
+        }
+
+        const teamReportRes = await fetch(
+          `${process.env.NEXT_PUBLIC_APP_URL}/api/pdf/team?teamId=${assessment.team_id}`,
+          { headers: { Cookie: req.headers.get('cookie') ?? '' } }
+        )
+        
+        if (teamReportRes.ok) {
+          html = await teamReportRes.text();    
+        }
+      }
+
     }
+    
   }
   
   const { error: profileError } = await supabase
@@ -152,5 +215,17 @@ export async function POST(req: NextRequest) {
     `[assessment/complete] User ${session.user.id} completed assessment. onboarded set to true.`,
   );
 
-  return NextResponse.json({ success: true, assessmentId, derived });
+  return NextResponse.json({ 
+    success: true, 
+    assessmentId, 
+    derived, 
+    team: {
+      html,
+      teamId: assessment.team_id,
+      teamName,
+      teamOName,
+      teamOEmail,
+      totalMembers
+    }
+  });
 }
