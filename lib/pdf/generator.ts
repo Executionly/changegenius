@@ -33,6 +33,15 @@ const ENERGY_COLORS: Record<string, string> = {
   Innovator: C.gold,
 };
 
+const ADAPTS_ORDER = [
+  "Alert",
+  "Diagnose",
+  "Prepare",
+  "Align",
+  "Transform",
+  "Sustain",
+] as const;
+
 // ── Band → colour ──────────────────────────────────────────────
 function bandColor(band: StageBand): string {
   switch (band) {
@@ -160,7 +169,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       <div>
         <div class="label" style="color:${C.purple};margin-bottom:24px">ASSESSMENT REPORT</div>
         <h1 style="color:${C.navy};font-size:48px;line-height:1.1;margin-bottom:8px">
-          CHANGE<br>GENIUS™
+          CHANGE GENIUS™
         </h1>
         <div style="width:60px;height:4px;background:${C.gold};margin:20px 0 28px"></div>
         <p style="font-size:18px;color:${C.gray};font-weight:300">${name}'s Change Genius™ Revealed</p>
@@ -445,7 +454,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
         </ul>
       </div>
     </div>
-  `, 7));
+  `, 6));
 
   // ── Page 8: Energy profile (Part 1) — cards + score breakdown ─
   pages.push(page(`
@@ -483,7 +492,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
 
     <h3 style="margin-bottom:12px">${energy_profile.dominant.toUpperCase()} ENERGY</h3>
     <p style="margin-bottom:24px">${narrative.energy_detailed}</p>
-  `, 8));
+  `, 7));
 
   // ── Page 9: Energy profile (Part 2) — dominant energy detail ──
   pages.push(page(`
@@ -505,7 +514,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
         </ul>
       </div>
     </div>
-  `, 9));
+  `, 8));
 
   // ── Page 10: ADAPTS full profile ──────────────────────────
   pages.push(page(`
@@ -514,23 +523,29 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
     <div class="divider"></div>
 
     <div style="display:flex;flex-direction:column;gap:12px">
-      ${Object.entries(stage_scores).map(([stage, score]) => {
+      ${ADAPTS_ORDER.map((stage) => {
+        const score  = stage_scores[stage as keyof typeof stage_scores] ?? 0;
         const detail = stage_detail[stage as keyof typeof stage_detail];
+        if (!detail) return ''; // guard against missing stage
         const color  = bandColor(detail.band);
+
         return `
-        <div style="background:${C.grayLight};border-radius:10px;padding:16px 20px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <div>
-              <span style="font-size:14px;font-weight:700">${stage}</span>
-              <span class="chip" style="background:${color}20;color:${color};margin-left:10px">${detail.band}</span>
+          <div style="background:${C.grayLight};border-radius:10px;padding:16px 20px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div>
+                <span style="font-size:14px;font-weight:700">${stage}</span>
+                <span class="chip" style="background:${color}20;color:${color};margin-left:10px">
+                  ${detail.band}
+                </span>
+              </div>
+              <span style="font-size:20px;font-weight:800;color:${color}">${score}</span>
             </div>
-            <span style="font-size:20px;font-weight:800;color:${color}">${score}</span>
+            ${scoreBar(Number(score), color)}
           </div>
-          ${scoreBar(Number(score), color)}
-        </div>`;
+        `;
       }).join("")}
     </div>
-  `, 10));
+  `, 9));
 
   // ── Page 11: ADAPTS strengths & growth ────────────────────
   pages.push(page(`
@@ -551,7 +566,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       <div class="label" style="color:${C.amber};margin-bottom:8px">NOTE ON DEVELOPMENT AREAS</div>
       <p style="font-size:13px">Development areas are not permanent limitations — they are growth opportunities and delegation signals. Some people become highly capable in their weaker stages through experience or focused development. However, sustained effort in these areas without support may lead to fatigue. Seek partners with complementary strengths to cover these stages.</p>
     </div>
-  `, 11));
+  `, 10));
 
   // ── Page 12: Application (Part 1) — work from genius + team ──
   pages.push(page(`
@@ -568,7 +583,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
     <ul class="bullets">
       ${narrative.how_to_apply_as_team.map(a => `<li>${a}</li>`).join("")}
     </ul>
-  `, 12));
+  `, 11));
 
   // ── Page 13: Application (Part 2) — 30-day action plan ────
   pages.push(page(`
@@ -583,7 +598,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
           <p style="font-size:14px;margin:0;line-height:1.7">${action}</p>
         </div>`).join("")}
     </div>
-  `, 13));
+  `, 12));
 
   // ── Pages 14–16: Entrepreneur Application (3 pages) ───────
   const weakestStage  = derived.bottom_adapts_stages[0];
@@ -618,7 +633,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       </div>
       <span class="chip" style="background:${C.green}20;color:${C.green};font-size:10px;white-space:nowrap;margin-left:20px">LEVERAGE THIS</span>
     </div>
-  `, 14));
+  `, 13));
 
   // Entrepreneur Part 2: best focus + offer feedback + content direction
   pages.push(page(`
@@ -669,7 +684,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
         </div>
       </div>
     </div>
-  `, 15));
+  `, 14));
 
   // Entrepreneur Part 3: execution support + next best move + CTA
   pages.push(page(`
@@ -714,7 +729,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       <div style="font-size:15px;font-weight:700;color:${C.navy};margin-bottom:6px">Build from your genius.</div>
       <p style="font-size:13px;color:${C.gray};margin:0;line-height:1.6">Your Change Genius™ is not just about self-awareness. It is a guide for turning your value into clear offers, consistent execution, and sustainable income.</p>
     </div>
-  `, 16));
+  `, 15));
 
   // ── Page 17: What's next ───────────────────────────────────
   pages.push(page(`
@@ -748,7 +763,7 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       <div style="font-size:16px;font-weight:700;color:${C.navy}">Reach us at</div>
       <a href="mailto:info@changegeniusai.com" style="display:inline-block;margin-top:8px;font-size:18px;font-weight:800;color:${C.purple};text-decoration:none">info@changegeniusai.com</a>
     </div>
-  `, 12));
+  `, 16));
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -764,170 +779,6 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
 </html>`;
 }
 
-// ══════════════════════════════════════════════════════════════
-// TEAM REPORT
-// ══════════════════════════════════════════════════════════════
-
-export interface TeamReportInput {
-  teamName: string;
-  diagnostic: TeamDiagnostic;
-  memberNames: string[];
-  date: string;
-}
-
-export function buildTeamReportHTML(input: TeamReportInput): string {
-  const { teamName, diagnostic, memberNames, date } = input;
-  const { stageScores, energyScores, roleDistribution, riskScore, frictionPatterns, rollout90Days } = diagnostic;
-
-  const teamChangeCapacityScore = 100 - riskScore;
-  const sortedStages  = Object.entries(stageScores).sort((a, b) => b[1] - a[1]);
-  const topStages     = sortedStages.slice(0, 2).map(([s]) => s);
-  const bottomStages  = sortedStages.slice(-2).map(([s]) => s);
-
-  const pages: string[] = [];
-
-  // ── Page 1: Cover ─────────────────────────────────────────
-  pages.push(page(`
-    <div style="height:100%;display:flex;flex-direction:column;justify-content:space-between;padding-top:40px">
-      <div>
-        <div class="label" style="color:${C.purple};margin-bottom:24px">TEAM ASSESSMENT REPORT</div>
-        <h1 style="color:${C.navy};font-size:44px;line-height:1.1;margin-bottom:8px">TEAM<br>CHANGE MAP™</h1>
-        <div style="width:60px;height:4px;background:${C.gold};margin:20px 0 28px"></div>
-        <p style="font-size:18px;color:${C.gray};font-weight:300">${teamName}</p>
-      </div>
-
-      <div style="background:${C.navy};border-radius:12px;padding:28px 32px;color:white">
-        <div class="label" style="color:rgba(255,255,255,0.6);margin-bottom:16px">TEAM SUMMARY</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
-          <div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:4px">TEAM SIZE</div>
-            <div style="font-size:24px;font-weight:800">${memberNames.length}</div>
-          </div>
-          <div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:4px">TEAM CAPACITY SCORE™</div>
-            <div style="font-size:24px;font-weight:800;color:${C.gold}">${teamChangeCapacityScore}<span style="font-size:14px;font-weight:400;color:rgba(255,255,255,0.5)">/100</span></div>
-          </div>
-          <div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:4px">DATE</div>
-            <div style="font-size:16px;font-weight:700">${date}</div>
-          </div>
-        </div>
-      </div>
-
-      <p style="font-size:12px;color:${C.gray};text-align:center">Prepared for team development and organisational insight · changegeniusai.com</p>
-    </div>
-  `));
-
-  // ── Page 2: Stage coverage ─────────────────────────────────
-  pages.push(page(`
-    <div class="label" style="color:${C.purple};margin-bottom:6px">TEAM RESULTS</div>
-    <h2 style="font-size:28px;margin-bottom:4px">Team ADAPTS™ Coverage</h2>
-    <div class="divider"></div>
-
-    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px">
-      ${Object.entries(stageScores).map(([stage, avg]) => {
-        const isTop    = topStages.includes(stage);
-        const isBottom = bottomStages.includes(stage);
-        const color    = isTop ? C.green : isBottom ? C.red : C.purple;
-        return `
-        <div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-            <span style="font-size:13px;font-weight:600">${stage}${isTop?" ✦":isBottom?" ⚠":""}</span>
-            <span style="font-size:11px;color:${color};font-weight:700">${isTop?"Team Strength":isBottom?"Coverage Gap":"Solid"}</span>
-          </div>
-          ${scoreBar(Math.round(avg), color)}
-        </div>`;
-      }).join("")}
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div style="background:${C.grayLight};border-radius:10px;padding:18px;border-left:4px solid ${C.green}">
-        <div class="label" style="color:${C.green};margin-bottom:10px">TEAM STRENGTHS</div>
-        ${topStages.map(s => `<div style="font-size:13px;font-weight:600;padding:4px 0">${s}</div>`).join("")}
-      </div>
-      <div style="background:${C.grayLight};border-radius:10px;padding:18px;border-left:4px solid ${C.red}">
-        <div class="label" style="color:${C.red};margin-bottom:10px">COVERAGE GAPS</div>
-        ${bottomStages.map(s => `<div style="font-size:13px;font-weight:600;padding:4px 0">${s}</div>`).join("")}
-      </div>
-    </div>
-  `, 1));
-
-  // ── Page 3: Role + energy map ──────────────────────────────
-  // Updated: 4 roles in 2x2 grid, 4 energies with correct color map
-  pages.push(page(`
-    <div class="label" style="color:${C.purple};margin-bottom:6px">TEAM RESULTS</div>
-    <h2 style="font-size:28px;margin-bottom:4px">Team Role Map</h2>
-    <div class="divider"></div>
-
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px">
-      ${Object.entries(roleDistribution).map(([role, count]) => `
-        <div style="background:${C.grayLight};border-radius:10px;padding:16px;text-align:center">
-          <div style="width:40px;height:40px;border-radius:50%;background:${C.navy};color:white;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 8px">${(role as string)[0]}</div>
-          <div style="font-size:13px;font-weight:700">${role}</div>
-          <div style="font-size:22px;font-weight:800;color:${count===0?C.red:C.purple};margin-top:4px">${count}</div>
-          <div style="font-size:10px;color:${C.gray}">${count===0?"MISSING":count===1?"member":"members"}</div>
-        </div>`).join("")}
-    </div>
-
-    <h2 style="font-size:22px;margin-bottom:8px">Team Energy Mix</h2>
-    <div class="divider"></div>
-
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-      ${Object.entries(energyScores).map(([energy, avg]) => {
-        const color = ENERGY_COLORS[energy] ?? C.purple;
-        return `
-        <div style="background:${C.grayLight};border-radius:10px;padding:16px;text-align:center;border-top:3px solid ${color}">
-          <div style="font-size:14px;font-weight:700;margin-bottom:6px;color:${color}">${energy}</div>
-          <div style="font-size:26px;font-weight:800;color:${color}">${Math.round(avg as number)}</div>
-          <div style="font-size:10px;color:${C.gray}">avg score</div>
-        </div>`;
-      }).join("")}
-    </div>
-  `, 2));
-
-  // ── Page 4: Friction + recommendations ────────────────────
-  pages.push(page(`
-    <div class="label" style="color:${C.purple};margin-bottom:6px">TEAM DIAGNOSTICS</div>
-    <h2 style="font-size:28px;margin-bottom:4px">Friction Patterns & Recommendations</h2>
-    <div class="divider"></div>
-
-    ${frictionPatterns && frictionPatterns.length > 0 ? `
-      <h3 style="margin-bottom:12px;color:${C.amber}">DETECTED FRICTION PATTERNS</h3>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
-        ${frictionPatterns.map(f => `
-          <div style="background:#FEF3C7;border-left:4px solid ${C.amber};border-radius:0 8px 8px 0;padding:14px 16px">
-            <p style="font-size:13px;margin:0;color:#92400E">${f}</p>
-          </div>`).join("")}
-      </div>
-    ` : `
-      <div style="background:#ECFDF5;border-left:4px solid ${C.green};border-radius:0 8px 8px 0;padding:14px 16px;margin-bottom:24px">
-        <p style="font-size:13px;margin:0;color:#065F46">No significant friction patterns detected. Your team has a well-balanced profile.</p>
-      </div>
-    `}
-
-    <h3 style="margin-bottom:12px">90-DAY TEAM RECOMMENDATIONS</h3>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      ${(rollout90Days ?? []).map((r, i) => `
-        <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:${C.grayLight};border-radius:8px">
-          <div style="width:28px;height:28px;border-radius:50%;background:${C.navy};color:white;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
-          <p style="font-size:13px;margin:0">${r}</p>
-        </div>`).join("")}
-    </div>
-  `, 3));
-
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Change Genius™ Team Report — ${teamName}</title>
-  <style>${BASE_CSS}</style>
-</head>
-<body>
-  ${pages.join("\n")}
-</body>
-</html>`;
-}
 
 // ── PDF generator ──────────────────────────────────────────────
 export async function generatePDF(html: string): Promise<Buffer> {

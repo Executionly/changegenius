@@ -14,6 +14,16 @@ const LABELS = [
   "Strongly Agree",
 ];
 
+interface ITeamReport {
+  id: string,
+  blob: any,
+  base64: any,
+  teamName: string;
+  teamOEmail: string;
+  teamOName: string;
+  totalMembers: string;
+}
+
 function AssessmentTakePageContent() {
   const { isAuthenticated, profile, loading: authLoading, user, session } = useAuth();
   const router = useRouter();
@@ -161,11 +171,25 @@ function AssessmentTakePageContent() {
         body: JSON.stringify({ assessmentId }),
       });
       if (!res.ok) {
-        const d = (await res.json()) as { error?: string };
-        throw new Error(d.error ?? "Submission failed");
+        throw new Error("Submission failed, try again later");
       }
+      const data = await res.json()
+      const {team} = data
+      let teamData;
       try {
-        await handleEmailPDF()
+        if(team && team?.html){
+          const pdf = await generateBlob(team?.html)
+          teamData = {
+            id: team?.teamId,
+            blob:pdf?.blob,
+            base64:pdf?.base64,
+            teamName: team?.teamName,
+            teamOName: team?.teamOName,
+            teamOEmail: team?.teamOEmail,
+            totalMembers: team?.totalMembers,
+          }
+        }
+        await handleEmailPDF(teamData)
       }catch(err) {
         console.error("Failed to email PDF:", err)
       }finally{
@@ -190,6 +214,10 @@ function AssessmentTakePageContent() {
     if (!contentType.includes("text/html")) return null;
 
     const html = await res.text();
+    return await generateBlob(html)
+  };
+
+  const generateBlob = async (html: any): Promise<{ blob: Blob; base64: string } | null> => {
     const { default: html2canvas } = await import("html2canvas");
     const { default: jsPDF } = await import("jspdf");
 
@@ -243,15 +271,17 @@ function AssessmentTakePageContent() {
     });
 
     return { blob, base64 };
-  };
+  }
 
-  const handleEmailPDF = async () => {
+  const handleEmailPDF = async (team?: ITeamReport) => {
     setEmailLoading(true)
     try {
       const result = await generatePDFBlob();
       if (!result) throw new Error("Failed to generate PDF");
   
       const filePath = `${session?.user.id}/report-${Date.now()}.pdf`;
+      let teamFilePath = null
+
       const { error: uploadError } = await supabase.storage
         .from("reports")
         .upload(filePath, result.blob, {
@@ -260,12 +290,33 @@ function AssessmentTakePageContent() {
         });
   
       if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
+      
+      if(team?.blob && team.id){
+        teamFilePath = `${team?.id}/team-report-${Date.now()}.pdf`;
+
+        const { error: uploadTError } = await supabase.storage
+        .from("reports")
+        .upload(teamFilePath, team.blob, {
+          contentType: "application/pdf",
+          upsert: true,
+        });
+  
+        if (uploadTError) throw new Error(`Upload failed: ${uploadTError.message}`);
+      }
   
       const res = await fetch("/api/pdf/email", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ filePath }),
+        body: JSON.stringify({ 
+          filePath, 
+          teamFilePath,
+          teamId: team?.id,
+          teamOEmail: team?.teamOEmail,
+          teamOName: team?.teamOName,
+          totalMembers: team?.totalMembers,
+          teamName: team?.teamName,
+        }),
       });
   
       if (!res.ok) {
@@ -274,6 +325,9 @@ function AssessmentTakePageContent() {
       }
   
       await supabase.storage.from("reports").remove([filePath]);
+      if(teamFilePath){
+        await supabase.storage.from("reports").remove([teamFilePath]);
+      }
     } catch (err) {
       console.error("Email PDF failed:", err);
       alert("Failed to send email. Please try downloading instead.");

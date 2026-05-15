@@ -9,7 +9,13 @@ interface Member {
   userId: string;
   fullName: string;
   status: string;
+  assessmentStatus: string;
   role: string | null;
+  primaryRole: string;
+  secondaryRole: string;
+  rolePairTitle: string;
+  topAdaptsStages: string;
+  bottomAdaptsStages: string;
   energy_profile: string | null;
 }
 
@@ -38,44 +44,48 @@ export default function TeamDetailPage() {
   const router = useRouter();
   const [team, setTeam] = useState<TeamDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingTeam, setLoadingTeam] = useState(false)
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviting, setInviting] = useState(false);
   const [inviteMessage, setInviteMessage] = useState("");
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfError, setPdfError] = useState("");
 
+  async function loadTeam() {
+    if (!isAuthenticated) return;
+    setLoadingTeam(true)
+    try {
+      const res = await fetch(`/api/teams/report?teamId=${teamId}`);
+      if (!res.ok) {
+        if (res.status === 404) router.push("/teams");
+        return;
+      }
+      const data = await res.json();
+      // Flatten the response
+      const flattened: TeamDetail = {
+        id: data.team?.id,
+        name: data.team?.name || "Unnamed Team",
+        organization: data.team?.organization || null,
+        inviteCode: data.team?.inviteCode,
+        inviteLink: data.team?.inviteLink,
+        isOwner: data.team?.isOwner || false,
+        totalMembers: data.totalMembers ?? 0,
+        completedCount: data.completedCount ?? 0,
+        unlocked: data.unlocked ?? false,
+        fullUnlocked: data.fullUnlocked ?? false,
+        members: data.members || [],
+        diagnostic: data.diagnostic || null,
+      };
+      setTeam(flattened);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+      setLoadingTeam(false)
+    }
+  }
   useEffect(() => {
     if (!isAuthenticated) return;
-    async function loadTeam() {
-      try {
-        const res = await fetch(`/api/teams/report?teamId=${teamId}`);
-        if (!res.ok) {
-          if (res.status === 404) router.push("/teams");
-          return;
-        }
-        const data = await res.json();
-        // Flatten the response
-        const flattened: TeamDetail = {
-          id: data.team?.id,
-          name: data.team?.name || "Unnamed Team",
-          organization: data.team?.organization || null,
-          inviteCode: data.team?.inviteCode,
-          inviteLink: data.team?.inviteLink,
-          isOwner: data.team?.isOwner || false,
-          totalMembers: data.totalMembers ?? 0,
-          completedCount: data.completedCount ?? 0,
-          unlocked: data.unlocked ?? false,
-          fullUnlocked: data.fullUnlocked ?? false,
-          members: data.members || [],
-          diagnostic: data.diagnostic || null,
-        };
-        setTeam(flattened);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
     loadTeam();
   }, [teamId, isAuthenticated, router]);
 
@@ -146,37 +156,95 @@ export default function TeamDetailPage() {
       ? `Need ${neededToUnlock} more completed member${neededToUnlock !== 1 ? "s" : ""} to unlock team insights.`
       : "Team insights unlocked!";
 
-  const handleDownloadPDF = async () => {
-    setPdfLoading(true);
-    setPdfError("");
-    try {
-      const res = await fetch(`/api/pdf/team?teamId=${team.id}`);
+  const generatePDFBlob = async (): Promise<{ blob: Blob; base64: string } | null> => {
+    const res = await fetch(`/api/pdf/team?teamId=${team.id}`, { credentials: "include" });
 
-      if (!res.ok) {
-        const result = await res.json();
-        setPdfError(result.error || "Failed to generate PDF");
-        return;
-      }
+    if (!res.ok) return null;
 
-      const contentType = res.headers.get("content-type") ?? "";
-      if (!contentType.includes("application/pdf")) {
-        const text = await res.text();
-        return;
-      }
+    const contentType = res.headers.get("content-type") ?? "";
+    if (!contentType.includes("text/html")) return null;
 
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "change-genius-team-report.pdf";
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("PDF download failed:", err);
-    } finally {
-      setPdfLoading(false);
+    const html = await res.text();
+    const { default: html2canvas } = await import("html2canvas");
+    const { default: jsPDF } = await import("jspdf");
+
+    const iframe = document.createElement("iframe");
+    iframe.style.cssText = "position:fixed;top:0;left:0;width:794px;height:1123px;opacity:0;pointer-events:none;border:none;";
+    document.body.appendChild(iframe);
+
+    const iframeDoc = iframe.contentDocument!;
+    iframeDoc.open();
+    iframeDoc.write(html);
+    iframeDoc.close();
+
+    await new Promise(resolve => setTimeout(resolve, 2500));
+
+    const pageEls = iframeDoc.querySelectorAll<HTMLElement>(".page");
+    const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+    const pdfWidthMm = 210;
+    const pdfHeightMm = 297;
+
+    for (let i = 0; i < pageEls.length; i++) {
+      const el = pageEls[i];
+
+      const canvas = await html2canvas(el, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        width: 794,
+        height: 1123,
+        windowWidth: 794,
+        windowHeight: 1123,
+        backgroundColor: "#ffffff",
+        logging: false,
+        imageTimeout: 0,
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 0.6);
+
+      if (i > 0) pdf.addPage();
+
+      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidthMm, pdfHeightMm);
     }
+
+    document.body.removeChild(iframe);
+
+    const blob = pdf.output("blob");
+    const base64 = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve((reader.result as string).split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+
+    return { blob, base64 };
   };
+
+  const handleDownloadPDF = async () => {
+      setPdfLoading(true);
+      setPdfError("");
+      try {
+        const result = await generatePDFBlob();
+        if (!result) {
+          setPdfError("Failed to generate PDF");
+          throw new Error("Failed to generate PDF Report");
+        }
+
+        const blob = result.blob;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "change-genius-team-report.pdf";
+        a.click();
+        URL.revokeObjectURL(url);
+
+      } catch (err) {
+        console.error("PDF download failed:", err);
+      } finally {
+        setPdfLoading(false);
+      }
+  };
+
 
   return (
     <DashboardLayout title={`Team: ${team.name}`}>
@@ -270,8 +338,53 @@ export default function TeamDetailPage() {
 
           {/* Members list */}
           <div style={{ marginBottom: 24 }}>
-            <div style={{ fontWeight: 600, marginBottom: 12 }}>
-              Members ({team.totalMembers})
+            <div style={{ 
+              fontWeight: 600, 
+              marginBottom: 12,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}>
+              <h2 style={{
+                fontSize: 17
+              }}>
+                Members ({team.totalMembers})
+              </h2>
+              <button 
+              disabled={loadingTeam}
+              onClick={loadTeam}
+              style={{
+                border: 'none',
+                borderRadius: '50px',
+                display: 'flex',
+                alignItems:'center',
+                justifyContent:'center',
+                padding: 3,
+                cursor: 'pointer'
+              }}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width={20}
+                  height={20}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M20 12A8 8 0 1 1 17.66 6.34"
+                    stroke={"#000"}
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M20 4V10H14"
+                    stroke={"#000"}
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
             </div>
             <div
               style={{
@@ -288,6 +401,9 @@ export default function TeamDetailPage() {
                     </th>
                     <th style={{ padding: "10px 12px", textAlign: "left" }}>
                       Status
+                    </th>
+                    <th style={{ padding: "10px 12px", textAlign: "left" }}>
+                      Assessment Status
                     </th>
                     <th style={{ padding: "10px 12px", textAlign: "left" }}>
                       Role
@@ -318,6 +434,18 @@ export default function TeamDetailPage() {
                           className={`badge ${member.status === "completed" ? "badge-green" : "badge-gray"}`}
                         >
                           {member.status}
+                        </span>
+                      </td>
+                      <td
+                        style={{
+                          padding: "8px 12px",
+                          borderTop: "1px solid var(--border)",
+                        }}
+                      >
+                        <span
+                          className={`badge ${member.assessmentStatus === "not_started" ? "badge-gray" : "badge-green"}`}
+                        >
+                          {member.assessmentStatus}
                         </span>
                       </td>
                       <td

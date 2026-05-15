@@ -74,7 +74,7 @@ function detectFrictionPatterns(
 ): string[] {
   const patterns: string[] = [];
 
-  // Too many Drivers + no Connectors → execution without alignment
+  // Too many Drivers + no Connectors
   if (
     (roleDistribution["Driver"] ?? 0) > 2 &&
     (roleDistribution["Connector"] ?? 0) === 0
@@ -84,7 +84,7 @@ function detectFrictionPatterns(
     );
   }
 
-  // Too many Spotters + no Architects → ideas without structure
+  // Too many Spotters + no Architects
   if (
     (roleDistribution["Spotter"] ?? 0) > 2 &&
     (roleDistribution["Architect"] ?? 0) === 0
@@ -94,21 +94,7 @@ function detectFrictionPatterns(
     );
   }
 
-  // No Architect → change won't sustain or scale
-  if ((roleDistribution["Architect"] ?? 0) === 0 && memberCount >= 5) {
-    patterns.push(
-      "No sustainability anchor — without an Architect, improvements are unlikely to be institutionalised after the change sprint.",
-    );
-  }
-
-  // No Driver → strategy-execution gap
-  if ((roleDistribution["Driver"] ?? 0) === 0 && memberCount >= 5) {
-    patterns.push(
-      "Strategy-execution gap — no one is converting decisions into momentum. Delivery is at risk.",
-    );
-  }
-
-  // Weak Align stage + Innovator or Achiever dominant energy → ignored voices
+  // Weak Align stage + Innovator/Achiever dominant energy
   if (
     stageHealth["Align"] === "Critical" ||
     stageHealth["Align"] === "At Risk"
@@ -120,7 +106,7 @@ function detectFrictionPatterns(
     }
   }
 
-  // Critical Alert stage → blind spots
+  // Critical Alert stage
   if (stageHealth["Alert"] === "Critical") {
     patterns.push(
       "Disruption blind spot — the team is not scanning for early warning signals. May be caught off-guard by external change.",
@@ -137,7 +123,6 @@ function suggestChangePods(
 ): ChangePod[] {
   const pods: ChangePod[] = [];
 
-  // Find the most At Risk / Critical stage → build a pod for it
   const priorityStage = STAGES.filter(
     (s) => stageHealth[s] === "Critical" || stageHealth[s] === "At Risk",
   ).sort((a, b) => {
@@ -146,12 +131,12 @@ function suggestChangePods(
   })[0];
 
   if (priorityStage) {
-    // Assign top 2-3 members by their score in this stage
     const best = [...members]
+      .filter(m => m.stageScores != null)  // ✅ null guard
       .sort(
         (a, b) =>
-          (b.stageScores[priorityStage] ?? 0) -
-          (a.stageScores[priorityStage] ?? 0),
+          (b.stageScores?.[priorityStage] ?? 0) -
+          (a.stageScores?.[priorityStage] ?? 0),
       )
       .slice(0, 3);
 
@@ -163,11 +148,11 @@ function suggestChangePods(
     });
   }
 
-  // Execution pod — top Drivers
   const executors = members
     .filter(
       (m) =>
-        m.primaryRole === "Driver" ||
+        m.primaryRole === "Driver" ||       // updated role names
+        m.primaryRole === "Architect" ||
         m.secondaryRole === "Driver",
     )
     .slice(0, 4);
@@ -175,10 +160,10 @@ function suggestChangePods(
   if (executors.length >= 2) {
     pods.push({
       name: "Execution Pod",
-      focus: "Transform",
+      focus: "Transform",                   // updated stage name
       members: executors.map((m) => m.userId),
       reason:
-        "Drivers convert decisions into momentum. This pod should own initiative execution and cross-team coordination.",
+        "Drivers and Architects move execution forward. This pod should own initiative execution and cross-team coordination.",
     });
   }
 
