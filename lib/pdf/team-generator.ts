@@ -1,6 +1,7 @@
 import { Role } from "../assessment/questions";
 import { TeamDiagnostic } from "../assessment/team-diagnostic";
 
+
 export interface TeamReportInput {
   teamName: string;
   diagnostic: TeamDiagnostic;
@@ -28,74 +29,82 @@ const ENERGY_COLORS: Record<string, string> = {
   Innovator: "#EC4899",
 };
 
-// ── Shared helpers ─────────────────────────────────────────────
-
+// ── Base CSS ───────────────────────────────────────────────────
 const BASE_CSS = `
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; background: #F8F9FB; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #F0F2F5; }
   .page {
     width: 794px; min-height: 1123px; background: white;
-    margin: 0 auto 32px; padding: 48px 52px;
+    margin: 0 auto 32px; padding: 44px 50px 60px;
     page-break-after: always; position: relative;
   }
-  h2 { font-size: 26px; color: ${C.navy}; font-weight: 800; }
-  h3 { font-size: 15px; color: ${C.navy}; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
-  p  { font-size: 13px; color: #374151; line-height: 1.6; }
+  h1 { font-size: 46px; color: ${C.navy}; font-weight: 900; line-height: 1.05; }
+  h2 { font-size: 24px; color: ${C.navy}; font-weight: 800; }
+  h3 { font-size: 13px; color: ${C.navy}; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
+  p  { font-size: 13px; color: #374151; line-height: 1.65; }
   .label { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-  .divider { height: 2px; background: ${C.grayLight}; margin: 12px 0 20px; }
+  .divider { height: 2px; background: ${C.grayLight}; margin: 10px 0 18px; }
+  .section-gap { margin-top: 22px; }
   .locked-card {
-    position: relative; border-radius: 12px; overflow: hidden;
-    border: 2px dashed #D1D5DB; padding: 24px;
+    position: relative; border-radius: 10px; overflow: hidden;
+    border: 2px dashed #D1D5DB; padding: 20px;
     background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+    min-height: 90px;
   }
   .locked-overlay {
     position: absolute; inset: 0; backdrop-filter: blur(3px);
     background: rgba(255,255,255,0.55);
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
   }
   .lock-badge {
     background: ${C.navy}; color: white; font-size: 11px; font-weight: 700;
-    padding: 6px 14px; border-radius: 20px; letter-spacing: .08em;
+    padding: 5px 12px; border-radius: 20px; letter-spacing: .08em;
   }
   .upgrade-cta {
     background: linear-gradient(135deg, ${C.navy} 0%, #1e3a6e 100%);
-    border-radius: 12px; padding: 22px 26px; color: white; text-align: center;
-    margin-top: 20px;
+    border-radius: 12px; padding: 20px 24px; color: white; text-align: center;
+    margin-top: 18px;
   }
   .cta-btn {
-    display: inline-block; margin-top: 12px;
+    display: inline-block; margin-top: 10px;
     background: ${C.gold}; color: ${C.navy}; font-weight: 800;
-    font-size: 12px; letter-spacing: .08em; padding: 10px 22px;
+    font-size: 12px; letter-spacing: .08em; padding: 9px 20px;
     border-radius: 20px; text-transform: uppercase;
+  }
+  .num-badge {
+    width: 26px; height: 26px; border-radius: 50%; background: ${C.navy};
+    color: white; font-weight: 700; font-size: 12px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
   @media print { .page { margin: 0; page-break-after: always; } }
 `;
 
+// ── Helpers ────────────────────────────────────────────────────
 function page(content: string, pageNum?: number): string {
   const footer = pageNum !== undefined ? `
-    <div style="position:absolute;bottom:28px;left:52px;right:52px;display:flex;justify-content:space-between;align-items:center">
-      <span style="font-size:10px;color:${C.gray}">Change Genius™ · Team Change Map™</span>
-      <span style="font-size:10px;color:${C.gray}">Page ${pageNum + 1}</span>
+    <div style="position:absolute;bottom:22px;left:50px;right:50px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid ${C.grayLight};padding-top:8px">
+      <span style="font-size:10px;color:${C.gray}">Change Genius™ · Team Change Map™ · changegeniusai.com</span>
+      <span style="font-size:10px;color:${C.gray};font-weight:700">Page ${pageNum + 1}</span>
     </div>` : "";
   return `<div class="page">${content}${footer}</div>`;
 }
 
-function scoreBar(value: number, color: string, height = 8): string {
+function scoreBar(value: number, color: string, height = 9): string {
   return `
     <div style="background:${C.grayLight};border-radius:99px;height:${height}px;overflow:hidden">
-      <div style="width:${value}%;height:100%;background:${color};border-radius:99px;transition:width .3s"></div>
+      <div style="width:${Math.min(value, 100)}%;height:100%;background:${color};border-radius:99px"></div>
     </div>`;
 }
 
-function lockedCard(label: string, previewLines: string[] = []): string {
+function lockedCard(label: string, desc: string): string {
   return `
-    <div class="locked-card">
-      <div style="opacity:0.25">
-        <div class="label" style="margin-bottom:10px">${label}</div>
-        ${previewLines.map(l => `<div style="height:10px;background:#D1D5DB;border-radius:4px;margin-bottom:6px;width:${l}"></div>`).join("")}
+    <div class="locked-card" style="min-height:100px">
+      <div style="opacity:0.2">
+        <div class="label" style="margin-bottom:6px">${label}</div>
+        <p style="font-size:11px;margin:0">${desc}</p>
       </div>
       <div class="locked-overlay">
-        <span style="font-size:20px">🔒</span>
+        <span style="font-size:16px">🔒</span>
         <span class="lock-badge">LOCKED</span>
       </div>
     </div>`;
@@ -104,608 +113,103 @@ function lockedCard(label: string, previewLines: string[] = []): string {
 function upgradeCTA(headline: string, body: string): string {
   return `
     <div class="upgrade-cta">
-      <div class="label" style="color:${C.gold};margin-bottom:6px">UPGRADE TO UNLOCK</div>
-      <div style="font-size:16px;font-weight:800;margin-bottom:8px">${headline}</div>
-      <p style="font-size:12px;color:rgba(255,255,255,0.75)">${body}</p>
+      <div class="label" style="color:${C.gold};margin-bottom:5px">UPGRADE TO UNLOCK</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:6px">${headline}</div>
+      <p style="font-size:12px;color:rgba(255,255,255,0.75);margin:0">${body}</p>
       <span class="cta-btn">Unlock Full Intelligence →</span>
     </div>`;
 }
 
-// ── Shared pages (all tiers) ───────────────────────────────────
-
-function coverPage(teamName: string, memberCount: number, capacityScore: number, date: string, tierLabel: string): string {
-  return page(`
-    <div style="height:100%;display:flex;flex-direction:column;justify-content:space-between;padding-top:40px">
-      <div>
-        <div class="label" style="color:${C.purple};margin-bottom:24px">TEAM ASSESSMENT REPORT · ${tierLabel.toUpperCase()}</div>
-        <h1 style="color:${C.navy};font-size:44px;line-height:1.1;margin-bottom:8px">TEAM CHANGE MAP™</h1>
-        <div style="width:60px;height:4px;background:${C.gold};margin:20px 0 28px"></div>
-        <p style="font-size:18px;color:${C.gray};font-weight:300">${teamName}</p>
-      </div>
-
-      <div style="background:${C.navy};border-radius:12px;padding:28px 32px;color:white;margin-top:40px;">
-        <div class="label" style="color:rgba(255,255,255,0.6);margin-bottom:16px">TEAM SUMMARY</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
-          <div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:4px">TEAM SIZE</div>
-            <div style="font-size:24px;font-weight:800">${memberCount}</div>
-          </div>
-          <div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:4px">TEAM CAPACITY SCORE™</div>
-            <div style="font-size:24px;font-weight:800;color:${C.gold}">${capacityScore}<span style="font-size:14px;font-weight:400;color:rgba(255,255,255,0.5)">/100</span></div>
-          </div>
-          <div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:4px">DATE</div>
-            <div style="font-size:16px;font-weight:700">${date}</div>
-          </div>
-        </div>
-      </div>
-
-      <p style="font-size:12px;color:${C.gray};text-align:center">Prepared for team development and organisational insight · changegeniusai.com</p>
-    </div>
-  `);
-}
-
-function stageCoveragePage(
-  stageScores: Record<string, number>,
-  roleDistribution: Record<string, number>,
-  energyScores: Record<string, number>,
-  pageNum: number
-): string {
-  const sorted    = Object.entries(stageScores).sort((a, b) => b[1] - a[1]);
-  const topStages = sorted.slice(0, 2).map(([s]) => s);
-  const botStages = sorted.slice(-2).map(([s]) => s);
-
-  return page(`
-    <div class="label" style="color:${C.purple};margin-bottom:6px">TEAM RESULTS</div>
-    <h2 style="margin-bottom:4px">Team ADAPTS™ Coverage</h2>
-    <div class="divider"></div>
-
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
-      ${sorted.map(([stage, avg]) => {
-        const isTop = topStages.includes(stage);
-        const isBot = botStages.includes(stage);
-        const color = isTop ? C.green : isBot ? C.red : C.purple;
-        return `
-        <div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-            <span style="font-size:13px;font-weight:600">${stage}${isTop ? " ✦" : isBot ? " ⚠" : ""}</span>
-            <span style="font-size:11px;color:${color};font-weight:700">${isTop ? "Team Strength" : isBot ? "Coverage Gap" : "Solid"} · ${Math.round(avg)}</span>
-          </div>
-          ${scoreBar(Math.round(avg), color)}
-        </div>`;
-      }).join("")}
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
-      <div style="background:${C.grayLight};border-radius:10px;padding:16px;border-left:4px solid ${C.green}">
-        <div class="label" style="color:${C.green};margin-bottom:8px">TEAM STRENGTHS</div>
-        ${topStages.map(s => `<div style="font-size:13px;font-weight:600;padding:3px 0">${s}</div>`).join("")}
-      </div>
-      <div style="background:${C.grayLight};border-radius:10px;padding:16px;border-left:4px solid ${C.red}">
-        <div class="label" style="color:${C.red};margin-bottom:8px">COVERAGE GAPS</div>
-        ${botStages.map(s => `<div style="font-size:13px;font-weight:600;padding:3px 0">${s}</div>`).join("")}
-      </div>
-    </div>
-
-    <h3 style="margin-bottom:10px">Team Role Map</h3>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px">
-      ${Object.entries(roleDistribution).map(([role, count]) => `
-        <div style="background:${C.grayLight};border-radius:10px;padding:12px;text-align:center">
-          <div style="width:36px;height:36px;border-radius:50%;background:${C.navy};color:white;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 6px">${role[0]}</div>
-          <div style="font-size:12px;font-weight:700">${role}</div>
-          <div style="font-size:20px;font-weight:800;color:${count === 0 ? C.red : C.purple};margin-top:2px">${count}</div>
-          <div style="font-size:10px;color:${C.gray}">${count === 0 ? "MISSING" : count === 1 ? "member" : "members"}</div>
-        </div>`).join("")}
-    </div>
-
-    <h3 style="margin-bottom:10px">Team Energy Mix</h3>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-      ${Object.entries(energyScores).map(([energy, avg]) => {
-        const color = ENERGY_COLORS[energy] ?? C.purple;
-        return `
-        <div style="background:${C.grayLight};border-radius:10px;padding:12px;text-align:center;border-top:3px solid ${color}">
-          <div style="font-size:13px;font-weight:700;margin-bottom:4px;color:${color}">${energy}</div>
-          <div style="font-size:22px;font-weight:800;color:${color}">${Math.round(avg)}</div>
-          <div style="font-size:10px;color:${C.gray}">avg score</div>
-        </div>`;
-      }).join("")}
-    </div>
-  `, pageNum);
-}
-
-
-function frictionPage(
-  frictionPatterns: string[],
-  rollout90Days: string[],
-  pageNum: number,
-  tier: 1 | 2 | 3
-): string {
-  // Tier 1: show 1 friction, 1 recommendation; lock the rest
-  // Tier 2+: show all
-  const visibleFriction = tier === 1 ? frictionPatterns.slice(0, 1) : frictionPatterns;
-  const visibleRollout  = tier === 1 ? rollout90Days.slice(0, 1) : rollout90Days;
-  const lockedFrictionCount = tier === 1 ? Math.max(0, frictionPatterns.length - 1) : 0;
-
-  return page(`
-    <div class="label" style="color:${C.purple};margin-bottom:6px">TEAM DIAGNOSTICS</div>
-    <h2 style="margin-bottom:4px">Friction Patterns & Recommendations</h2>
-    <div class="divider"></div>
-
-    <h3 style="margin-bottom:12px;color:${C.amber}">DETECTED FRICTION PATTERNS</h3>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:${tier === 1 ? "16px" : "24px"}">
-      ${visibleFriction.length > 0
-        ? visibleFriction.map(f => `
-          <div style="background:#FEF3C7;border-left:4px solid ${C.amber};border-radius:0 8px 8px 0;padding:14px 16px">
-            <p style="margin:0;color:#92400E">${f}</p>
-          </div>`).join("")
-        : `<div style="background:#ECFDF5;border-left:4px solid ${C.green};border-radius:0 8px 8px 0;padding:14px 16px">
-            <p style="margin:0;color:#065F46">No significant friction patterns detected. Your team has a well-balanced profile.</p>
-           </div>`
-      }
-      ${lockedFrictionCount > 0 ? lockedCard(`+${lockedFrictionCount} more friction pattern${lockedFrictionCount > 1 ? "s" : ""} detected`, ["80%","60%","70%"]) : ""}
-    </div>
-
-    <h3 style="margin-bottom:12px">RECOMMENDATIONS</h3>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      ${visibleRollout.map((r, i) => `
-        <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:${C.grayLight};border-radius:8px">
-          <div style="width:28px;height:28px;border-radius:50%;background:${C.navy};color:white;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i + 1}</div>
-          <p style="margin:0">${r}</p>
-        </div>`).join("")}
-    </div>
-
-    ${tier === 1 ? upgradeCTA(
-      "Unlock Full Team Intelligence",
-      "Add more team members to unlock deeper diagnostics, leadership insights, execution bottlenecks, and scaling recommendations."
-    ) : ""}
-  `, pageNum);
-}
-
-// ── Tier 1 locked preview page ─────────────────────────────────
-
-function tier1LockedPage(pageNum: number): string {
-  return page(`
-    <div class="label" style="color:${C.purple};margin-bottom:6px">LOCKED FEATURES</div>
-    <h2 style="margin-bottom:4px">Full Team Intelligence Preview</h2>
-    <div class="divider"></div>
-    <p style="color:${C.gray};margin-bottom:20px">The following insights unlock as your team grows. Add members to reveal deeper organizational intelligence.</p>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      ${[
-        "Team Bottleneck Analysis",
-        "Leadership Dynamics",
-        "Scaling Diagnostics",
-        "Hiring Recommendations",
-        "Pressure Response Analysis",
-        "Team Maturity Level",
-        "Full 90-Day Roadmap",
-        "Role Tension Forecast",
-      ].map(label => lockedCard(label, ["90%", "70%", "55%"])).join("")}
-    </div>
-
-    ${upgradeCTA(
-      "Unlock Full Team Intelligence",
-      "Add more team members to unlock deeper diagnostics, leadership insights, execution bottlenecks, and scaling recommendations."
-    )}
-  `, pageNum);
-}
-
-// ── Tier 2 pages ───────────────────────────────────────────────
-
-function teamDynamicsPage(diagnostic: TeamDiagnostic, pageNum: number): string {
-  const { dominantEnergy, missingRoles, overweightRoles, riskLevel } = diagnostic;
-  return page(`
-    <div class="label" style="color:${C.purple};margin-bottom:6px">TEAM DYNAMICS</div>
-    <h2 style="margin-bottom:4px">Team Identity & Communication Analysis</h2>
-    <div class="divider"></div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
-      <div style="background:${C.grayLight};border-radius:10px;padding:18px">
-        <div class="label" style="color:${C.navy};margin-bottom:10px">DOMINANT ENERGY</div>
-        <div style="font-size:22px;font-weight:800;color:${ENERGY_COLORS[dominantEnergy] ?? C.purple}">${dominantEnergy}</div>
-        <p style="margin-top:8px;font-size:12px">${ENERGY_TEAM_DESC[dominantEnergy] ?? ""}</p>
-      </div>
-      <div style="background:${C.grayLight};border-radius:10px;padding:18px">
-        <div class="label" style="color:${C.navy};margin-bottom:10px">CHANGE RISK LEVEL</div>
-        <div style="font-size:22px;font-weight:800;color:${riskLevel === "Low" ? C.green : riskLevel === "Moderate" ? C.amber : C.red}">${riskLevel}</div>
-        <p style="margin-top:8px;font-size:12px">${RISK_LEVEL_DESC[riskLevel]}</p>
-      </div>
-    </div>
-
-    <h3 style="margin-bottom:12px">MISSING ROLE IMPACT</h3>
-    ${missingRoles.length > 0
-      ? `<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
-          ${missingRoles.map((role: string) => `
-            <div style="background:#FEF2F2;border-left:4px solid ${C.red};border-radius:0 8px 8px 0;padding:14px 16px">
-              <div style="font-weight:700;margin-bottom:4px;color:#991B1B">Missing: ${role}</div>
-              <p style="margin:0;font-size:12px;color:#7F1D1D">${MISSING_ROLE_IMPACT[role] ?? ""}</p>
-            </div>`).join("")}
-        </div>`
-      : `<div style="background:#ECFDF5;border-left:4px solid ${C.green};padding:14px 16px;border-radius:0 8px 8px 0;margin-bottom:20px">
-          <p style="margin:0;color:#065F46">All four roles are represented — your team has a complete change capability profile.</p>
-         </div>`
-    }
-
-    <h3 style="margin-bottom:12px">LEADERSHIP RISK ALERTS</h3>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      ${LEADERSHIP_RISKS.map(({ label, desc, flagged }) => `
-        <div style="background:${flagged(diagnostic) ? "#FEF3C7" : C.grayLight};border-radius:10px;padding:14px;border-left:3px solid ${flagged(diagnostic) ? C.amber : C.green}">
-          <div style="font-size:12px;font-weight:700;margin-bottom:4px">${label}</div>
-          <p style="font-size:11px;margin:0;color:${C.gray}">${desc}</p>
-        </div>`).join("")}
-    </div>
-  `, pageNum);
-}
-
-function roleTensionPage(diagnostic: TeamDiagnostic, pageNum: number): string {
-  const { roleDistribution } = diagnostic;
-  return page(`
-    <div class="label" style="color:${C.purple};margin-bottom:6px">TEAM DYNAMICS</div>
-    <h2 style="margin-bottom:4px">Role Tension Forecast & Communication Guide</h2>
-    <div class="divider"></div>
-
-    <h3 style="margin-bottom:12px;color:${C.amber}">LIKELY TENSION PATTERNS</h3>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
-      ${buildTensionPatterns(roleDistribution).map(t => `
-        <div style="background:#FEF3C7;border-left:4px solid ${C.amber};border-radius:0 8px 8px 0;padding:14px 16px">
-          <div style="font-weight:700;margin-bottom:4px;color:#92400E">${t.title}</div>
-          <p style="margin:0;font-size:12px;color:#78350F">${t.desc}</p>
-        </div>`).join("")}
-    </div>
-
-    <h3 style="margin-bottom:12px">TEAM COMMUNICATION GUIDE</h3>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      ${ROLE_COMM_GUIDE.map(g => `
-        <div style="display:grid;grid-template-columns:100px 1fr 1fr;gap:12px;padding:12px;background:${C.grayLight};border-radius:8px;align-items:start">
-          <div style="font-weight:700;font-size:13px">${g.role}</div>
-          <div>
-            <div class="label" style="color:${C.green};margin-bottom:3px">Motivated by</div>
-            <p style="font-size:11px;margin:0">${g.motivates}</p>
-          </div>
-          <div>
-            <div class="label" style="color:${C.red};margin-bottom:3px">Frustrated by</div>
-            <p style="font-size:11px;margin:0">${g.frustrates}</p>
-          </div>
-        </div>`).join("")}
-    </div>
-
-    ${upgradeCTA(
-      "Unlock Full Organizational Intelligence™",
-      "Add 8 or more team members to unlock advanced execution diagnostics, scaling intelligence, hiring recommendations, and full transformation insights."
-    )}
-  `, pageNum);
-}
-
-function tier2LockedPage(pageNum: number): string {
-  return page(`
-    <div class="label" style="color:${C.purple};margin-bottom:6px">PREMIUM FEATURES</div>
-    <h2 style="margin-bottom:4px">Organizational Intelligence Preview</h2>
-    <div class="divider"></div>
-    <p style="color:${C.gray};margin-bottom:20px">These features unlock when your team reaches 8 or more members.</p>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      ${[
-        "Full Execution Diagnostics™",
-        "Team Pressure Heatmap™",
-        "Leadership Compatibility Analysis™",
-        "Hiring Intelligence™",
-        "Team Maturity Analysis™",
-        "Full 90-Day Transformation Roadmap™",
-      ].map(label => lockedCard(label, ["90%", "70%", "55%"])).join("")}
-    </div>
-
-    ${upgradeCTA(
-      "Unlock Full Organizational Intelligence™",
-      "Add 8 or more team members to unlock advanced execution diagnostics, scaling intelligence, hiring recommendations, and full transformation insights."
-    )}
-  `, pageNum);
-}
-
-// ── Tier 3 pages ───────────────────────────────────────────────
-
-function buildBottlenecks(
-  roleDistribution: Record<string, number>,
-  stageHealth: Record<string, string>,
-  riskScore: number,
-): Array<{ icon: string; title: string; desc: string }> {
-  const bottlenecks: Array<{ icon: string; title: string; desc: string }> = [];
-
-  if ((roleDistribution["Driver"] ?? 0) === 0) {
-    bottlenecks.push({
-      icon: "⚡",
-      title: "Execution Vacuum",
-      desc: "No Driver role present. Plans and strategies are unlikely to be converted into consistent momentum. Delivery depends on whoever has the most urgency on any given day.",
-    });
-  }
-
-  if ((roleDistribution["Connector"] ?? 0) === 0) {
-    bottlenecks.push({
-      icon: "🔗",
-      title: "Communication Bottleneck",
-      desc: "No Connector role present. Information flow is fragmented and trust is not being actively maintained. Misalignment accumulates silently until it surfaces as conflict.",
-    });
-  }
-
-  if ((roleDistribution["Architect"] ?? 0) === 0) {
-    bottlenecks.push({
-      icon: "🏗️",
-      title: "Systems & Process Gap",
-      desc: "No Architect role present. Execution is ad hoc and processes are likely undocumented. The team is rebuilding the same solutions repeatedly without a scalable foundation.",
-    });
-  }
-
-  if (stageHealth["Sustain"] === "Critical" || stageHealth["Sustain"] === "At Risk") {
-    bottlenecks.push({
-      icon: "📉",
-      title: "Sustainability Breakdown",
-      desc: "The Sustain stage is critically weak. Improvements are not being institutionalised — the team reverts to old patterns after each change sprint ends.",
-    });
-  }
-
-  if (stageHealth["Align"] === "Critical" || stageHealth["Align"] === "At Risk") {
-    bottlenecks.push({
-      icon: "🗣️",
-      title: "Alignment Deficit",
-      desc: "The Align stage is weak. Decisions are being made without sufficient buy-in, and dissenting voices are not being surfaced before execution begins.",
-    });
-  }
-
-  if (riskScore >= 60) {
-    bottlenecks.push({
-      icon: "🚨",
-      title: "High Organisational Risk",
-      desc: "Your team's overall risk score indicates multiple compounding gaps. Without structural intervention, execution quality will degrade as team size and project complexity increase.",
-    });
-  }
-
-  if (bottlenecks.length === 0) {
-    bottlenecks.push({
-      icon: "✅",
-      title: "No Critical Bottlenecks Detected",
-      desc: "Your team has a well-rounded profile with no major execution bottlenecks. Focus on sustaining current strengths and deepening capability in your lowest-scoring ADAPTS stages.",
-    });
-  }
-
-  return bottlenecks;
-}
-
-function executionBottleneckPage(diagnostic: TeamDiagnostic, pageNum: number): string {
-  const { roleDistribution, stageHealth, riskScore } = diagnostic;
-  return page(`
-    <div class="label" style="color:${C.purple};margin-bottom:6px">EXECUTION INTELLIGENCE</div>
-    <h2 style="margin-bottom:4px">Execution Bottleneck Analysis</h2>
-    <div class="divider"></div>
-
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
-      ${buildBottlenecks(roleDistribution, stageHealth, riskScore).map((b: any) => `
-        <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:#FEF2F2;border-radius:8px;border-left:4px solid ${C.red}">
-          <div style="flex-shrink:0;font-size:18px">${b.icon}</div>
-          <div>
-            <div style="font-weight:700;margin-bottom:4px;color:#991B1B">${b.title}</div>
-            <p style="margin:0;font-size:12px;color:#7F1D1D">${b.desc}</p>
-          </div>
-        </div>`).join("")}
-    </div>
-
-    <h3 style="margin-bottom:12px">SCALABILITY DIAGNOSTICS</h3>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      ${SCALABILITY_DIMENSIONS.map(dim => {
-        const score = getScalabilityScore(dim.key, diagnostic);
-        const color = score >= 70 ? C.green : score >= 45 ? C.amber : C.red;
-        return `
-        <div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-            <span style="font-size:13px;font-weight:600">${dim.label}</span>
-            <span style="font-size:11px;font-weight:700;color:${color}">${score}/100</span>
-          </div>
-          ${scoreBar(score, color)}
-          <p style="font-size:11px;color:${C.gray};margin-top:4px">${dim.desc}</p>
-        </div>`;
-      }).join("")}
-    </div>
-  `, pageNum);
-}
-
-function pressureHeatmapPage(diagnostic: TeamDiagnostic, pageNum: number): string {
-  const { roleDistribution } = diagnostic;
-  const HEATMAP_DIMS = ["Trust","Communication","Execution","Sustainability","Innovation","Alignment"];
-  return page(`
-    <div class="label" style="color:${C.purple};margin-bottom:6px">EXECUTION INTELLIGENCE</div>
-    <h2 style="margin-bottom:4px">Execution Risk Heatmap & Pressure Response</h2>
-    <div class="divider"></div>
-
-    <h3 style="margin-bottom:14px">EXECUTION RISK HEATMAP</h3>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px">
-      ${HEATMAP_DIMS.map(dim => {
-        const score = getHeatmapScore(dim, diagnostic);
-        const color = score >= 70 ? C.green : score >= 45 ? C.amber : C.red;
-        const label = score >= 70 ? "Strong" : score >= 45 ? "Watch" : "Risk";
-        return `
-        <div style="border-radius:10px;padding:16px;text-align:center;background:${color}18;border:2px solid ${color}">
-          <div style="font-size:12px;font-weight:700;margin-bottom:4px">${dim}</div>
-          <div style="font-size:26px;font-weight:800;color:${color}">${score}</div>
-          <div style="font-size:10px;color:${color};font-weight:700">${label}</div>
-        </div>`;
-      }).join("")}
-    </div>
-
-    <h3 style="margin-bottom:14px">PRESSURE RESPONSE ANALYSIS</h3>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      ${PRESSURE_RESPONSES.filter((p: any) => (roleDistribution[p.role as Role] as any ?? 0) > 0).map(p => `
-        <div style="display:grid;grid-template-columns:100px 1fr;gap:14px;padding:14px;background:${C.grayLight};border-radius:8px">
-          <div>
-            <div style="font-weight:700;font-size:13px">${p.role}</div>
-            <div style="font-size:10px;color:${C.gray}">${roleDistribution[p.role as Role]} member${(roleDistribution[p.role as Role] ?? 0) > 1 ? "s" : ""}</div>
-          </div>
-          <div>
-            <div class="label" style="color:${C.amber};margin-bottom:4px">UNDER PRESSURE</div>
-            <p style="font-size:12px;margin:0">${p.response}</p>
-          </div>
-        </div>`).join("")}
-    </div>
-  `, pageNum);
-}
-
-function maturityHirePage(diagnostic: TeamDiagnostic, pageNum: number): string {
-  const maturity = getTeamMaturity(diagnostic);
-  const idealHire = getIdealHire(diagnostic);
-  return page(`
-    <div class="label" style="color:${C.purple};margin-bottom:6px">ORGANIZATIONAL INTELLIGENCE</div>
-    <h2 style="margin-bottom:4px">Team Maturity & Ideal Next Hire</h2>
-    <div class="divider"></div>
-
-    <div style="background:${C.navy};border-radius:12px;padding:24px 28px;color:white;margin-bottom:24px">
-      <div class="label" style="color:${C.gold};margin-bottom:8px">TEAM MATURITY LEVEL</div>
-      <div style="font-size:26px;font-weight:800;margin-bottom:10px">${maturity.level}</div>
-      <p style="font-size:13px;color:rgba(255,255,255,0.8);margin-bottom:12px">${maturity.description}</p>
-      <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:12px">
-        <div class="label" style="color:${C.gold};margin-bottom:6px">NEXT GROWTH STAGE</div>
-        <p style="font-size:12px;color:rgba(255,255,255,0.75);margin:0">${maturity.nextStage}</p>
-      </div>
-    </div>
-
-    <h3 style="margin-bottom:12px">IDEAL NEXT HIRE</h3>
-    <div style="background:#EFF6FF;border-radius:10px;padding:20px;border-left:4px solid #3B82F6;margin-bottom:24px">
-      <div style="font-size:18px;font-weight:800;color:#1E40AF;margin-bottom:8px">${idealHire.role}</div>
-      <p style="font-size:13px;color:#1E3A8A;margin-bottom:10px">${idealHire.reason}</p>
-      <div class="label" style="color:#3B82F6;margin-bottom:6px">WHAT IMPROVES AFTER HIRING</div>
-      <p style="font-size:12px;color:#1E40AF;margin:0">${idealHire.improvement}</p>
-    </div>
-
-    <h3 style="margin-bottom:12px">LEADERSHIP COMPATIBILITY</h3>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div style="background:#ECFDF5;border-radius:10px;padding:16px;border-top:3px solid ${C.green}">
-        <div class="label" style="color:${C.green};margin-bottom:8px">STRONGEST PAIRINGS</div>
-        ${getCompatibilityPairings(diagnostic, "strong").map(p => `<div style="font-size:12px;padding:3px 0;font-weight:600">${p}</div>`).join("")}
-      </div>
-      <div style="background:#FEF2F2;border-radius:10px;padding:16px;border-top:3px solid ${C.red}">
-        <div class="label" style="color:${C.red};margin-bottom:8px">HIGHEST TENSION</div>
-        ${getCompatibilityPairings(diagnostic, "tension").map(p => `<div style="font-size:12px;padding:3px 0;font-weight:600">${p}</div>`).join("")}
-      </div>
-    </div>
-  `, pageNum);
-}
-
-function fullRoadmapPage(diagnostic: TeamDiagnostic, pageNum: number): string {
-  const { rollout90Days, missingRoles, frictionPatterns } = diagnostic;
-  const phases = [
-    { label: "Days 1–30", color: C.purple, icon: "🧭", items: rollout90Days.filter((_: any, i: number) => i === 0) },
-    { label: "Days 31–60", color: C.amber,  icon: "⚙️", items: rollout90Days.filter((_: any, i: number) => i === 1 || i === 2) },
-    { label: "Days 61–90", color: C.green,  icon: "🚀", items: rollout90Days.filter((_: any, i: number) => i === 3) },
-  ];
-  return page(`
-    <div class="label" style="color:${C.purple};margin-bottom:6px">TRANSFORMATION ROADMAP</div>
-    <h2 style="margin-bottom:4px">Full 90-Day Transformation Roadmap™</h2>
-    <div class="divider"></div>
-
-    ${phases.map(phase => `
-      <div style="margin-bottom:20px">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-          <span style="font-size:20px">${phase.icon}</span>
-          <div style="font-size:15px;font-weight:800;color:${phase.color}">${phase.label}</div>
-        </div>
-        <div style="border-left:3px solid ${phase.color};padding-left:16px;display:flex;flex-direction:column;gap:8px">
-          ${phase.items.map((item: any) => `
-            <div style="background:${C.grayLight};border-radius:8px;padding:14px">
-              <p style="margin:0;font-size:13px">${item}</p>
-            </div>`).join("")}
-        </div>
-      </div>`).join("")}
-
-    ${missingRoles.length > 0 ? `
-      <div style="background:#EFF6FF;border-radius:10px;padding:18px;margin-top:8px">
-        <div class="label" style="color:#3B82F6;margin-bottom:8px">PRIORITY HIRING GAPS</div>
-        <p style="font-size:12px;color:#1E40AF">Missing roles — ${missingRoles.join(", ")} — should be addressed as part of your 90-day plan. These gaps create compounding execution risk.</p>
-      </div>` : ""}
-
-    ${frictionPatterns.length > 0 ? `
-      <div style="background:#FEF3C7;border-radius:10px;padding:18px;margin-top:12px">
-        <div class="label" style="color:${C.amber};margin-bottom:8px">FRICTION TO RESOLVE</div>
-        ${frictionPatterns.map((f: string)=> `<p style="font-size:12px;color:#92400E;margin-bottom:6px">• ${f}</p>`).join("")}
-      </div>` : ""}
-  `, pageNum);
-}
-
 // ── Supplementary data ─────────────────────────────────────────
 
+const STAGE_DESCRIPTIONS: Record<string, string> = {
+  Alert:     "Sensing disruption early and creating urgency before the market forces it.",
+  Diagnose:  "Asking harder questions to address root causes — not just symptoms.",
+  Prepare:   "Assessing capability and confidence before launch to reduce implementation risk.",
+  Align:     "Building shared understanding and surfacing hidden concerns before execution.",
+  Transform: "Converting agreement into coordinated action through complex change.",
+  Sustain:   "Embedding new behaviours and building systems that make change last.",
+};
+
 const ENERGY_TEAM_DESC: Record<string, string> = {
-  Achiever:  "This team moves fast and values visible results. Communication should be direct, goal-oriented, and tied to outcomes.",
-  Unifier:   "This team prioritises people and trust. Decisions land better when relationships are considered and voices are heard.",
-  Organizer: "This team values structure and reliability. They respond well to clear processes, defined roles, and logical planning.",
-  Innovator: "This team is idea-driven and future-focused. They need space for creative thinking but benefit from execution support.",
+  Achiever:  "Results-driven and fast-moving. This team measures success in visible outcomes. Communication should be direct, goal-oriented, and tied to measurable progress. Push too hard without relational investment and trust will erode.",
+  Unifier:   "People-first and trust-driven. This team makes better decisions when all voices are heard. Relationships are the engine — protect them under pressure. The risk is avoiding difficult conversations to preserve harmony.",
+  Organizer: "Structure-dependent and reliability-focused. This team performs best with clear processes, defined roles, and logical planning. The risk is over-engineering systems before validating the direction.",
+  Innovator: "Idea-rich and future-focused. This team generates strong creative thinking but needs execution support to convert insight into consistent delivery. The risk is moving to the next idea before the last one is complete.",
 };
 
 const RISK_LEVEL_DESC: Record<string, string> = {
-  Low:      "Your team has a well-balanced profile with low execution risk. Maintain current strengths.",
-  Moderate: "Some gaps exist that could create friction as complexity grows. Address proactively.",
-  High:     "Significant role or stage gaps are creating active execution risk. Prioritise interventions.",
-  Critical: "Multiple critical gaps are present. Immediate structural attention is recommended.",
+  Low:      "Your team has a well-balanced profile with low execution risk. Maintain current strengths and deepen capability in your weakest ADAPTS stages.",
+  Moderate: "Some gaps exist that could create friction as complexity grows. Address proactively before scaling initiatives or team size.",
+  High:     "Significant role or stage gaps are creating active execution risk. Structural intervention is needed before the next major initiative.",
+  Critical: "Multiple critical gaps are compounding. Immediate structural attention is strongly recommended to prevent execution failure.",
 };
 
 const MISSING_ROLE_IMPACT: Record<string, string> = {
-  Driver:    "Without a Driver, the team may struggle to convert alignment and planning into consistent execution momentum. Deadlines slip, initiatives stall.",
-  Connector: "Without a Connector, trust erodes under pressure. Misalignment builds silently until it surfaces as conflict or disengagement.",
-  Architect: "Without an Architect, good ideas lack operational structure. Execution is ad hoc, processes are unclear, and scale becomes difficult.",
-  Spotter:   "Without a Spotter, the team may execute confidently in the wrong direction. Strategic blind spots accumulate unnoticed.",
+  Driver:    "Without a Driver, the team struggles to convert planning into consistent momentum. Deadlines slip, initiatives stall, and urgency is lost between meetings. Someone is always pushing who shouldn't have to.",
+  Connector: "Without a Connector, trust erodes under pressure. Misalignment builds silently, voices go unheard, and conflict surfaces only after it has done damage. Retention risk increases significantly.",
+  Architect: "Without an Architect, good ideas lack operational structure. Execution is ad hoc, processes are undocumented, and the same mistakes are made repeatedly. Scaling becomes painful.",
+  Spotter:   "Without a Spotter, the team may execute confidently in the wrong direction. Strategic blind spots accumulate and the team is slow to detect emerging risk or better opportunity.",
 };
 
 const LEADERSHIP_RISKS = [
   {
     label: "Alignment Breakdown Risk™",
-    desc:  "Misalignment forming between team members due to communication or role gaps.",
+    desc:  "Misalignment forming between team members. Decisions made without genuine buy-in lead to passive resistance and rework.",
     flagged: (d: TeamDiagnostic) => (d.stageScores["Align"] ?? 100) < 50,
   },
   {
     label: "Execution Drift Risk™",
-    desc:  "Execution losing consistency or focus without clear accountability structures.",
+    desc:  "Execution losing consistency over time. Initiatives start with energy but accountability fades before completion.",
     flagged: (d: TeamDiagnostic) => (d.stageScores["Transform"] ?? 100) < 50,
   },
   {
     label: "Founder Dependency Risk™",
-    desc:  "Over-reliance on one or two people to drive delivery and decisions.",
+    desc:  "Over-reliance on one or two people to drive delivery and decisions. The team stalls when they are unavailable.",
     flagged: (d: TeamDiagnostic) => (d.roleDistribution["Driver"] ?? 0) <= 1,
   },
   {
     label: "Communication Fragmentation™",
-    desc:  "Breakdown in information flow between roles or functional areas.",
+    desc:  "Breakdown in information flow between roles. Important context is lost and people operate from different assumptions.",
     flagged: (d: TeamDiagnostic) => (d.roleDistribution["Connector"] ?? 0) === 0,
   },
 ];
 
 const ROLE_COMM_GUIDE = [
-  { role: "Driver",    motivates: "Clear goals, visible progress, accountability, speed",        frustrates: "Slow decisions, endless discussion, lack of follow-through" },
-  { role: "Connector", motivates: "Trust, inclusion, being heard, collaborative decisions",       frustrates: "Rushed decisions, ignored input, conflict avoidance" },
-  { role: "Architect", motivates: "Clear process, logical structure, reliable systems",           frustrates: "Ambiguity, last-minute changes, skipping steps" },
-  { role: "Spotter",   motivates: "New challenges, strategic questions, intellectual freedom",    frustrates: "Repetition, over-structure, being locked into one approach" },
+  { role: "Driver",    motivates: "Clear goals, visible progress, accountability, speed, decisive leadership",  frustrates: "Slow decisions, endless discussion, vague next steps, no follow-through" },
+  { role: "Connector", motivates: "Trust, inclusion, being heard, collaborative decisions, team harmony",        frustrates: "Rushed decisions, ignored input, unresolved conflict, cold communication" },
+  { role: "Architect", motivates: "Clear process, logical structure, reliable systems, well-defined scope",      frustrates: "Ambiguity, last-minute changes, skipping steps, inconsistent standards" },
+  { role: "Spotter",   motivates: "New challenges, strategic thinking, intellectual freedom, open questions",    frustrates: "Repetition, over-structure, locked-in plans, being told how rather than why" },
 ];
 
 function buildTensionPatterns(roleDistribution: Record<string, number>) {
   const tensions = [];
   if ((roleDistribution["Driver"] ?? 0) > 0 && (roleDistribution["Architect"] ?? 0) > 0)
-    tensions.push({ title: "Driver vs Architect", desc: "Drivers push for speed; Architects want the plan right before moving. This creates friction around launch timing and quality standards." });
+    tensions.push({ title: "Driver vs Architect", desc: "Drivers push for speed; Architects want the plan right before moving. Friction builds around launch timing, quality standards, and when 'good enough' is ready to ship. Left unmanaged this creates mutual frustration and delayed decisions." });
   if ((roleDistribution["Spotter"] ?? 0) > 0 && (roleDistribution["Driver"] ?? 0) > 0)
-    tensions.push({ title: "Spotter vs Driver", desc: "Spotters want to explore new directions; Drivers want to finish what's started. This creates tension around pivoting vs committing." });
+    tensions.push({ title: "Spotter vs Driver", desc: "Spotters want to explore new directions; Drivers want to finish what's started. Tension emerges around whether to pivot or commit — especially mid-execution when switching costs are high." });
   if ((roleDistribution["Connector"] ?? 0) > 0 && (roleDistribution["Driver"] ?? 0) > 0)
-    tensions.push({ title: "Connector vs Driver", desc: "Connectors prioritise consensus and trust; Drivers prioritise outcomes and speed. This creates friction around decision pace and inclusion." });
+    tensions.push({ title: "Connector vs Driver", desc: "Connectors prioritise consensus and relational trust; Drivers prioritise outcomes and speed. Friction builds around pace of decisions and how much discussion is 'enough' before action." });
+  if ((roleDistribution["Spotter"] ?? 0) > 0 && (roleDistribution["Architect"] ?? 0) > 0)
+    tensions.push({ title: "Spotter vs Architect", desc: "Spotters want open exploration; Architects want defined structure. Tension emerges around how much freedom is given before a framework is imposed — and who decides when it's time to stop exploring." });
   if (tensions.length === 0)
-    tensions.push({ title: "No Major Tension Detected", desc: "Your current role mix does not show strong predictive tension patterns. Monitor as team grows." });
+    tensions.push({ title: "No Major Tension Detected", desc: "Your current role mix does not show strong predictive tension patterns. Monitor as team grows and roles become more defined under pressure. Tension often emerges when workload increases or deadlines compress." });
   return tensions;
 }
 
 const PRESSURE_RESPONSES = [
-  { role: "Driver",    response: "Drivers become forceful — pushing harder, raising urgency, and sometimes steamrolling team input. Watch for communication breakdown under delivery pressure." },
-  { role: "Connector", response: "Connectors avoid conflict — staying quiet about concerns, smoothing over issues, and delaying necessary difficult conversations. Watch for silent disengagement." },
-  { role: "Architect", response: "Architects overanalyse — diving deeper into planning, requesting more data, and hesitating to commit without complete information. Watch for execution paralysis." },
-  { role: "Spotter",   response: "Spotters become critical — pointing out everything that could go wrong, reframing the problem instead of solving it, and questioning current direction. Watch for destabilisation." },
+  { role: "Driver",    response: "Drivers become forceful — pushing harder, raising urgency, and sometimes steamrolling input. They may make unilateral decisions and lose awareness of team impact. Watch for communication breakdown and resentment building silently beneath a compliant surface." },
+  { role: "Connector", response: "Connectors avoid conflict — staying quiet about concerns, smoothing over issues, and delaying necessary difficult conversations. They may agree outwardly while disconnecting internally. Watch for passive resistance and sudden disengagement after sustained pressure." },
+  { role: "Architect", response: "Architects overanalyse — diving deeper into planning and hesitating to commit without complete information. They enter a loop of refinement that blocks decision-making. Watch for execution paralysis disguised as diligence and quality standards." },
+  { role: "Spotter",   response: "Spotters become critical — pointing out what could go wrong, reframing the problem instead of solving it, and questioning direction at the worst moment. Watch for team destabilisation and loss of confidence when a Spotter's doubt becomes contagious." },
 ];
 
 const SCALABILITY_DIMENSIONS = [
-  { key: "leadership",     label: "Leadership Scalability",     desc: "Can the team sustain delivery without founder overload?" },
-  { key: "communication",  label: "Communication Scalability",  desc: "Can information flow reliably as the team grows?" },
-  { key: "operational",    label: "Operational Scalability",    desc: "Are systems in place to support more volume without breakdown?" },
-  { key: "sustainability", label: "Sustainability Scalability", desc: "Will improvements hold after the change sprint ends?" },
-  { key: "innovation",     label: "Innovation Scalability",     desc: "Can the team continue generating and testing new ideas at scale?" },
+  { key: "leadership",     label: "Leadership Scalability",     desc: "Can the team sustain delivery without founder or lead overload as complexity grows?" },
+  { key: "communication",  label: "Communication Scalability",  desc: "Can information flow reliably and without distortion as team size and project count increases?" },
+  { key: "operational",    label: "Operational Scalability",    desc: "Are systems and processes in place to support more volume without breakdown or rework?" },
+  { key: "sustainability", label: "Sustainability Scalability", desc: "Will improvements hold and compound after the initial change sprint ends?" },
+  { key: "innovation",     label: "Innovation Scalability",     desc: "Can the team continue generating and testing new ideas at scale without losing execution quality?" },
 ];
 
 function getScalabilityScore(key: string, d: TeamDiagnostic): number {
@@ -733,33 +237,58 @@ function getHeatmapScore(dim: string, d: TeamDiagnostic): number {
 
 function getTeamMaturity(d: TeamDiagnostic) {
   const avg = Object.values(d.stageScores).reduce((a, b) => a + b, 0) / 6;
-  if (avg >= 75) return { level: "Strategic Leadership Team",  description: "This team operates with high trust, clear execution, and strong change capability.", nextStage: "Focus on innovation, external market positioning, and scaling leadership depth." };
-  if (avg >= 60) return { level: "High-Trust Team",            description: "Trust and communication are strong. Execution is mostly consistent.", nextStage: "Build sustainability systems and scale operational capacity." };
-  if (avg >= 45) return { level: "Scaling Team",               description: "The team has functional foundations but faces growing pains under pressure.", nextStage: "Strengthen alignment and execution consistency before adding complexity." };
-  if (avg >= 30) return { level: "Functional Team",            description: "Core roles are in place but capability gaps are creating friction.", nextStage: "Address missing roles and improve dialogue and preparation disciplines." };
-  return              { level: "Emerging Team",                description: "The team is in early formation — foundations are being built.", nextStage: "Focus on role clarity, communication, and establishing shared operating norms." };
+  if (avg >= 75) return {
+    level: "Strategic Leadership Team",
+    description: "This team operates with high trust, clear execution patterns, and strong change capability across all six ADAPTS stages. They are able to lead complex transformation from within without external support.",
+    risks: "Risk of complacency and under-challenging team members. Ensure continued growth through stretch goals, external exposure, and high-stakes initiative ownership.",
+    nextStage: "Focus on innovation leadership, external market positioning, and scaling leadership depth beyond current key individuals.",
+  };
+  if (avg >= 60) return {
+    level: "High-Trust Team",
+    description: "Trust and communication are strong. Execution is mostly consistent and team members have a working understanding of their roles in the change system.",
+    risks: "Risk of avoiding necessary disruption to preserve harmony. May need to push harder into uncomfortable strategic questions and harder performance conversations.",
+    nextStage: "Build sustainability systems and scale operational capacity to support the next phase of growth.",
+  };
+  if (avg >= 45) return {
+    level: "Scaling Team",
+    description: "The team has functional foundations but faces growing pains under pressure. Capability gaps become visible and performance becomes uneven as complexity increases.",
+    risks: "Risk of burning out key performers and losing trust if execution gaps are not addressed before the next major initiative is launched.",
+    nextStage: "Strengthen alignment and execution consistency. Build role clarity before adding more people or projects to the team.",
+  };
+  if (avg >= 30) return {
+    level: "Functional Team",
+    description: "Core roles are in place but significant capability gaps are creating friction. The team works — but not efficiently — and performance is inconsistent across initiatives.",
+    risks: "Risk of talent frustration and initiative failure if structural gaps are not acknowledged and directly addressed with investment and change.",
+    nextStage: "Address missing roles, improve preparation and dialogue disciplines, and create shared accountability frameworks across the team.",
+  };
+  return {
+    level: "Emerging Team",
+    description: "The team is in early formation. Foundations are still being built and contribution patterns are not yet established, understood, or consistently applied.",
+    risks: "Risk of early disengagement if people don't understand how they fit, what is expected, or how their contribution connects to team success.",
+    nextStage: "Focus on role clarity, communication norms, and establishing shared operating agreements before scaling headcount or project complexity.",
+  };
 }
 
 function getIdealHire(d: TeamDiagnostic) {
   if ((d.roleDistribution["Connector"] ?? 0) === 0) return {
     role: "Connector / Culture Lead",
-    reason: "Your team has no trust-builder or alignment anchor. As the team scales, conflict and silent disengagement will become your biggest risks.",
-    improvement: "Faster alignment, healthier conflict resolution, stronger retention, and improved cross-team communication.",
+    reason: "Your team has no trust-builder or alignment anchor. As complexity grows, conflict and silent disengagement will become your biggest risks — not strategy or execution capacity.",
+    improvement: "Faster alignment, healthier conflict resolution, stronger retention, improved cross-team communication, and a culture people actively choose to stay in.",
   };
   if ((d.roleDistribution["Architect"] ?? 0) === 0) return {
     role: "Architect / Operations Lead",
-    reason: "Your team lacks a systems thinker. Good ideas are being executed inconsistently and processes are likely ad hoc.",
-    improvement: "Reliable delivery, scalable processes, reduced rework, and clearer operational ownership.",
+    reason: "Your team lacks a systems thinker. Good work is being done inconsistently, and processes are likely informal or undocumented — creating rework, scaling resistance, and repeated mistakes.",
+    improvement: "Reliable delivery standards, scalable processes, reduced rework, clearer operational ownership, and systems that run without direct founder involvement.",
   };
   if ((d.roleDistribution["Spotter"] ?? 0) === 0) return {
     role: "Spotter / Strategy Advisor",
-    reason: "Your team has no strategic radar. You may be executing effectively but missing shifts in the market or better approaches.",
-    improvement: "Improved strategic positioning, earlier detection of risk, and better-informed pivots.",
+    reason: "Your team has no strategic radar. You may be executing effectively in the wrong direction — missing market shifts, better approaches, or early risk signals that a Spotter would catch.",
+    improvement: "Improved strategic positioning, earlier detection of execution risk, better-informed pivots, and more confident long-range planning.",
   };
   return {
     role: "Driver / Execution Lead",
-    reason: "Adding another Driver increases delivery capacity, especially as projects grow in complexity and volume.",
-    improvement: "Higher execution throughput, reduced bottlenecks, and stronger accountability culture.",
+    reason: "Adding another Driver increases delivery capacity and distributes accountability — reducing bottlenecks and leader overload as projects grow in volume and cross-functional complexity.",
+    improvement: "Higher execution throughput, distributed accountability, reduced leader overload, and a stronger delivery culture across the team.",
   };
 }
 
@@ -780,7 +309,631 @@ function getCompatibilityPairings(d: TeamDiagnostic, type: "strong" | "tension")
   return Object.entries(pairs)
     .filter(([k]) => k.split("+").every(r => roles.includes(r)))
     .map(([, v]) => v)
-    .slice(0, 3);
+    .slice(0, 4);
+}
+
+function buildBottlenecks(
+  roleDistribution: Record<string, number>,
+  stageHealth: Record<string, string>,
+  riskScore: number,
+): Array<{ icon: string; title: string; desc: string }> {
+  const b: Array<{ icon: string; title: string; desc: string }> = [];
+
+  if ((roleDistribution["Driver"] ?? 0) === 0)
+    b.push({ icon: "⚡", title: "Execution Vacuum", desc: "No Driver present. Plans and strategies are unlikely to convert into consistent momentum. Delivery depends on whoever has the most urgency on any given day — creating unpredictable output and missed deadlines." });
+  if ((roleDistribution["Connector"] ?? 0) === 0)
+    b.push({ icon: "🔗", title: "Communication Bottleneck", desc: "No Connector present. Information flow is fragmented and trust is not being actively maintained. Misalignment accumulates silently until it surfaces as conflict, disengagement, or failed handoffs between team members." });
+  if ((roleDistribution["Architect"] ?? 0) === 0)
+    b.push({ icon: "🏗️", title: "Systems & Process Gap", desc: "No Architect present. Execution is ad hoc and processes are likely undocumented. The team rebuilds the same solutions repeatedly without a scalable foundation — creating rework, inconsistent quality, and onboarding problems." });
+  if (stageHealth["Sustain"] === "Critical" || stageHealth["Sustain"] === "At Risk")
+    b.push({ icon: "📉", title: "Sustainability Breakdown", desc: "The Sustain stage is critically weak. Improvements are not being institutionalised — the team reverts to old patterns after each change sprint ends, making progress feel temporary and exhausting for those who drove it." });
+  if (stageHealth["Align"] === "Critical" || stageHealth["Align"] === "At Risk")
+    b.push({ icon: "🗣️", title: "Alignment Deficit", desc: "The Align stage is weak. Decisions are being made without sufficient buy-in and dissenting voices are not being surfaced before execution begins. Silent resistance is likely building beneath the surface." });
+  if (stageHealth["Prepare"] === "Critical" || stageHealth["Prepare"] === "At Risk")
+    b.push({ icon: "📋", title: "Launch Without Readiness", desc: "The Prepare stage is weak. The team is moving into execution before capability, capacity, or confidence has been verified — creating preventable failure, rework, and team frustration with repeated missed launches." });
+  if (riskScore >= 60)
+    b.push({ icon: "🚨", title: "High Organisational Risk", desc: "Multiple compounding gaps are present. Without structural intervention, execution quality will degrade significantly as team size and project complexity increase. The risk compounds faster than it appears." });
+  if (b.length === 0)
+    b.push({ icon: "✅", title: "No Critical Bottlenecks Detected", desc: "Your team has a well-rounded profile with no major execution bottlenecks. Focus on sustaining current strengths and deepening capability in your lowest-scoring ADAPTS stages to reach Strategic Leadership Team status." });
+
+  return b;
+}
+
+// ── Page builders ──────────────────────────────────────────────
+
+function coverPage(
+  teamName: string, memberCount: number, capacityScore: number,
+  date: string, tierLabel: string, diagnostic: TeamDiagnostic
+): string {
+  const riskColor = diagnostic.riskLevel === "Low" ? C.green : diagnostic.riskLevel === "Moderate" ? C.amber : C.red;
+  return page(`
+    <div style="height:100%;display:flex;flex-direction:column;justify-content:space-between">
+
+      <div>
+        <div class="label" style="color:${C.purple};margin-bottom:18px">TEAM ASSESSMENT REPORT · ${tierLabel.toUpperCase()}</div>
+        <h1>TEAM<br>CHANGE MAP™</h1>
+        <div style="width:56px;height:4px;background:${C.gold};margin:16px 0 20px"></div>
+        <p style="font-size:17px;color:${C.gray};font-weight:300;margin-bottom:5px">${teamName}</p>
+        <p style="font-size:13px;color:${C.gray}">Assessment Date: ${date} &nbsp;·&nbsp; ${memberCount} Team Member${memberCount !== 1 ? "s" : ""}</p>
+      </div>
+
+      <div style="margin-top:20px;background:${C.navy};border-radius:14px;padding:26px 30px;color:white">
+        <div class="label" style="color:rgba(255,255,255,0.5);margin-bottom:16px">TEAM OVERVIEW</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:18px;margin-bottom:18px">
+          <div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:3px;letter-spacing:.08em;text-transform:uppercase">Team Size</div>
+            <div style="font-size:28px;font-weight:900">${memberCount}</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:3px;letter-spacing:.08em;text-transform:uppercase">Capacity Score™</div>
+            <div style="font-size:28px;font-weight:900;color:${C.gold}">${capacityScore}<span style="font-size:13px;font-weight:400;color:rgba(255,255,255,0.4)">/100</span></div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:3px;letter-spacing:.08em;text-transform:uppercase">Dominant Energy</div>
+            <div style="font-size:20px;font-weight:800;color:${ENERGY_COLORS[diagnostic.dominantEnergy] ?? C.gold}">${diagnostic.dominantEnergy}</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:3px;letter-spacing:.08em;text-transform:uppercase">Risk Level</div>
+            <div style="font-size:20px;font-weight:800;color:${riskColor}">${diagnostic.riskLevel}</div>
+          </div>
+        </div>
+        ${diagnostic.missingRoles.length > 0
+          ? `<div style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:8px;padding:11px 14px">
+               <span style="font-size:11px;font-weight:700;color:#FCA5A5;letter-spacing:.08em;text-transform:uppercase">⚠ Missing Roles: </span>
+               <span style="font-size:12px;color:#FCA5A5">${diagnostic.missingRoles.join(", ")} — execution gaps active</span>
+             </div>`
+          : `<div style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);border-radius:8px;padding:11px 14px">
+               <span style="font-size:11px;font-weight:700;color:#6EE7B7;letter-spacing:.08em;text-transform:uppercase">✓ All Four Roles Represented</span>
+               <span style="font-size:12px;color:#6EE7B7"> — Complete change capability profile detected</span>
+             </div>`}
+      </div>
+
+      <div style="margin-top: 50px;">
+        <div class="label" style="color:${C.gray};margin-bottom:10px">ADAPTS™ STAGE SCORES AT A GLANCE</div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px">
+          ${Object.entries(diagnostic.stageScores).map(([stage, score]) => {
+            const color = score >= 70 ? C.green : score >= 50 ? C.purple : score >= 30 ? C.amber : C.red;
+            return `<div style="margin:10px;text-align:center;padding:10px 6px;background:${C.grayLight};border-radius:8px;border-top:3px solid ${color}">
+              <div style="font-size:10px;font-weight:700;color:${C.navy};margin-bottom:4px">${stage}</div>
+              <div style="font-size:20px;font-weight:900;color:${color}">${Math.round(score)}</div>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+
+      <div style="margin-top:30px;display:grid;grid-template-columns:repeat(4,1fr);gap:7px">
+        ${Object.entries(diagnostic.roleDistribution).map(([role, count]) => {
+          const color = count === 0 ? C.red : count >= 3 ? C.amber : C.green;
+          return `<div style="text-align:center;padding:10px 6px;background:${count === 0 ? "#FEF2F2" : C.grayLight};border-radius:8px;border-top:3px solid ${color}">
+            <div style="font-size:10px;font-weight:700;color:${C.navy};margin-bottom:3px">${role}</div>
+            <div style="font-size:18px;font-weight:900;color:${color}">${count}</div>
+            <div style="font-size:9px;color:${count === 0 ? C.red : C.gray};font-weight:${count === 0 ? "700" : "400"}">${count === 0 ? "MISSING" : "members"}</div>
+          </div>`;
+        }).join("")}
+      </div>
+
+      <p style="margin-top:30px;font-size:11px;color:${C.gray};text-align:center">Prepared for team development and organisational insight · Change Genius™ · changegeniusai.com</p>
+    </div>
+  `);
+}
+
+function adaptsCoveragePage(
+  stageScores: Record<string, number>,
+  roleDistribution: Record<string, number>,
+  energyScores: Record<string, number>,
+  pageNum: number
+): string {
+  const sorted    = Object.entries(stageScores).sort((a, b) => b[1] - a[1]);
+  const topStages = sorted.slice(0, 2).map(([s]) => s);
+  const botStages = sorted.slice(-2).map(([s]) => s);
+
+  return page(`
+    <div class="label" style="color:${C.purple};margin-bottom:5px">TEAM RESULTS</div>
+    <h2 style="margin-bottom:3px">Team ADAPTS™ Stage Coverage</h2>
+    <p style="color:${C.gray};font-size:12px;margin-bottom:0">How well your team covers the six stages of organisational change. Scores reflect team average.</p>
+    <div class="divider"></div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
+      ${sorted.map(([stage, avg]) => {
+        const isTop = topStages.includes(stage);
+        const isBot = botStages.includes(stage);
+        const color = isTop ? C.green : isBot ? C.red : C.purple;
+        const badge = isTop
+          ? `<span style="background:${C.green}22;color:${C.green};font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap">Team Strength ✦</span>`
+          : isBot
+          ? `<span style="background:${C.red}22;color:${C.red};font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap">Coverage Gap ⚠</span>`
+          : `<span style="background:${C.purple}22;color:${C.purple};font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px">Solid</span>`;
+        return `
+        <div style="margin-top:10px;padding:11px 13px;background:${color}08;border-radius:9px;border-left:3px solid ${color}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+            <div style="flex:1;min-width:0;padding-right:10px">
+              <span style="font-size:13px;font-weight:700;color:${C.navy}">${stage}</span>
+              <span style="font-size:11px;color:${C.gray};margin-left:7px">${STAGE_DESCRIPTIONS[stage] ?? ""}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+              ${badge}
+              <span style="font-size:14px;font-weight:800;color:${color};min-width:26px;text-align:right">${Math.round(avg)}</span>
+            </div>
+          </div>
+          ${scoreBar(Math.round(avg), color, 7)}
+        </div>`;
+      }).join("")}
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:25px">
+      <div style="background:${C.green}10;border-radius:10px;padding:14px 16px;border-left:4px solid ${C.green}">
+        <div class="label" style="color:${C.green};margin-bottom:8px">TEAM STRENGTHS</div>
+        ${topStages.map(s => `
+          <div style="margin-bottom:7px">
+            <div style="font-size:13px;font-weight:700;color:${C.navy}">${s}</div>
+            <div style="font-size:11px;color:#374151;margin-top:1px">${STAGE_DESCRIPTIONS[s] ?? ""}</div>
+          </div>`).join("")}
+      </div>
+      <div style="background:${C.red}10;border-radius:10px;padding:14px 16px;border-left:4px solid ${C.red}">
+        <div class="label" style="color:${C.red};margin-bottom:8px">COVERAGE GAPS</div>
+        ${botStages.map(s => `
+          <div style="margin-bottom:7px">
+            <div style="font-size:13px;font-weight:700;color:${C.navy}">${s}</div>
+            <div style="font-size:11px;color:#374151;margin-top:1px">${STAGE_DESCRIPTIONS[s] ?? ""}</div>
+          </div>`).join("")}
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:10px;margin-top:30px">Team Energy Mix</h3>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      ${Object.entries(energyScores).map(([energy, avg]) => {
+        const color = ENERGY_COLORS[energy] ?? C.purple;
+        const rounded = Math.round(avg);
+        return `
+        <div style="background:${C.grayLight};border-radius:10px;padding:13px;text-align:center;border-top:3px solid ${color}">
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px;color:${color}">${energy}</div>
+          <div style="font-size:26px;font-weight:900;color:${color}">${rounded}</div>
+          <div style="font-size:10px;color:${C.gray};margin-top:2px;margin-bottom:6px">avg score</div>
+          ${scoreBar(rounded, color, 5)}
+        </div>`;
+      }).join("")}
+    </div>
+  `, pageNum);
+}
+
+function frictionAndRecommendationsPage(
+  frictionPatterns: string[],
+  rollout90Days: string[],
+  pageNum: number,
+  tier: 1 | 2 | 3
+): string {
+  const visibleFriction = tier === 1 ? frictionPatterns.slice(0, 1) : frictionPatterns;
+  const visibleRollout  = tier === 1 ? rollout90Days.slice(0, 1)    : rollout90Days;
+  const lockedCount     = tier === 1 ? Math.max(0, frictionPatterns.length - 1) : 0;
+
+  return page(`
+    <div class="label" style="color:${C.purple};margin-bottom:5px">TEAM DIAGNOSTICS</div>
+    <h2 style="margin-bottom:3px">Friction Patterns & Recommendations</h2>
+    <p style="color:${C.gray};font-size:12px;margin-bottom:0">Detected patterns that create execution friction and recommended actions to address them.</p>
+    <div class="divider"></div>
+
+    <h3 style="margin-bottom:10px;color:${C.amber}">DETECTED FRICTION PATTERNS</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+      ${visibleFriction.length > 0
+        ? visibleFriction.map(f => `
+          <div style="background:#FEF3C7;border-left:4px solid ${C.amber};border-radius:0 9px 9px 0;padding:13px 15px">
+            <p style="margin:0;color:#92400E;font-size:13px">${f}</p>
+          </div>`).join("")
+        : `<div style="background:#ECFDF5;border-left:4px solid ${C.green};border-radius:0 9px 9px 0;padding:13px 15px">
+            <p style="margin:0;color:#065F46;font-size:13px">No significant friction patterns detected. Your team has a well-balanced profile with strong coverage across roles and ADAPTS stages.</p>
+           </div>`
+      }
+      ${lockedCount > 0 ? `
+        <div style="position:relative;border-radius:10px;overflow:hidden;border:2px dashed #D1D5DB;padding:16px;background:#F9FAFB;min-height:70px">
+          <div style="opacity:0.2">
+            <div class="label" style="margin-bottom:6px">+${lockedCount} more friction pattern${lockedCount > 1 ? "s" : ""} detected</div>
+            <div style="height:9px;background:#9CA3AF;border-radius:4px;margin-bottom:5px;width:85%"></div>
+            <div style="height:9px;background:#9CA3AF;border-radius:4px;margin-bottom:5px;width:65%"></div>
+          </div>
+          <div class="locked-overlay"><span style="font-size:16px">🔒</span><span class="lock-badge">LOCKED</span></div>
+        </div>` : ""}
+    </div>
+
+    <h3 style="margin-bottom:10px">90-DAY RECOMMENDATIONS</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+      ${visibleRollout.map((r, i) => `
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:13px;background:${C.grayLight};border-radius:8px">
+          <div class="num-badge">${i + 1}</div>
+          <p style="margin:0;font-size:13px">${r}</p>
+        </div>`).join("")}
+    </div>
+
+    ${tier === 1 ? `
+    <h3 style="margin-bottom:10px">STARTER RECOMMENDATIONS</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px">
+      <div style="background:${C.grayLight};border-radius:9px;padding:13px;border-top:3px solid ${C.purple}">
+        <div class="label" style="color:${C.purple};margin-bottom:6px">Communication</div>
+        <p style="font-size:12px;margin:0">Agree on one shared communication channel and a weekly rhythm before scaling team size or project complexity.</p>
+      </div>
+      <div style="background:${C.grayLight};border-radius:9px;padding:13px;border-top:3px solid ${C.green}">
+        <div class="label" style="color:${C.green};margin-bottom:6px">Role Awareness</div>
+        <p style="font-size:12px;margin:0">Share individual Change Genius™ profiles so each person understands how they contribute to the team system and where tensions may arise.</p>
+      </div>
+      <div style="background:${C.grayLight};border-radius:9px;padding:13px;border-top:3px solid ${C.amber}">
+        <div class="label" style="color:${C.amber};margin-bottom:6px">Delegation</div>
+        <p style="font-size:12px;margin:0">Identify one task each person is doing that would be better owned by someone with a different role strength. Reassign it this week.</p>
+      </div>
+    </div>
+    ${upgradeCTA(
+      "Unlock Full Team Intelligence",
+      "Add more team members to unlock deeper diagnostics, leadership insights, execution bottlenecks, and scaling recommendations."
+    )}` : ""}
+  `, pageNum);
+}
+
+function tier1LockedPage(pageNum: number): string {
+  const features = [
+    { label: "Team Bottleneck Analysis",    desc: "Identifies where execution breaks down, communication fails, and leadership overloads across your team system." },
+    { label: "Leadership Dynamics",          desc: "Reveals how your leadership team makes decisions, responds to conflict, and distributes authority under pressure." },
+    { label: "Scaling Diagnostics",          desc: "Five-dimension scalability assessment across leadership, communication, operations, sustainability, and innovation." },
+    { label: "Hiring Recommendations",       desc: "AI-generated ideal next hire based on your team's role gaps and execution weaknesses — with impact analysis." },
+    { label: "Pressure Response Analysis",   desc: "How each role behaves under high pressure — and what specific risks that creates for team performance and trust." },
+    { label: "Team Maturity Level",           desc: "Five-stage maturity framework showing where your team is now, what risks exist, and what's needed to reach the next level." },
+    { label: "Full 90-Day Roadmap",           desc: "Phase-by-phase transformation plan built from your specific role gaps, stage scores, and friction patterns." },
+    { label: "Role Tension Forecast",         desc: "Predicts the most likely communication friction and accountability conflicts before they appear — and how to prevent them." },
+  ];
+  return page(`
+    <div class="label" style="color:${C.purple};margin-bottom:5px">LOCKED FEATURES</div>
+    <h2 style="margin-bottom:3px">Full Team Intelligence Preview</h2>
+    <p style="color:${C.gray};font-size:12px;margin-bottom:16px">The following insights unlock as your team grows. Each member added deepens the organizational intelligence available.</p>
+    <div class="divider"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:16px">
+      ${features.map(f => lockedCard(f.label, f.desc)).join("")}
+    </div>
+
+    ${upgradeCTA(
+      "Unlock Full Team Intelligence",
+      "Add more team members to unlock deeper diagnostics, leadership insights, execution bottlenecks, and scaling recommendations."
+    )}
+  `, pageNum);
+}
+
+function teamDynamicsPage(diagnostic: TeamDiagnostic, pageNum: number): string {
+  return page(`
+    <div class="label" style="color:${C.purple};margin-bottom:5px">TEAM DYNAMICS</div>
+    <h2 style="margin-bottom:3px">Team Identity, Risk Analysis & Communication Guide</h2>
+    <p style="color:${C.gray};font-size:12px;margin-bottom:0">How this team operates, where leadership risks are forming, and how to communicate with each role.</p>
+    <div class="divider"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
+      <div style="background:${C.grayLight};border-radius:10px;padding:15px">
+        <div class="label" style="color:${C.navy};margin-bottom:7px">DOMINANT ENERGY</div>
+        <div style="font-size:19px;font-weight:800;color:${ENERGY_COLORS[diagnostic.dominantEnergy] ?? C.purple};margin-bottom:5px">${diagnostic.dominantEnergy}</div>
+        <p style="font-size:12px;margin:0">${ENERGY_TEAM_DESC[diagnostic.dominantEnergy] ?? ""}</p>
+      </div>
+      <div style="background:${C.grayLight};border-radius:10px;padding:15px">
+        <div class="label" style="color:${C.navy};margin-bottom:7px">CHANGE RISK LEVEL</div>
+        <div style="font-size:19px;font-weight:800;color:${diagnostic.riskLevel === "Low" ? C.green : diagnostic.riskLevel === "Moderate" ? C.amber : C.red};margin-bottom:5px">${diagnostic.riskLevel}</div>
+        <p style="font-size:12px;margin:0">${RISK_LEVEL_DESC[diagnostic.riskLevel]}</p>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:9px">MISSING ROLE IMPACT</h3>
+    <div style="margin-bottom:18px">
+      ${diagnostic.missingRoles.length > 0
+        ? diagnostic.missingRoles.map((role: string) => `
+          <div style="background:#FEF2F2;border-left:4px solid ${C.red};border-radius:0 9px 9px 0;padding:12px 14px;margin-bottom:7px">
+            <div style="font-weight:700;margin-bottom:3px;color:#991B1B;font-size:13px">Missing: ${role}</div>
+            <p style="margin:0;font-size:12px;color:#7F1D1D">${MISSING_ROLE_IMPACT[role] ?? ""}</p>
+          </div>`).join("")
+        : `<div style="background:#ECFDF5;border-left:4px solid ${C.green};padding:12px 14px;border-radius:0 9px 9px 0">
+            <p style="margin:0;color:#065F46;font-size:13px">All four roles are represented — your team has a complete change capability profile. Focus on depth and collaboration between roles rather than filling gaps.</p>
+           </div>`
+      }
+    </div>
+
+    <h3 style="margin-bottom:9px">LEADERSHIP RISK ALERTS</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px">
+      ${LEADERSHIP_RISKS.map(({ label, desc, flagged }) => {
+        const active = flagged(diagnostic);
+        return `
+        <div style="background:${active ? "#FEF3C7" : C.grayLight};border-radius:10px;padding:13px;border-left:3px solid ${active ? C.amber : C.green}">
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">
+            <span style="font-size:12px">${active ? "⚠️" : "✓"}</span>
+            <div style="font-size:12px;font-weight:700;color:${active ? "#92400E" : C.navy}">${label}</div>
+          </div>
+          <p style="font-size:11px;margin:0;color:${active ? "#78350F" : C.gray}">${desc}</p>
+        </div>`;
+      }).join("")}
+    </div>
+
+    <h3 style="margin-bottom:9px">TEAM COMMUNICATION GUIDE</h3>
+    <div style="display:flex;flex-direction:column;gap:7px">
+      ${ROLE_COMM_GUIDE.filter(g => (diagnostic.roleDistribution[g.role as Role] ?? 0) > 0).map(g => `
+        <div style="display:grid;grid-template-columns:88px 1fr 1fr;gap:10px;padding:11px 13px;background:${C.grayLight};border-radius:8px;align-items:start">
+          <div style="font-weight:700;font-size:13px;color:${C.navy}">${g.role}</div>
+          <div>
+            <div class="label" style="color:${C.green};margin-bottom:3px">Motivated by</div>
+            <p style="font-size:11px;margin:0">${g.motivates}</p>
+          </div>
+          <div>
+            <div class="label" style="color:${C.red};margin-bottom:3px">Frustrated by</div>
+            <p style="font-size:11px;margin:0">${g.frustrates}</p>
+          </div>
+        </div>`).join("")}
+    </div>
+  `, pageNum);
+}
+
+function roleTensionPage(diagnostic: TeamDiagnostic, pageNum: number): string {
+  const tensions = buildTensionPatterns(diagnostic.roleDistribution);
+  return page(`
+    <div class="label" style="color:${C.purple};margin-bottom:5px">TEAM DYNAMICS</div>
+    <h2 style="margin-bottom:3px">Role Tension Forecast & Scalability Assessment</h2>
+    <p style="color:${C.gray};font-size:12px;margin-bottom:0">Predicted friction patterns between roles and how well your team is positioned to scale.</p>
+    <div class="divider"></div>
+
+    <h3 style="margin-bottom:9px;color:${C.amber}">LIKELY TENSION PATTERNS</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+      ${tensions.map(t => `
+        <div style="background:#FEF3C7;border-left:4px solid ${C.amber};border-radius:0 9px 9px 0;padding:12px 14px">
+          <div style="font-weight:700;margin-bottom:3px;color:#92400E;font-size:13px">${t.title}</div>
+          <p style="margin:0;font-size:12px;color:#78350F">${t.desc}</p>
+        </div>`).join("")}
+    </div>
+
+    <h3 style="margin-bottom:9px">SCALABILITY ASSESSMENT</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+      ${SCALABILITY_DIMENSIONS.map(dim => {
+        const score = getScalabilityScore(dim.key, diagnostic);
+        const color = score >= 70 ? C.green : score >= 45 ? C.amber : C.red;
+        return `
+        <div style="margin-top:20px;padding:11px 13px;background:${color}08;border-radius:9px;border-left:3px solid ${color}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="font-size:13px;font-weight:700">${dim.label}</span>
+            <span style="font-size:13px;font-weight:800;color:${color}">${score}/100</span>
+          </div>
+          ${scoreBar(score, color, 7)}
+          <p style="font-size:11px;color:${C.gray};margin-top:5px;margin-bottom:0">${dim.desc}</p>
+        </div>`;
+      }).join("")}
+    </div>
+
+  `, pageNum);
+}
+
+function tier2LockedPage(pageNum: number): string {
+  const features = [
+    { label: "Full Execution Diagnostics™",          desc: "Deep analysis of where execution is breaking down across delegation, communication, and accountability." },
+    { label: "Team Pressure Heatmap™",               desc: "Visual map of team performance across six critical organizational dimensions under pressure." },
+    { label: "Leadership Compatibility Analysis™",   desc: "Strongest pairings, highest tension combinations, and how to manage them for sustained performance." },
+    { label: "Hiring Intelligence™",                 desc: "Role-specific ideal hire with detailed impact analysis for your exact team composition." },
+    { label: "Team Maturity Analysis™",              desc: "Five-stage maturity level with current position, active risks, and specific actions to reach the next stage." },
+    { label: "Full 90-Day Transformation Roadmap™", desc: "Phase-by-phase transformation plan tied directly to your role gaps, ADAPTS scores, and friction patterns." },
+  ];
+  return page(`
+    <div class="label" style="color:${C.purple};margin-bottom:5px">PREMIUM FEATURES</div>
+    <h2 style="margin-bottom:3px">Organizational Intelligence Preview</h2>
+    <p style="color:${C.gray};font-size:12px;margin-bottom:16px">These features unlock when your team reaches 8 or more members — revealing executive-level organisational intelligence.</p>
+    <div class="divider"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:16px">
+      ${features.map(f => lockedCard(f.label, f.desc)).join("")}
+    </div>
+
+    ${upgradeCTA(
+      "Unlock Full Organizational Intelligence™",
+      "Add 8 or more team members to unlock advanced execution diagnostics, scaling intelligence, hiring recommendations, and full transformation insights."
+    )}
+  `, pageNum);
+}
+
+function executionBottleneckPage(diagnostic: TeamDiagnostic, pageNum: number): string {
+  const bottlenecks = buildBottlenecks(diagnostic.roleDistribution, diagnostic.stageHealth, diagnostic.riskScore);
+  return page(`
+    <div class="label" style="color:${C.purple};margin-bottom:5px">EXECUTION INTELLIGENCE</div>
+    <h2 style="margin-bottom:3px">Execution Bottleneck Analysis</h2>
+    <p style="color:${C.gray};font-size:12px;margin-bottom:0">Where execution is breaking down and what it costs your team's performance and scale potential.</p>
+    <div class="divider"></div>
+
+    <h3 style="margin-bottom:9px">BOTTLENECK DIAGNOSTICS</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+      ${bottlenecks.map(b => `
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:#FEF2F2;border-radius:9px;border-left:4px solid ${C.red}">
+          <div style="flex-shrink:0;font-size:17px;margin-top:1px">${b.icon}</div>
+          <div>
+            <div style="font-weight:700;margin-bottom:3px;color:#991B1B;font-size:13px">${b.title}</div>
+            <p style="margin:0;font-size:12px;color:#7F1D1D">${b.desc}</p>
+          </div>
+        </div>`).join("")}
+    </div>
+
+    <h3 style="margin-bottom:9px">SCALABILITY DIAGNOSTICS</h3>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${SCALABILITY_DIMENSIONS.map(dim => {
+        const score = getScalabilityScore(dim.key, diagnostic);
+        const color = score >= 70 ? C.green : score >= 45 ? C.amber : C.red;
+        return `
+        <div style="padding:11px 13px;background:${color}08;border-radius:9px;border-left:3px solid ${color}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="font-size:13px;font-weight:700">${dim.label}</span>
+            <span style="font-size:13px;font-weight:800;color:${color}">${score}/100</span>
+          </div>
+          ${scoreBar(score, color, 7)}
+          <p style="font-size:11px;color:${C.gray};margin-top:4px;margin-bottom:0">${dim.desc}</p>
+        </div>`;
+      }).join("")}
+    </div>
+  `, pageNum);
+}
+
+function pressureAndMaturityPage(diagnostic: TeamDiagnostic, pageNum: number): string {
+  const HEATMAP_DIMS = ["Trust","Communication","Execution","Sustainability","Innovation","Alignment"];
+  const maturity = getTeamMaturity(diagnostic);
+  return page(`
+    <div class="label" style="color:${C.purple};margin-bottom:5px">EXECUTION INTELLIGENCE</div>
+    <h2 style="margin-bottom:3px">Pressure Response, Risk Heatmap & Team Maturity</h2>
+    <p style="color:${C.gray};font-size:12px;margin-bottom:0">How your team behaves under pressure, where your risk concentrations are, and your current maturity level.</p>
+    <div class="divider"></div>
+
+    <h3 style="margin-bottom:9px">EXECUTION RISK HEATMAP</h3>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px">
+      ${HEATMAP_DIMS.map(dim => {
+        const score = getHeatmapScore(dim, diagnostic);
+        const color = score >= 70 ? C.green : score >= 45 ? C.amber : C.red;
+        return `
+        <div style="border-radius:10px;padding:13px;text-align:center;background:${color}12;border:2px solid ${color}">
+          <div style="font-size:12px;font-weight:700;margin-bottom:3px;color:${C.navy}">${dim}</div>
+          <div style="font-size:24px;font-weight:900;color:${color}">${score}</div>
+          <div style="font-size:10px;color:${color};font-weight:700;margin-top:2px;margin-bottom:4px">${score >= 70 ? "Strong" : score >= 45 ? "Watch" : "Risk"}</div>
+          ${scoreBar(score, color, 5)}
+        </div>`;
+      }).join("")}
+    </div>
+
+    <h3 style="margin-bottom:9px">PRESSURE RESPONSE ANALYSIS</h3>
+    <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:18px">
+      ${PRESSURE_RESPONSES.filter(p => (diagnostic.roleDistribution[p.role as Role] ?? 0) > 0).map(p => `
+        <div style="display:grid;grid-template-columns:88px 1fr;gap:11px;padding:11px 13px;background:${C.grayLight};border-radius:8px">
+          <div>
+            <div style="font-weight:700;font-size:13px">${p.role}</div>
+            <div style="font-size:10px;color:${C.gray};margin-top:2px">${diagnostic.roleDistribution[p.role as Role]} member${(diagnostic.roleDistribution[p.role as Role] ?? 0) > 1 ? "s" : ""}</div>
+          </div>
+          <div>
+            <div class="label" style="color:${C.amber};margin-bottom:3px">Under Pressure</div>
+            <p style="font-size:12px;margin:0">${p.response}</p>
+          </div>
+        </div>`).join("")}
+    </div>
+
+    <h3 style="margin-bottom:9px">TEAM MATURITY LEVEL</h3>
+    <div style="background:${C.navy};border-radius:12px;padding:18px 22px;color:white">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px">
+        <div>
+          <div class="label" style="color:${C.gold};margin-bottom:4px">CURRENT LEVEL</div>
+          <div style="font-size:19px;font-weight:800">${maturity.level}</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:7px 12px;font-size:12px;color:rgba(255,255,255,0.65)">
+          Avg Score: ${Math.round(Object.values(diagnostic.stageScores).reduce((a,b)=>a+b,0)/6)}/100
+        </div>
+      </div>
+      <p style="font-size:12px;color:rgba(255,255,255,0.8);margin-bottom:9px">${maturity.description}</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:rgba(255,255,255,0.08);border-radius:8px;padding:10px 13px">
+          <div class="label" style="color:${C.gold};margin-bottom:3px">RISKS AT THIS STAGE</div>
+          <p style="font-size:11px;color:rgba(255,255,255,0.7);margin:0">${maturity.risks}</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.08);border-radius:8px;padding:10px 13px">
+          <div class="label" style="color:${C.gold};margin-bottom:3px">NEXT GROWTH STAGE</div>
+          <p style="font-size:11px;color:rgba(255,255,255,0.7);margin:0">${maturity.nextStage}</p>
+        </div>
+      </div>
+    </div>
+  `, pageNum);
+}
+
+function hireAndCompatibilityPage(diagnostic: TeamDiagnostic, pageNum: number): string {
+  const idealHire = getIdealHire(diagnostic);
+  return page(`
+    <div class="label" style="color:${C.purple};margin-bottom:5px">ORGANIZATIONAL INTELLIGENCE</div>
+    <h2 style="margin-bottom:3px">Hiring Intelligence, Compatibility & Culture Profile</h2>
+    <p style="color:${C.gray};font-size:12px;margin-bottom:0">Your ideal next hire, how leadership pairings will perform together, and your team's cultural profile.</p>
+    <div class="divider"></div>
+
+    <h3 style="margin-bottom:9px">IDEAL NEXT HIRE</h3>
+    <div style="background:#EFF6FF;border-radius:12px;padding:18px 20px;border-left:5px solid #3B82F6;margin-bottom:18px">
+      <div style="font-size:19px;font-weight:800;color:#1E40AF;margin-bottom:7px">${idealHire.role}</div>
+      <p style="font-size:13px;color:#1E3A8A;margin-bottom:10px">${idealHire.reason}</p>
+      <div style="background:#DBEAFE;border-radius:8px;padding:11px 13px">
+        <div class="label" style="color:#3B82F6;margin-bottom:4px">WHAT IMPROVES AFTER HIRING</div>
+        <p style="font-size:12px;color:#1E40AF;margin:0">${idealHire.improvement}</p>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:9px">LEADERSHIP COMPATIBILITY ANALYSIS</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:18px">
+      <div style="background:#ECFDF5;border-radius:10px;padding:14px;border-top:3px solid ${C.green}">
+        <div class="label" style="color:${C.green};margin-bottom:8px">STRONGEST PAIRINGS</div>
+        ${getCompatibilityPairings(diagnostic, "strong").length > 0
+          ? getCompatibilityPairings(diagnostic, "strong").map(p => `<div style="font-size:12px;padding:5px 0;font-weight:600;border-bottom:1px solid ${C.grayLight}">${p}</div>`).join("")
+          : `<p style="font-size:12px;color:${C.gray};margin:0">Expand team to reveal pairing analysis.</p>`}
+      </div>
+      <div style="background:#FEF2F2;border-radius:10px;padding:14px;border-top:3px solid ${C.red}">
+        <div class="label" style="color:${C.red};margin-bottom:8px">HIGHEST TENSION</div>
+        ${getCompatibilityPairings(diagnostic, "tension").length > 0
+          ? getCompatibilityPairings(diagnostic, "tension").map(p => `<div style="font-size:12px;padding:5px 0;font-weight:600;border-bottom:1px solid ${C.grayLight}">${p}</div>`).join("")
+          : `<p style="font-size:12px;color:${C.gray};margin:0">No high-tension pairings in current composition.</p>`}
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:9px">CULTURE & EXECUTION PROFILE</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+      <div style="background:${C.grayLight};border-radius:10px;padding:13px">
+        <div class="label" style="color:${C.navy};margin-bottom:5px">EMOTIONAL CLIMATE</div>
+        <p style="font-size:12px;margin:0">${ENERGY_TEAM_DESC[diagnostic.dominantEnergy] ?? "Balanced energy profile across the team."}</p>
+      </div>
+      <div style="background:${C.grayLight};border-radius:10px;padding:13px">
+        <div class="label" style="color:${C.navy};margin-bottom:5px">ACCOUNTABILITY STYLE</div>
+        <p style="font-size:12px;margin:0">${(diagnostic.roleDistribution["Driver"] ?? 0) > 1
+          ? "Results-first accountability. The team holds itself to measurable standards — but may underinvest in relational trust and psychological safety."
+          : (diagnostic.roleDistribution["Connector"] ?? 0) > 1
+          ? "Relationship-first accountability. Trust is high but direct performance conversations may be softened or avoided to preserve harmony."
+          : "Balanced accountability. Structure and relationships are weighted relatively equally across the team."}</p>
+      </div>
+      <div style="background:${C.grayLight};border-radius:10px;padding:13px">
+        <div class="label" style="color:${C.navy};margin-bottom:5px">CONFLICT TENDENCY</div>
+        <p style="font-size:12px;margin:0">${(diagnostic.roleDistribution["Connector"] ?? 0) === 0
+          ? "High risk of unresolved conflict. No Connector to facilitate difficult conversations or maintain relational safety under pressure."
+          : "Moderate conflict handling. Connectors provide a buffer — but Drivers may escalate faster than Connectors can absorb in high-pressure periods."}</p>
+      </div>
+      <div style="background:${C.grayLight};border-radius:10px;padding:13px">
+        <div class="label" style="color:${C.navy};margin-bottom:5px">COLLABORATION BEHAVIOUR</div>
+        <p style="font-size:12px;margin:0">${(diagnostic.roleDistribution["Architect"] ?? 0) > 0
+          ? "Process-anchored collaboration. The team works best with defined roles, clear handoffs, and structured workflows."
+          : "Fluid collaboration. The team adapts quickly but may lack structure needed for complex multi-person execution and consistent delivery."}</p>
+      </div>
+    </div>
+  `, pageNum);
+}
+
+function fullRoadmapPage(diagnostic: TeamDiagnostic, pageNum: number): string {
+  const { rollout90Days, missingRoles, frictionPatterns } = diagnostic;
+  const phases = [
+    { label: "Days 1–30",  color: C.purple, icon: "🧭", items: rollout90Days.filter((_, i) => i === 0) },
+    { label: "Days 31–60", color: C.amber,  icon: "⚙️", items: rollout90Days.filter((_, i) => i === 1 || i === 2) },
+    { label: "Days 61–90", color: C.green,  icon: "🚀", items: rollout90Days.filter((_, i) => i === 3) },
+  ];
+
+  return page(`
+    <div class="label" style="color:${C.purple};margin-bottom:5px">TRANSFORMATION ROADMAP</div>
+    <h2 style="margin-bottom:3px">Full 90-Day Transformation Roadmap™</h2>
+    <p style="color:${C.gray};font-size:12px;margin-bottom:0">A phase-by-phase plan built from your team's specific role gaps, ADAPTS scores, and friction patterns.</p>
+    <div class="divider"></div>
+
+    ${phases.map(phase => `
+      <div style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;padding-bottom:7px;border-bottom:2px solid ${phase.color}22">
+          <span style="font-size:17px">${phase.icon}</span>
+          <div style="font-size:14px;font-weight:800;color:${phase.color}">${phase.label}</div>
+        </div>
+        <div style="border-left:3px solid ${phase.color};padding-left:13px;display:flex;flex-direction:column;gap:6px">
+          ${phase.items.map(item => `
+            <div style="background:${C.grayLight};border-radius:8px;padding:12px 13px">
+              <p style="margin:0;font-size:13px">${item}</p>
+            </div>`).join("")}
+        </div>
+      </div>`).join("")}
+
+    <div style="display:grid;grid-template-columns:${missingRoles.length > 0 && frictionPatterns.length > 0 ? "1fr 1fr" : "1fr"};gap:11px;margin-top:6px">
+      ${missingRoles.length > 0 ? `
+        <div style="background:#EFF6FF;border-radius:10px;padding:14px 16px;border-left:4px solid #3B82F6">
+          <div class="label" style="color:#3B82F6;margin-bottom:6px">PRIORITY HIRING GAPS</div>
+          <p style="font-size:12px;color:#1E40AF;margin-bottom:8px">Missing roles — <strong>${missingRoles.join(", ")}</strong> — create compounding execution risk that grows with team size. Address within 60 days.</p>
+          ${missingRoles.map(r => `<div style="font-size:11px;color:#3B82F6;padding:4px 0;border-top:1px solid #BFDBFE">→ Hire or develop <strong>${r}</strong> capability</div>`).join("")}
+        </div>` : ""}
+      ${frictionPatterns.length > 0 ? `
+        <div style="background:#FEF3C7;border-radius:10px;padding:14px 16px;border-left:4px solid ${C.amber}">
+          <div class="label" style="color:${C.amber};margin-bottom:6px">FRICTION TO RESOLVE</div>
+          ${frictionPatterns.map(f => `<p style="font-size:12px;color:#92400E;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid #FDE68A">• ${f}</p>`).join("")}
+        </div>` : ""}
+    </div>
+  `, pageNum);
 }
 
 // ── Main export ────────────────────────────────────────────────
@@ -789,39 +942,36 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
   const { teamName, diagnostic, memberNames, date } = input;
   const { stageScores, energyScores, roleDistribution, riskScore, frictionPatterns, rollout90Days } = diagnostic;
 
-  const memberCount         = memberNames.length;
-  const teamChangeCapacity  = 100 - riskScore;
-  const tier: 1 | 2 | 3    = memberCount >= 8 ? 3 : memberCount >= 3 ? 2 : 1;
-  const tierLabel           = tier === 1 ? "Core Team Snapshot" : tier === 2 ? "Team Change Map" : "Full Organizational Intelligence";
+  const memberCount        = memberNames.length;
+  const teamChangeCapacity = 100 - riskScore;
+  const tier: 2 | 3   = memberCount >= 8 ? 3 : memberCount >= 3 ? 2 : 2;
+  const tierLabel          =  tier === 2 ? "Team Change Map" : "Full Organizational Intelligence";
 
   const pages: string[] = [];
-  let pageNum = 0;
+  let p = 0;
 
-  // ── All tiers ──────────────────────────────────────────────
-  pages.push(coverPage(teamName, memberCount, teamChangeCapacity, date, tierLabel));
-  pages.push(stageCoveragePage(diagnostic.stageScores, diagnostic.roleDistribution, diagnostic.energyScores, 1));
-  pages.push(frictionPage(frictionPatterns, rollout90Days, pageNum++, tier));
+  pages.push(coverPage(teamName, memberCount, teamChangeCapacity, date, tierLabel, diagnostic));
+  pages.push(adaptsCoveragePage(stageScores, roleDistribution, energyScores, p++));
+  pages.push(frictionAndRecommendationsPage(frictionPatterns, rollout90Days, p++, tier));
 
-  // ── Tier 1: locked preview only ───────────────────────────
-  if (tier === 1) {
-    pages.push(tier1LockedPage(pageNum++));
-  }
+  // if (tier === 1) {
+  //   pages.push(tier1LockedPage(p++));
+  // }
 
-  // ── Tier 2: team dynamics + locked Tier 3 preview ─────────
   if (tier >= 2) {
-    pages.push(teamDynamicsPage(diagnostic, pageNum++));
-    pages.push(roleTensionPage(diagnostic, pageNum++));
-  }
-  if (tier === 2) {
-    pages.push(tier2LockedPage(pageNum++));
+    pages.push(teamDynamicsPage(diagnostic, p++));
+    pages.push(roleTensionPage(diagnostic, p++));
   }
 
-  // ── Tier 3: full intelligence ─────────────────────────────
+  if (tier === 2) {
+    pages.push(tier2LockedPage(p++));
+  }
+
   if (tier === 3) {
-    pages.push(executionBottleneckPage(diagnostic, pageNum++));
-    pages.push(pressureHeatmapPage(diagnostic, pageNum++));
-    pages.push(maturityHirePage(diagnostic, pageNum++));
-    pages.push(fullRoadmapPage(diagnostic, pageNum++));
+    pages.push(executionBottleneckPage(diagnostic, p++));
+    pages.push(pressureAndMaturityPage(diagnostic, p++));
+    pages.push(hireAndCompatibilityPage(diagnostic, p++));
+    pages.push(fullRoadmapPage(diagnostic, p++));
   }
 
   return `<!DOCTYPE html>
