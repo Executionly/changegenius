@@ -1,6 +1,9 @@
 "use client";
 
-import { buildNarrative, normalizeStageName } from "@/lib/assessment/narratives";
+import {
+  buildNarrative,
+  normalizeStageName,
+} from "@/lib/assessment/narratives";
 import { AdaptsStage, Role } from "@/lib/assessment/questions";
 import { EnergyProfile } from "@/lib/assessment/scoring";
 import Link from "next/link";
@@ -29,14 +32,6 @@ interface EnergyScores {
   Innovator: number;
   Organizer: number;
 }
-
-// interface EnergyProfile {
-//   scores: EnergyScores;
-//   strain: string;
-//   depleted: string;
-//   dominant: string;
-//   secondary: string;
-// }
 
 interface DerivedData {
   primary_role: string;
@@ -80,6 +75,16 @@ const formatDate = (dateStr: string) => {
     month: "long",
     year: "numeric",
   });
+};
+
+// Map short stage names to full names for SVG and display
+const STAGE_NAME_MAP: Record<string, string> = {
+  Alert: "Alert the System",
+  Diagnose: "Diagnose the Gaps",
+  Prepare: "Access Readiness",
+  Participate: "Participate Through Dialogue",
+  Transform: "Transform Through Alignment",
+  Scale: "Scale and Sustain",
 };
 
 const STAGE_TO_LETTER: Record<string, string> = {
@@ -345,8 +350,15 @@ export default function ResultsPage({
   const secondary = derived.secondary_role;
   const pairingTitle = derived.role_pair_title;
   const date = formatDate(completedAt);
-  const topStages = derived.top_adapts_stages;
-  const bottomStages = derived.bottom_adapts_stages;
+
+  // Map short stage names to full names for SVG and display
+  const topStagesShort = derived.top_adapts_stages || [];
+  const bottomStagesShort = derived.bottom_adapts_stages || [];
+
+  // Map to full stage names
+  const topStages = topStagesShort.map((s) => STAGE_NAME_MAP[s] || s);
+  const bottomStages = bottomStagesShort.map((s) => STAGE_NAME_MAP[s] || s);
+
   const energyProfile = derived.energy_profile;
   const capacityScore = derived.change_capacity_score;
 
@@ -369,19 +381,19 @@ export default function ResultsPage({
       type: "competency",
       letter: ADAPTS_LABELS[stage]?.[0] || stage[0],
       name: ADAPTS_LABELS[stage] || stage,
-      desc: `A natural strength. You thrive in the "${stage}" phase of change — this is one of your highest-scoring ADAPTS stages (${stageScores[stage as keyof typeof stageScores]}).`,
+      desc: `A natural strength. You thrive in the "${ADAPTS_LABELS[stage] || stage}" phase of change — this is one of your highest-scoring ADAPTS stages (${stageScores[stage as keyof typeof stageScores]}).`,
     })),
     // Bottom ADAPTS stages → frustration
     ...bottomStages.map((stage) => ({
       type: "frustration",
       letter: ADAPTS_LABELS[stage]?.[0] || stage[0],
       name: ADAPTS_LABELS[stage] || stage,
-      desc: `An area of strain. Extended time in the "${stage}" phase can drain your energy. Your score here is ${stageScores[stage as keyof typeof stageScores]} — consider partnering with others who thrive here.`,
+      desc: `An area of strain. Extended time in the "${ADAPTS_LABELS[stage] || stage}" phase can drain your energy. Your score here is ${stageScores[stage as keyof typeof stageScores]} — consider partnering with others who thrive here.`,
     })),
   ];
 
   const normalizedStageScores = Object.fromEntries(
-    Object.entries(stageScores).map(([k, v]) => [normalizeStageName(k), v])
+    Object.entries(stageScores).map(([k, v]) => [normalizeStageName(k), v]),
   ) as Record<AdaptsStage, number>;
 
   const narrative = buildNarrative({
@@ -390,8 +402,8 @@ export default function ResultsPage({
     role_pair_title: derived.role_pair_title,
     energy_profile: derived.energy_profile,
     stage_scores: normalizedStageScores,
-    top_adapts_stages: derived.top_adapts_stages as AdaptsStage[],
-    bottom_adapts_stages: derived.bottom_adapts_stages as AdaptsStage[],
+    top_adapts_stages: topStages as AdaptsStage[],
+    bottom_adapts_stages: bottomStages as AdaptsStage[],
   });
 
   return (

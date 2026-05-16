@@ -98,7 +98,7 @@ export default function AboutPage() {
             <p className="description">
               Change Genius™ is the first assessment-based model that reveals
               exactly how individuals and teams drive transformation. Built on
-              the ADAPTS model — six stages from sensing disruption to scaling
+              the ADAPTS™ model — six stages from sensing disruption to scaling
               impact — it gives every leader and organization a shared language
               for change.
             </p>
@@ -297,7 +297,7 @@ export default function AboutPage() {
             <div className="stat-number-container">
               <span className="stat-number">6</span>
             </div>
-            <div className="stat-label">ADAPTS Stages</div>
+            <div className="stat-label">ADAPTS™ Stages</div>
             <div className="stat-desc">
               Mapped across the full arc of organizational transformation
             </div>
@@ -394,7 +394,7 @@ export default function AboutPage() {
                   <Link href="/about">About Us</Link>
                 </li>
                 <li>
-                  <Link href="/#adapts">ADAPTS model</Link>
+                  <Link href="/#adapts">ADAPTS™ model</Link>
                 </li>
                 <li>
                   <Link href="#">Case Studies</Link>

@@ -378,7 +378,7 @@ export default async function ResultsPageById({ params }: PageProps) {
                   marginBottom: 16,
                 }}
               >
-                ADAPTS Stage Map
+                ADAPTS™ Stage Map
               </div>
               <RadarChart stageScores={scores.stage_scores} />
             </div>
@@ -622,7 +622,7 @@ export default async function ResultsPageById({ params }: PageProps) {
                 marginBottom: 12,
               }}
             >
-              ADAPTS Strengths
+              ADAPTS™ Strengths
             </div>
             <p
               style={{ fontSize: 14, color: "var(--text-2)", lineHeight: 1.75 }}
