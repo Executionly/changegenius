@@ -749,26 +749,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========== TRUSTED SLIDER ========== */}
+      {/* ========== TRUSTED SECTION ========== */}
       <section className="trusted-section">
         <div className="trusted-header">
-          <h2 className="trusted-title">Trusted by organizations worldwide</h2>
-        </div>
-        <div className="marquee-wrapper">
-          <div className="marquee-track">
-            {[
-              "As seen on forbes",
-              "As seen on forbes",
-              "As seen on forbes",
-              "As seen on forbes",
-              "As seen on forbes",
-              "As seen on forbes",
-              "As seen on forbes",
-            ].map((name) => (
-              <span key={name} className="logo-item">
-                {name}
-              </span>
-            ))}
+          <h2
+            className="trusted-title"
+            style={{ marginBottom: "20px", fontSize: "1.0rem" }}
+          >
+            Trusted by organizations worldwide
+          </h2>
+          <div className="trusted-logos">
+            <span className="trusted-title">As seen on Forbes</span>
           </div>
         </div>
       </section>
@@ -879,8 +870,8 @@ export default function HomePage() {
             </p>
           </div>
           <div className="model-click-hint">
-            <span className="hint-icon"></span> Click any segment to explore{" "}
-            <span className="hint-arrow">|</span>
+            <span className="hint-icon"></span> Click any segment to
+            explore{" "}
           </div>
         </div>
         <div className="model-container">
@@ -1227,6 +1218,64 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ========== UNDERSTAND YOUR GIFTS SECTION ========== */}
+      <section className="gifts-section">
+        <div className="gifts-container">
+          <div className="gifts-content">
+            <h2 className="gifts-title">
+              Understand your gifts,
+              <br />
+              your frustrations & your team's
+              <br />
+              <span className="gifts-highlight">
+                natural productivity energy.
+              </span>
+            </h2>
+            <p className="gifts-description">
+              Most professionals spend years trying to fit into roles that drain
+              them. Change Genius™ reveals exactly where you naturally thrive —
+              and where you expend energy fighting your own nature. Stop
+              guessing. Start building teams and careers around what actually
+              works.
+            </p>
+            <div className="gifts-buttons">
+              <button onClick={handleStart} className="gifts-btn-primary">
+                Take the Assessment →
+              </button>
+              <Link href="#pricing" className="gifts-btn-secondary">
+                View Team Pricing
+              </Link>
+            </div>
+            <div className="gifts-stats">
+              <div className="gifts-stat">
+                <span className="gifts-stat-number">94%</span>
+                <span className="gifts-stat-label">
+                  of leaders gain new
+                  <br />
+                  self-awareness
+                </span>
+              </div>
+              <div className="gifts-stat">
+                <span className="gifts-stat-number">8-10</span>
+                <span className="gifts-stat-label">
+                  minutes to complete
+                  <br />
+                  the assessment
+                </span>
+              </div>
+              <div className="gifts-stat">
+                <span className="gifts-stat-number">6</span>
+                <span className="gifts-stat-label">
+                  ADAPTS™ stages of
+                  <br />
+                  transformation
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ========== WHAT IS CHANGE GENIUS? ========== */}
       <section className="two-column-section">
         <div className="section-bg">{/* optional bg SVG */}</div>
@@ -1291,7 +1340,7 @@ export default function HomePage() {
                   so every meeting has the right people in the right roles, from
                   sparking ideas to driving execution.
                 </div>
-                <div className="testimonial-block">
+                {/*<div className="testimonial-block">
                   <div className="quote-icon">“</div>
                   <div className="quote-text">
                     Before ChangeGenius, our leadership meetings were a drag.
@@ -1302,7 +1351,7 @@ export default function HomePage() {
                   <div className="quote-author">
                     Elena Vasquez, COO, NexaTech
                   </div>
-                </div>
+                </div>*/}
               </div>
             )}
             {activeImpactTab === "hiring" && (
@@ -1313,7 +1362,7 @@ export default function HomePage() {
                   Unifier — so you can build teams that complement each other,
                   reduce friction, and close capability gaps before they emerge.
                 </div>
-                <div className="testimonial-block">
+                {/*<div className="testimonial-block">
                   <div className="quote-icon">“</div>
                   <div className="quote-text">
                     We used ChangeGenius to restructure our hiring process. Now
@@ -1324,7 +1373,7 @@ export default function HomePage() {
                   <div className="quote-author">
                     Marcus Thorne, VP of People, Stratex
                   </div>
-                </div>
+                </div>*/}
               </div>
             )}
             {activeImpactTab === "productivity" && (
@@ -1335,7 +1384,7 @@ export default function HomePage() {
                   much of one energy and too little of another — then gives you
                   a 90‑day roadmap to rebalance and accelerate outcomes.
                 </div>
-                <div className="testimonial-block">
+                {/* <div className="testimonial-block">
                   <div className="quote-icon">“</div>
                   <div className="quote-text">
                     Our cross‑functional teams used to step on each other's
@@ -1346,7 +1395,7 @@ export default function HomePage() {
                   <div className="quote-author">
                     Priya Mehta, Head of Delivery, GlobalSync
                   </div>
-                </div>
+                </div> */}
               </div>
             )}
             {activeImpactTab === "morale" && (
@@ -1357,7 +1406,7 @@ export default function HomePage() {
                   where every person feels seen, valued, and empowered to
                   contribute in the way that energizes them most.
                 </div>
-                <div className="testimonial-block">
+                {/*<div className="testimonial-block">
                   <div className="quote-icon">“</div>
                   <div className="quote-text">
                     ChangeGenius turned our retention crisis around. For the
@@ -1368,7 +1417,7 @@ export default function HomePage() {
                   <div className="quote-author">
                     Dr. Lena Wu, Chief People Officer, CareBridge
                   </div>
-                </div>
+                </div>*/}
               </div>
             )}
             {activeImpactTab === "language" && (
@@ -1379,7 +1428,7 @@ export default function HomePage() {
                   Innovator, Achiever, Organizer, Unifier — that everyone can
                   use to name what they need and where they struggle.
                 </div>
-                <div className="testimonial-block">
+                {/*<div className="testimonial-block">
                   <div className="quote-icon">“</div>
                   <div className="quote-text">
                     We rolled out ChangeGenius across 12 countries. Within a
@@ -1390,7 +1439,7 @@ export default function HomePage() {
                   <div className="quote-author">
                     David Okonkwo, Global Transformation Lead, Unity Health
                   </div>
-                </div>
+                </div>*/}
               </div>
             )}
           </div>
@@ -1526,21 +1575,15 @@ export default function HomePage() {
                   </p>
                   <div className="tier-list">
                     <div className="tier-item">
-                      <span className="tier-size">3 members</span>
+                      <span className="tier-size">3-7 members</span>
                       <span className="tier-feature">
-                        Basic role distribution visible
-                      </span>
-                    </div>
-                    <div className="tier-item">
-                      <span className="tier-size">5 members</span>
-                      <span className="tier-feature">
-                        Team Change Map™ unlocks
+                        Visible role distribution and team change map unlocks
                       </span>
                     </div>
                     <div className="tier-item">
                       <span className="tier-size">8+ members</span>
                       <span className="tier-feature">
-                        Full diagnostics unlock
+                        Full team diagnostics unlocks
                       </span>
                     </div>
                   </div>
@@ -1567,7 +1610,7 @@ export default function HomePage() {
       </section>
 
       {/* ========== WALL OF LOVE (TESTIMONIALS) ========== */}
-      <section className="wall-of-love-section">
+      {/*<section className="wall-of-love-section">
         <div className="section-header">
           <h2>What people are saying</h2>
           <p>
@@ -1629,7 +1672,7 @@ export default function HomePage() {
             </div>
           </div>
         )}
-      </section>
+      </section>*/}
 
       {/* ========== RESOURCES SECTION ========== */}
       <section className="resources-section">
@@ -1811,10 +1854,7 @@ export default function HomePage() {
               <h4>Resources</h4>
               <ul>
                 <li>
-                  <Link href="#">Case Studies</Link>
-                </li>
-                <li>
-                  <Link href="#">Research</Link>
+                  <Link href="/resources">articles</Link>
                 </li>
               </ul>
             </div>
@@ -1825,7 +1865,7 @@ export default function HomePage() {
                   <Link href="/about">About Us</Link>
                 </li>
                 <li>
-                  <Link href="#">Contact</Link>
+                  <Link href="/contact">Contact</Link>
                 </li>
               </ul>
             </div>
@@ -1833,10 +1873,10 @@ export default function HomePage() {
               <h4>Legal</h4>
               <ul>
                 <li>
-                  <Link href="#">Privacy</Link>
+                  <Link href="/privacy">Privacy</Link>
                 </li>
                 <li>
-                  <Link href="#">Terms</Link>
+                  <Link href="/terms">Terms</Link>
                 </li>
               </ul>
             </div>

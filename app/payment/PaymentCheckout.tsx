@@ -31,7 +31,8 @@ const TEAM_FEATURES = [
   "Change pod recommendations",
   "90-day team rollout plan",
   "Team PDF report export",
-  "Unlocks at 3 members, full report at 5",
+  "3-7 members - Visible role distribution and team change map unlocks",
+  "8+ members - Full team diagnostics unlocks",
 ];
 
 export default function PaymentCheckout() {
@@ -276,7 +277,7 @@ export default function PaymentCheckout() {
                       <span>Stripe</span>
                     </div>
                     <div className="payment-provider-desc">
-                      Cards · USD · International
+                      Cards · USD · Global
                     </div>
                   </button>
                   <button

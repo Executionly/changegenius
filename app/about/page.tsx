@@ -80,8 +80,7 @@ export default function AboutPage() {
                 margin: "20px auto",
               }}
             >
-              The leadership intelligence platform for change. Built on the
-              ADAPTS™ model.
+              The leadership intelligence platform for change.
             </p>
           </div>
         </div>
@@ -356,18 +355,17 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* ========== FOOTER ========== */}
       <footer className="site-footer">
         <div className="footer-container">
           <div className="footer-brand">
             <svg width="32" height="32" viewBox="0 0 159 159" fill="none">
-              <path
-                opacity="0.94"
-                d="M49.6719 33.999C53.9563 30.0391 53.9602 26.5696 50.7754 20.1943C49.6463 18.2211 49 15.9353 49 13.499C49.0003 6.0434 55.0443 -0.000976562 62.5 -0.000976562C69.9557 -0.000976562 75.9997 6.0434 76 13.499C75.9999 16.3747 75.0999 19.0406 73.5674 21.2305C72.2363 23.5977 68.6459 31.0713 74.5 33.999L125 33.999L125 83.6699C128.96 87.9546 132.429 87.9584 138.805 84.7734C140.778 83.6443 143.064 82.998 145.5 82.998C152.956 82.998 158.999 89.0427 159 96.498C159 103.954 152.956 109.998 145.5 109.998C142.624 109.998 139.959 109.098 137.769 107.565C135.401 106.234 127.928 102.645 125 108.498L125 159L0 159L0 108.6C2.97579 103.838 9.56578 107.402 11.4727 108.575C11.6295 108.68 11.7882 108.781 11.9492 108.88C11.9821 108.902 12 108.913 12 108.913V108.91C14.1883 110.235 16.755 110.999 19.5 110.999C27.5079 110.999 34 104.507 34 96.499C34 88.4911 27.5079 81.9993 19.5 81.999C16.7552 81.999 14.1882 82.7619 12 84.0869V84.0811C5.49986 87.999 0.999854 84.999 0 82.999L0 33.999L49.6719 33.999ZM48 139.499C48 142.244 48.7629 144.811 50.0879 146.999H50.082C53.9999 153.499 51 157.999 49 158.999L74.6006 158.999C69.8388 156.023 73.4026 149.433 74.5762 147.526C74.6806 147.37 74.7824 147.211 74.8809 147.05C74.903 147.017 74.9141 146.999 74.9141 146.999H74.9111C76.2363 144.811 77 142.244 77 139.499C76.9997 131.491 70.508 124.999 62.5 124.999C54.492 124.999 48.0003 131.491 48 139.499Z"
-                fill="#0101ee"
-              />
+              {/* PASTE YOUR LOGO MARK PATH AGAIN (or reuse) */}
+              <path d="[PASTE YOUR LOGO MARK PATH HERE]" fill="#0101ee" />
             </svg>
-            <span className="footer-logo-text">ChangeGenius™</span>
+            <span className="footer-logo-text">
+              changegenius<sup>™</sup>
+            </span>
           </div>
           <div className="footer-links">
             <div className="footer-col">
@@ -377,13 +375,13 @@ export default function AboutPage() {
                   <Link href="/assessment">Assessment</Link>
                 </li>
                 <li>
-                  <Link href="/#pricing">For Individuals</Link>
+                  <Link href="/pricing?plan=individual">For Individuals</Link>
                 </li>
                 <li>
-                  <Link href="/#pricing">For Teams</Link>
+                  <Link href="/pricing?plan=team">For Teams</Link>
                 </li>
                 <li>
-                  <Link href="/#pricing">Pricing</Link>
+                  <Link href="/pricing">Pricing</Link>
                 </li>
               </ul>
             </div>
@@ -391,27 +389,18 @@ export default function AboutPage() {
               <h4>Resources</h4>
               <ul>
                 <li>
-                  <Link href="/about">About Us</Link>
-                </li>
-                <li>
-                  <Link href="/#adapts">ADAPTS™ model</Link>
-                </li>
-                <li>
-                  <Link href="#">Case Studies</Link>
+                  <Link href="/resources">articles</Link>
                 </li>
               </ul>
             </div>
             <div className="footer-col">
-              <h4>Support</h4>
+              <h4>Company</h4>
               <ul>
                 <li>
-                  <Link href="#">Help Center</Link>
+                  <Link href="/about">About Us</Link>
                 </li>
                 <li>
-                  <Link href="#">Contact</Link>
-                </li>
-                <li>
-                  <Link href="#">Privacy Policy</Link>
+                  <Link href="/contact">Contact</Link>
                 </li>
               </ul>
             </div>
@@ -419,22 +408,16 @@ export default function AboutPage() {
               <h4>Legal</h4>
               <ul>
                 <li>
-                  <Link href="#">Terms of Service</Link>
+                  <Link href="/privacy">Privacy</Link>
                 </li>
                 <li>
-                  <Link href="#">Cookie Policy</Link>
-                </li>
-                <li>
-                  <Link href="#">Accessibility</Link>
+                  <Link href="/terms">Terms</Link>
                 </li>
               </ul>
             </div>
           </div>
           <div className="footer-bottom">
-            <p>
-              &copy; {new Date().getFullYear()} ChangeGenius™. All rights
-              reserved.
-            </p>
+            <p>&copy; 2026 ChangeGenius™. All rights reserved.</p>
             <div className="footer-social">
               <a href="#">in</a>
               <a href="#">𝕏</a>
