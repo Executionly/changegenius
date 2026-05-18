@@ -221,6 +221,7 @@ export function computeTeamDiagnostic(members: MemberScore[]): TeamDiagnostic {
   const scoredMembers = members.filter(
     (m) => m.stageScores !== null && m.energyScores !== null,
   );
+  console.log("scoredMembers", scoredMembers)
   const n = members.length;
   const sn = scoredMembers.length;
 
@@ -228,7 +229,7 @@ export function computeTeamDiagnostic(members: MemberScore[]): TeamDiagnostic {
   const roleDistribution = Object.fromEntries(
     ROLES.map((r) => [r, 0]),
   ) as Record<Role, number>;
-
+console.log("roleDistribution", roleDistribution)
   for (const m of members) {
     if (m.primaryRole) {
       roleDistribution[m.primaryRole] = (roleDistribution[m.primaryRole] ?? 0) + 1;
@@ -237,7 +238,7 @@ export function computeTeamDiagnostic(members: MemberScore[]): TeamDiagnostic {
       roleDistribution[m.secondaryRole] = (roleDistribution[m.secondaryRole] ?? 0) + 1;
     }
   }
-
+console.log("roleDistribution", roleDistribution)
   const missingRoles = ROLES.filter((r) => roleDistribution[r] === 0);
   const overweightRoles = ROLES.filter(
     (r) => n > 0 && roleDistribution[r] / (n * 2) > 0.4,
@@ -280,7 +281,7 @@ export function computeTeamDiagnostic(members: MemberScore[]): TeamDiagnostic {
   const dominantEnergy = [...ENERGIES].sort(
     (a, b) => energyScores[b] - energyScores[a],
   )[0];
-
+console.log("dominantEnergy", dominantEnergy)
   // ── Risk score
   let riskScore = 0;
   riskScore += missingRoles.length * 12;

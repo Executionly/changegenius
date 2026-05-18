@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     .from('teams')
     .select(`
       id, name, organization, invite_code, created_at,
-      team_members(id, status, user_id, profiles(full_name, email, change_genius_role, onboarded))
+      team_members(id, status, assessment_status, user_id, profiles(full_name, email, change_genius_role, onboarded))
     `)
     .eq('owner_id', uid)
     .order('created_at', { ascending: false })
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
   const { data: memberOf } = await supabase
     .from('team_members')
     .select(`
-      id, status, user_id,
+      id, status, assessment_status, user_id,
       teams(
         id, name, organization, invite_code, created_at, owner_id,
         team_members(id, status, user_id, profiles(full_name, email, change_genius_role, onboarded))
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
 
   const enrichTeam = (team: any, isOwner: boolean) => {
     const members = (team.team_members as any[]) ?? []
-    const completed = members.filter(m => m.status === 'completed').length
+    const completed = members.filter(m => m.assessment_status === 'completed').length
     const total     = members.length
     const member = members.find(m => m.user_id === uid)
     if(isOwner){
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
         ...team,
         owner_id: undefined,
         isOwner,
-        memberCount:    total,
+        memberCount: total,
         completedCount: completed,
         inviteLink: `${appUrl}/teams/join?code=${team.invite_code}`,
         unlocked: completed >= 3,
@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
         owner_id: undefined,
         isOwner,
         memberCount: total,
-        assessment: member?.status === "joined" ? "Pending" : member?.status === "completed" ? "Completed" : "Invited",
+        assessment: member?.assessment_status,
       }
     }
   }

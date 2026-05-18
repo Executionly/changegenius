@@ -4,6 +4,7 @@ import React from 'react'
 import { TeamInviteEmail } from './email-templates/team-invite'
 import { ReportReadyEmail } from './email-templates/report-readt'
 import { TeamReportReadyEmail } from './email-templates/team.report-ready'
+import { ContactUsEmail } from './email-templates/contact'
 
 if (!process.env.RESEND_API_KEY || !process.env.NEXT_PUBLIC_MAIL_FORM) {
   throw new Error('RESEND_API_KEY environment variable is required')
@@ -36,6 +37,50 @@ interface SendTeamReportEmailParams {
   memberCount: number
   teamId: string
   pdfBase64: string
+}
+
+interface SendContactEmailParams {
+  name: string
+  email: string
+  inquiryType: string
+  message: string
+  organization?: string
+}
+
+export async function sendContactUsEmail({
+  name,
+  email,
+  inquiryType,
+  message,
+  organization
+}: SendContactEmailParams) {
+  try {
+    const emailElement = React.createElement(ContactUsEmail, {
+      name,
+      email,
+      inquiryType,
+      message,
+    })
+
+    const html = await render(emailElement)
+
+    const { data, error } = await resend.emails.send({
+      from: process.env.NEXT_PUBLIC_MAIL_FORM!,
+      to: ['info@changegeniusai.com'],
+      subject: `New Contact Form: ${inquiryType}`,
+      html,
+      text: `From: ${name} (${email})\nSubject: ${inquiryType}\n\n${message}`,
+    })
+
+    if (error) throw new Error(error.message)
+
+    return { success: true, id: data?.id }
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    }
+  }
 }
 
 export async function sendTeamReportEmail({

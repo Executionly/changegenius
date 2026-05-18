@@ -154,22 +154,22 @@ const MISSING_ROLE_IMPACT: Record<string, string> = {
 
 const LEADERSHIP_RISKS = [
   {
-    label: "Alignment Breakdown Risk™",
+    label: "Alignment Breakdown Risk",
     desc:  "Misalignment forming between team members. Decisions made without genuine buy-in lead to passive resistance and rework.",
     flagged: (d: TeamDiagnostic) => (d.stageScores["Align"] ?? 100) < 50,
   },
   {
-    label: "Execution Drift Risk™",
+    label: "Execution Drift Risk",
     desc:  "Execution losing consistency over time. Initiatives start with energy but accountability fades before completion.",
     flagged: (d: TeamDiagnostic) => (d.stageScores["Transform"] ?? 100) < 50,
   },
   {
-    label: "Founder Dependency Risk™",
+    label: "Founder Dependency Risk",
     desc:  "Over-reliance on one or two people to drive delivery and decisions. The team stalls when they are unavailable.",
     flagged: (d: TeamDiagnostic) => (d.roleDistribution["Driver"] ?? 0) <= 1,
   },
   {
-    label: "Communication Fragmentation™",
+    label: "Communication Fragmentation",
     desc:  "Breakdown in information flow between roles. Important context is lost and people operate from different assumptions.",
     flagged: (d: TeamDiagnostic) => (d.roleDistribution["Connector"] ?? 0) === 0,
   },
@@ -952,7 +952,9 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
 
   pages.push(coverPage(teamName, memberCount, teamChangeCapacity, date, tierLabel, diagnostic));
   pages.push(adaptsCoveragePage(stageScores, roleDistribution, energyScores, p++));
-  pages.push(frictionAndRecommendationsPage(frictionPatterns, rollout90Days, p++, tier));
+  if(tier !== 3){
+    pages.push(frictionAndRecommendationsPage(frictionPatterns, rollout90Days, p++, tier));
+  }
 
   // if (tier === 1) {
   //   pages.push(tier1LockedPage(p++));

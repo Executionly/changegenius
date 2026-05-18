@@ -29,15 +29,14 @@ export default function TeamsListPage() {
         const data = await res.json();
         const owned = data.owned ?? [];
         const simplified = owned.map((item: any) => {
-          const teamBase = item.team || item;
           return {
-            id: teamBase.id,
-            name: teamBase.name,
-            organization: teamBase.organization,
-            totalMembers: item.totalMembers ?? teamBase.totalMembers ?? 0,
-            completedCount: item.completedCount ?? teamBase.completedCount ?? 0,
-            unlocked: item.unlocked ?? teamBase.unlocked ?? false,
-            fullUnlocked: item.fullUnlocked ?? teamBase.fullUnlocked ?? false,
+            id: item.id,
+            name: item.name,
+            organization: item.organization,
+            totalMembers: item.memberCount,
+            completedCount: item.completedCount,
+            unlocked: item.unlocked ?? false,
+            fullUnlocked: item.fullUnlock ?? false,
           };
         });
         setTeams(simplified);
