@@ -3652,3 +3652,24 @@ nav {
     font-size: 10px;
   }
 }
+.trusted-logo-img {
+  height: 96px;
+  width: auto;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.trusted-logo-img:hover {
+  opacity: .7;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .trusted-logos {
+    gap: 24px;
+  }
+  
+  .trusted-logo-img {
+    height: 96px;
+  }
+}

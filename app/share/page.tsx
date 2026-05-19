@@ -30,7 +30,7 @@ const ROLE_COLORS: Record<string, string> = {
 };
 
 function ShareCardInner() {
-  const { isAuthenticated, profile, loading: authLoading } = useAuth();
+  const { isAuthenticated, profile, loading: authLoading, user } = useAuth();
   const router = useRouter();
   const params = useSearchParams();
   const cardRef = useRef<HTMLDivElement>(null);
@@ -64,7 +64,9 @@ function ShareCardInner() {
     if (!data) return;
     const { primary_role, secondary_role, role_pair_title, top_adapts_stages } =
       data.derived;
-    const text = `I just discovered my Change Genius™ role: ${primary_role} + ${secondary_role} — The ${role_pair_title}.\n\nMy top ADAPTS™ stage: ${top_adapts_stages[0]}.\n\nDiscover yours at changegeniussuite.com`;
+    const userName =
+      profile?.full_name || user?.email?.split("@")[0] || "Change Leader";
+    const text = `🎯 ${userName} just discovered their Change Genius™ profile!\n\nRole: ${primary_role} + ${secondary_role} — The ${role_pair_title}\nTop ADAPTS™ Stage: ${top_adapts_stages[0]}\nFind your Change Genius at changegeniusai.com`;
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -150,13 +152,16 @@ function ShareCardInner() {
     bottom_adapts_stages,
   } = data.derived;
   const roleColor = ROLE_COLORS[primary_role] ?? "var(--navy)";
+  const userName =
+    profile?.full_name || user?.email?.split("@")[0] || "Change Leader";
+  const userInitial = userName.charAt(0).toUpperCase();
 
   const energyProfile = {
     dominant: primary_energy,
-    secondary: primary_energy, // placeholder – same as dominant
-    strain: primary_energy, // placeholder
-    depleted: primary_energy, // placeholder
-    scores: { Innovator: 0, Achiever: 0, Organizer: 0, Unifier: 0 }, // dummy scores (not used in share card)
+    secondary: primary_energy,
+    strain: primary_energy,
+    depleted: primary_energy,
+    scores: { Innovator: 0, Achiever: 0, Organizer: 0, Unifier: 0 },
   };
 
   const narrativeInput = {
@@ -175,7 +180,7 @@ function ShareCardInner() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--sage)" }}>
       {/* Nav */}
-      <div style={{ background: "var(--navy)", padding: "0 24px" }}>
+      <div style={{ background: "var(--brand", padding: "0 24px" }}>
         <div
           style={{
             maxWidth: 1160,
@@ -201,7 +206,7 @@ function ShareCardInner() {
             href="/results"
             style={{
               fontSize: 13,
-              color: "rgba(255,255,255,.6)",
+              color: "rgb(255, 255, 255)",
               textDecoration: "none",
             }}
           >
@@ -235,7 +240,7 @@ function ShareCardInner() {
               marginBottom: 8,
             }}
           >
-            Your Change Genius™ Identity Card
+            Your Change Genius™ Display Card
           </h1>
           <p style={{ fontSize: 15, color: "var(--text-3)" }}>
             Download as PNG or copy your share text for LinkedIn.
@@ -248,7 +253,7 @@ function ShareCardInner() {
           style={{
             width: "100%",
             aspectRatio: "1200/628",
-            background: `linear-gradient(135deg, ${roleColor} 0%, var(--navy) 60%)`,
+            background: `linear-gradient(135deg, ${roleColor} 0%, var(--brand) 60%)`,
             borderRadius: 16,
             padding: "48px 56px",
             display: "flex",
@@ -259,6 +264,7 @@ function ShareCardInner() {
             boxShadow: "0 20px 60px rgba(10,37,64,.25)",
           }}
         >
+          {/* Decorative circles */}
           <div
             style={{
               position: "absolute",
@@ -281,6 +287,43 @@ function ShareCardInner() {
               background: "rgba(255,255,255,.04)",
             }}
           />
+
+          {/* User Name Badge - NEW */}
+          <div
+            style={{
+              position: "absolute",
+              top: 20,
+              right: 30,
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              background: "rgba(255,255,255,.12)",
+              backdropFilter: "blur(4px)",
+              padding: "6px 16px 6px 12px",
+              borderRadius: 40,
+              zIndex: 2,
+            }}
+          >
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: "50%",
+                background: "rgba(255,255,255,.2)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 14,
+                fontWeight: 700,
+                color: "white",
+              }}
+            >
+              {userInitial}
+            </div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "white" }}>
+              {userName}
+            </span>
+          </div>
 
           <div
             style={{
@@ -333,29 +376,7 @@ function ShareCardInner() {
                 padding: "12px 20px",
                 textAlign: "center",
               }}
-            >
-              <div
-                style={{
-                  fontSize: "clamp(8px,0.9vw,11px)",
-                  fontWeight: 700,
-                  color: "rgba(255,255,255,.45)",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  marginBottom: 4,
-                }}
-              >
-                Energy
-              </div>
-              <div
-                style={{
-                  fontSize: "clamp(13px,1.5vw,18px)",
-                  fontWeight: 800,
-                  color: "white",
-                }}
-              >
-                {primary_energy}
-              </div>
-            </div>
+            ></div>
           </div>
 
           <div style={{ position: "relative", zIndex: 1 }}>
@@ -419,13 +440,13 @@ function ShareCardInner() {
             </div>
             <div
               style={{
-                fontSize: "clamp(11px,1.2vw,14px)",
-                fontWeight: 800,
-                color: "rgba(255,255,255,.45)",
-                letterSpacing: "-0.3px",
+                fontSize: "clamp(9px,1vw,11px)",
+                fontWeight: 500,
+                color: "rgba(255,255,255,.35)",
+                letterSpacing: "-0.2px",
               }}
             >
-              changegeniussuite.com
+              changegeniusai.com
             </div>
           </div>
         </div>
@@ -479,8 +500,8 @@ function ShareCardInner() {
           >
             {copied ? "✓ Copied!" : "📋 Copy Share Text"}
           </button>
-          <a
-            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent("https://changegeniussuite.com")}`}
+          {/*<a
+            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent("https://changegeniusai.com")}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -497,7 +518,7 @@ function ShareCardInner() {
             }}
           >
             Share on LinkedIn
-          </a>
+          </a>*/}
         </div>
 
         <p
@@ -522,7 +543,7 @@ export default function SharePage() {
         <div
           style={{
             minHeight: "100vh",
-            background: "var(--sage)",
+            background: "blue",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

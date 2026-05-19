@@ -29,6 +29,11 @@ const resources = [
     url: "https://hbr.org/2024/07/build-a-corporate-culture-that-works",
     source: "Harvard Business Review",
   },
+  {
+    title: "Why Change Efforts Still Fail And What Leaders Can Do Differently",
+    url: "https://www.forbes.com/councils/forbescoachescouncil/2026/04/30/why-change-efforts-still-fail-and-what-leaders-can-do-differently/",
+    source: "Forbes",
+  },
 ];
 
 export default function ResourcesPage() {
