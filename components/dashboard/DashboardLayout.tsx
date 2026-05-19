@@ -6,7 +6,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { signOut } from "@/lib/auth";
 import Sidebar from "./Sidebar";
 
-
 interface DashboardLayoutProps {
   children: ReactNode;
   title: string;
@@ -54,11 +53,13 @@ export default function DashboardLayout({
   };
 
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    alert("Link copied to clipboard");
+    router.push("/share");
   };
 
-  const generatePDFBlob = async (): Promise<{ blob: Blob; base64: string } | null> => {
+  const generatePDFBlob = async (): Promise<{
+    blob: Blob;
+    base64: string;
+  } | null> => {
     const res = await fetch("/api/pdf/individual", { credentials: "include" });
 
     if (!res.ok) return null;
@@ -71,7 +72,8 @@ export default function DashboardLayout({
     const { default: jsPDF } = await import("jspdf");
 
     const iframe = document.createElement("iframe");
-    iframe.style.cssText = "position:fixed;top:0;left:0;width:794px;height:1123px;opacity:0;pointer-events:none;border:none;";
+    iframe.style.cssText =
+      "position:fixed;top:0;left:0;width:794px;height:1123px;opacity:0;pointer-events:none;border:none;";
     document.body.appendChild(iframe);
 
     const iframeDoc = iframe.contentDocument!;
@@ -79,10 +81,14 @@ export default function DashboardLayout({
     iframeDoc.write(html);
     iframeDoc.close();
 
-    await new Promise(resolve => setTimeout(resolve, 2500));
+    await new Promise((resolve) => setTimeout(resolve, 2500));
 
     const pageEls = iframeDoc.querySelectorAll<HTMLElement>(".page");
-    const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+    const pdf = new jsPDF({
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait",
+    });
     const pdfWidthMm = 210;
     const pdfHeightMm = 297;
 
@@ -123,24 +129,23 @@ export default function DashboardLayout({
   };
 
   const handleDownloadPDF = async () => {
-      setPdfLoading(true);
-      try {
-        const result = await generatePDFBlob();
-        if (!result) throw new Error("Failed to generate PDF Report");
+    setPdfLoading(true);
+    try {
+      const result = await generatePDFBlob();
+      if (!result) throw new Error("Failed to generate PDF Report");
 
-        const blob = result.blob;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "change-genius-report.pdf";
-        a.click();
-        URL.revokeObjectURL(url);
-
-      } catch (err) {
-        console.error("PDF download failed:", err);
-      } finally {
-        setPdfLoading(false);
-      }
+      const blob = result.blob;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "change-genius-report.pdf";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("PDF download failed:", err);
+    } finally {
+      setPdfLoading(false);
+    }
   };
 
   const toggleSidebar = () => {

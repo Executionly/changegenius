@@ -406,6 +406,12 @@ export default function HomePage() {
             <Link href="#pricing" onClick={() => setMobOpen(false)}>
               For Teams · Pricing
             </Link>
+            <Link href="/contact" onClick={() => setMobOpen(false)}>
+              Contact Us
+            </Link>
+            <Link href="/resources" onClick={() => setMobOpen(false)}>
+              Resources
+            </Link>
             <Link href="/dashboard" onClick={() => setMobOpen(false)}>
               Dashboard
             </Link>
@@ -536,15 +542,10 @@ export default function HomePage() {
 
         <nav className="header-nav">
           <Link href="/" className="nav-logo">
-            <svg className="nav-logo-mark" viewBox="0 0 159 159" fill="none">
-              <path
-                d="M49.6719 33.999C53.9563 30.0391 53.9602 26.5696 50.7754 20.1943C49.6463 18.2231 49 15.9353 49 13.499C49.0003 6.0434 55.0443 -0.000976562 62.5 -0.000976562C69.9557 -0.000976562 75.9997 6.0434 76 13.499C75.9999 16.3747 75.0999 19.0406 73.5674 21.2305C72.2363 23.5977 68.6459 31.0713 74.5 33.999L125 33.999L125 83.6699C128.96 87.9546 132.429 87.9584 138.805 84.7734C140.778 83.6443 143.064 82.998 145.5 82.998C152.956 82.998 158.999 89.0427 159 96.498C159 103.954 152.956 109.998 145.5 109.998C142.624 109.998 139.959 109.098 137.769 107.565C135.401 106.234 127.928 102.645 125 108.498L125 159L0 159L0 108.6C2.97579 103.838 9.56578 107.402 11.4727 108.575C11.6295 108.68 11.7882 108.781 11.9492 108.88C11.9821 108.902 12 108.913 12 108.913V108.91C14.1883 110.235 16.755 110.999 19.5 110.999C27.5079 110.999 34 104.507 34 96.499C34 88.4911 27.5079 81.9993 19.5 81.999C16.7552 81.999 14.1882 82.7619 12 84.0869V84.0811C5.49986 87.999 0.999854 84.999 0 82.999L0 33.999L49.6719 33.999ZM48 139.499C48 142.244 48.7629 144.811 50.0879 146.999H50.082C53.9999 153.499 51 157.999 49 158.999L74.6006 158.999C69.8388 156.023 73.4026 149.433 74.5762 147.526C74.6806 147.37 74.7824 147.211 74.8809 147.05C74.903 147.017 74.9141 146.999 74.9141 146.999H74.9111C76.2363 144.811 77 142.244 77 139.499C76.9997 131.491 70.508 124.999 62.5 124.999C54.492 124.999 48.0003 131.491 48 139.499Z"
-                fill="#0101ee"
-              />
-            </svg>
-            <span className="nav-brand">
+            <img src="/logo.png" alt="Forbes" className="trusted-logo-img" />
+            {/*<span className="nav-brand">
               ChangeGenius<sup>™</sup>
-            </span>
+            </span>*/}
           </Link>
           <ul className="nav-links">
             <li>
@@ -558,6 +559,12 @@ export default function HomePage() {
             </li>
             <li>
               <Link href="#pricing">Pricing</Link>
+            </li>
+            <li>
+              <Link href="/resources">Resources</Link>
+            </li>
+            <li>
+              <Link href="/contact">Contact Us</Link>
             </li>
           </ul>
           <div className="nav-actions">
@@ -609,7 +616,7 @@ export default function HomePage() {
 
             <div className="hero-footnote">
               <span className="footnote-icon">✓</span> No subscription ·
-              One-time {formatPrice(PRICING.INDIVIDUAL)} · Instant results
+              One-time payment · Instant results
             </div>
           </div>
 
@@ -718,30 +725,30 @@ export default function HomePage() {
       <section className="stats-overlap">
         <div className="stats-container">
           <div className="stat-item">
-            <div className="stat-number-container">
+            {/*  <div className="stat-number-container">
               <span className="stat-number">6</span>
-            </div>
-            <div className="stat-label">ADAPTS™ Stages</div>
+            </div> */}
+            <div className="stat-label">6 ADAPTS™ Stages</div>
             <div className="stat-desc">
               Mapped across the full arc of organizational transformation
             </div>
           </div>
           <div className="stat-item">
-            <div className="stat-number-container">
+            {/*  <div className="stat-number-container">
               <span className="stat-number">72</span>
-            </div>
-            <div className="stat-label">Questions</div>
+            </div> */}
+            <div className="stat-label">Assesment</div>
             <div className="stat-desc">
               Science-backed assessment completed in 8–10 minutes
             </div>
           </div>
           <div className="stat-item">
-            <div className="stat-number-container">
+            {/*  <div className="stat-number-container">
               <span className="stat-number">
                 {formatPrice(PRICING.INDIVIDUAL)}
-              </span>
-            </div>
-            <div className="stat-label">Per Person</div>
+              </span> 
+            </div> */}
+            <div className="stat-label">No subscription</div>
             <div className="stat-desc">
               One-time payment. No subscription. No license complexity.
             </div>
@@ -759,7 +766,11 @@ export default function HomePage() {
             Trusted by organizations worldwide
           </h2>
           <div className="trusted-logos">
-            <span className="trusted-title">As seen on Forbes</span>
+            <img
+              src="/forbes-logo.png"
+              alt="Forbes"
+              className="trusted-logo-img"
+            />
           </div>
         </div>
       </section>
@@ -1212,7 +1223,7 @@ export default function HomePage() {
           <div className="promise-cta">
             <Link href="/assessment" className="btn-primary promise-btn">
               Take the Assessment →{" "}
-              <span>{formatPrice(PRICING.INDIVIDUAL)} one-time</span>
+              {/*<span>{formatPrice(PRICING.INDIVIDUAL)} one-time</span>*/}
             </Link>
           </div>
         </div>
@@ -1799,6 +1810,25 @@ export default function HomePage() {
               Read article →
             </a>
           </div>
+          <div className="resource-card">
+            <div className="resource-image">
+              <img
+                src="https://imageio.forbes.com/specials-images/imageserve/66d2135aa3eebcfe32c51c53/Three-Employees-Giving-Presentation-During-Seminar/0x0.jpg?width=960&dpr=1.5"
+                alt="Why Change Efforts Still Fail And What Leaders Can Do Differently"
+              />
+            </div>
+            <h3 className="resource-title">
+              Why Change Efforts Still Fail And What Leaders Can Do Differently
+            </h3>
+            <a
+              href="
+https://www.forbes.com/councils/forbescoachescouncil/2026/04/30/why-change-efforts-still-fail-and-what-leaders-can-do-differently/"
+              className="resource-link"
+              target="_blank"
+            >
+              Read article →
+            </a>
+          </div>
         </div>
       </section>
 
@@ -1814,9 +1844,9 @@ export default function HomePage() {
           <button className="cta-button" onClick={handleStart}>
             Take The Assessment Now →
           </button>
-          <div className="cta-price">
+          {/*<div className="cta-price">
             {formatPrice(PRICING.INDIVIDUAL)} per license
-          </div>
+          </div>*/}
         </div>
       </section>
 
@@ -1883,11 +1913,6 @@ export default function HomePage() {
           </div>
           <div className="footer-bottom">
             <p>&copy; 2026 ChangeGenius™. All rights reserved.</p>
-            <div className="footer-social">
-              <a href="#">in</a>
-              <a href="#">𝕏</a>
-              <a href="#">▶</a>
-            </div>
           </div>
         </div>
       </footer>
