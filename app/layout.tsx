@@ -27,10 +27,6 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <link rel="icon" href="/logo.png" sizes="any" />
-        <script
-          src="//code.tidio.co/04hpwbat73cpohjtwkvw7uaao13b31wv.js"
-          async
-        />
       </head>
       <body>
         <AuthProvider>{children}</AuthProvider>
