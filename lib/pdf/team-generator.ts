@@ -346,73 +346,146 @@ function coverPage(
   date: string, tierLabel: string, diagnostic: TeamDiagnostic
 ): string {
   const riskColor = diagnostic.riskLevel === "Low" ? C.green : diagnostic.riskLevel === "Moderate" ? C.amber : C.red;
-  return page(`
-    <div style="height:100%;display:flex;flex-direction:column;justify-content:space-between">
 
+  // Find which energy each member contributes most to dominant
+  const dominantColor = ENERGY_COLORS[diagnostic.dominantEnergy] ?? C.gold;
+
+  // ADAPTS stage meaning
+  const STAGE_MEANING: Record<string, string> = {
+    Alert:     "Recognises signals, risks, and opportunities early",
+    Diagnose:  "Identifies root causes and real problems",
+    Prepare:   "Builds structure, readiness, and systems",
+    Align:     "Creates trust, communication, and shared direction",
+    Transform: "Turns plans into execution and measurable movement",
+    Sustain:   "Maintains consistency, rhythm, and long-term growth",
+  };
+
+  // Role meaning
+  const ROLE_MEANING: Record<string, string> = {
+    Driver:    "Moves execution forward",
+    Connector: "Builds trust and alignment",
+    Architect: "Creates structure and clarity",
+    Spotter:   "Sees patterns and possibilities",
+  };
+
+  // Energy meaning
+  const ENERGY_MEANING: Record<string, string> = {
+    Achiever:  "Energised by progress and results",
+    Unifier:   "Energised by people and connection",
+    Organizer: "Energised by structure and order",
+    Innovator: "Energised by ideas and possibilities",
+  };
+
+  // Score band meaning
+  const scoreBand = (score: number) =>
+    score >= 70 ? { label: "Strong", color: C.green } :
+    score >= 50 ? { label: "Solid",  color: C.purple } :
+    score >= 30 ? { label: "At Risk", color: C.amber } :
+                  { label: "Critical", color: C.red };
+
+  return page(`
+    <div style="display:flex;flex-direction:column;gap:18px">
+
+      <!-- Header -->
       <div>
-        <div class="label" style="color:${C.purple};margin-bottom:18px">TEAM ASSESSMENT REPORT · ${tierLabel.toUpperCase()}</div>
-        <h1>TEAM<br>CHANGE MAP™</h1>
-        <div style="width:56px;height:4px;background:${C.gold};margin:16px 0 20px"></div>
-        <p style="font-size:17px;color:${C.gray};font-weight:300;margin-bottom:5px">${teamName}</p>
-        <p style="font-size:13px;color:${C.gray}">Assessment Date: ${date} &nbsp;·&nbsp; ${memberCount} Team Member${memberCount !== 1 ? "s" : ""}</p>
+        <div class="label" style="color:${C.purple};margin-bottom:10px">TEAM ASSESSMENT REPORT · ${tierLabel.toUpperCase()}</div>
+        <h1 style="font-size:36px;line-height:1.1;margin-bottom:6px">TEAM CHANGE MAP™</h1>
+        <div style="width:48px;height:3px;background:${C.gold};margin-bottom:10px"></div>
+        <p style="font-size:15px;color:${C.gray};font-weight:300;margin-bottom:2px">${teamName}</p>
+        <p style="font-size:11px;color:${C.gray}">Assessment Date: ${date} &nbsp;·&nbsp; ${memberCount} Team Member${memberCount !== 1 ? "s" : ""}</p>
       </div>
 
-      <div style="margin-top:20px;background:${C.navy};border-radius:14px;padding:26px 30px;color:white">
-        <div class="label" style="color:rgba(255,255,255,0.5);margin-bottom:16px">TEAM OVERVIEW</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:18px;margin-bottom:18px">
+      <!-- Summary bar -->
+      <div style="background:${C.navy};border-radius:12px;padding:20px 24px;color:white;style="margin-top:30px;"">
+        <div class="label" style="color:rgba(255,255,255,0.5);margin-bottom:12px">TEAM OVERVIEW</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:14px">
           <div>
-            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:3px;letter-spacing:.08em;text-transform:uppercase">Team Size</div>
-            <div style="font-size:28px;font-weight:900">${memberCount}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:2px;text-transform:uppercase;letter-spacing:.08em">Team Size</div>
+            <div style="font-size:26px;font-weight:900">${memberCount}</div>
           </div>
           <div>
-            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:3px;letter-spacing:.08em;text-transform:uppercase">Capacity Score™</div>
-            <div style="font-size:28px;font-weight:900;color:${C.gold}">${capacityScore}<span style="font-size:13px;font-weight:400;color:rgba(255,255,255,0.4)">/100</span></div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:2px;text-transform:uppercase;letter-spacing:.08em">Capacity Score™</div>
+            <div style="font-size:26px;font-weight:900;color:${C.gold}">${capacityScore}<span style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.4)">/100</span></div>
           </div>
           <div>
-            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:3px;letter-spacing:.08em;text-transform:uppercase">Dominant Energy</div>
-            <div style="font-size:20px;font-weight:800;color:${ENERGY_COLORS[diagnostic.dominantEnergy] ?? C.gold}">${diagnostic.dominantEnergy}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:2px;text-transform:uppercase;letter-spacing:.08em">Dominant Energy</div>
+            <div style="font-size:18px;font-weight:800;color:${dominantColor}">${diagnostic.dominantEnergy}</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-top:2px">${ENERGY_MEANING[diagnostic.dominantEnergy] ?? ""}</div>
           </div>
           <div>
-            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:3px;letter-spacing:.08em;text-transform:uppercase">Risk Level</div>
-            <div style="font-size:20px;font-weight:800;color:${riskColor}">${diagnostic.riskLevel}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:2px;text-transform:uppercase;letter-spacing:.08em">Risk Level</div>
+            <div style="font-size:18px;font-weight:800;color:${riskColor}">${diagnostic.riskLevel}</div>
           </div>
         </div>
         ${diagnostic.missingRoles.length > 0
-          ? `<div style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:8px;padding:11px 14px">
-               <span style="font-size:11px;font-weight:700;color:#FCA5A5;letter-spacing:.08em;text-transform:uppercase">⚠ Missing Roles: </span>
-               <span style="font-size:12px;color:#FCA5A5">${diagnostic.missingRoles.join(", ")} — execution gaps active</span>
+          ? `<div style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:7px;padding:9px 12px">
+               <span style="font-size:10px;font-weight:700;color:#FCA5A5;letter-spacing:.08em;text-transform:uppercase">⚠ Missing Roles: </span>
+               <span style="font-size:11px;color:#FCA5A5">${diagnostic.missingRoles.join(", ")} — execution gaps active</span>
              </div>`
-          : `<div style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);border-radius:8px;padding:11px 14px">
-               <span style="font-size:11px;font-weight:700;color:#6EE7B7;letter-spacing:.08em;text-transform:uppercase">✓ All Four Roles Represented</span>
-               <span style="font-size:12px;color:#6EE7B7"> — Complete change capability profile detected</span>
+          : `<div style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);border-radius:7px;padding:9px 12px">
+               <span style="font-size:10px;font-weight:700;color:#6EE7B7;letter-spacing:.08em;text-transform:uppercase">✓ All Four Roles Represented </span>
+               <span style="font-size:11px;color:#6EE7B7">— Complete change capability profile</span>
              </div>`}
       </div>
 
-      <div style="margin-top: 50px;">
-        <div class="label" style="color:${C.gray};margin-bottom:10px">ADAPTS™ STAGE SCORES AT A GLANCE</div>
-        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px">
+      <!-- Dominant energy source -->
+      <div style="background:${dominantColor}12;border:1px solid ${dominantColor}40;border-radius:10px;padding:14px 16px;margin-top:30px;">
+        <div class="label" style="color:${dominantColor};margin-bottom:8px">DOMINANT ENERGY SOURCE — ${diagnostic.dominantEnergy.toUpperCase()}</div>
+        <p style="font-size:11px;color:${C.navy};margin-bottom:8px">
+          The team's dominant productivity energy is <strong>${diagnostic.dominantEnergy}</strong> — ${ENERGY_MEANING[diagnostic.dominantEnergy]}. 
+          This is derived from the average energy scores across all ${memberCount} assessed members. 
+          It reflects what collectively gives this team momentum, focus, and sustainable performance.
+        </p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+          ${Object.entries(diagnostic.energyScores)
+            .sort(([,a],[,b]) => b - a)
+            .map(([energy, score]) => {
+              const ec = ENERGY_COLORS[energy] ?? C.purple;
+              const isDominant = energy === diagnostic.dominantEnergy;
+              return `<div style="text-align:center;padding:8px 6px;background:${isDominant ? ec+'22' : C.grayLight};border-radius:7px;border-top:2px solid ${isDominant ? ec : C.gray}">
+                <div style="font-size:10px;font-weight:700;color:${isDominant ? ec : C.gray};margin-bottom:2px">${energy}</div>
+                <div style="font-size:16px;font-weight:800;color:${isDominant ? ec : C.navy}">${Math.round(score)}</div>
+                <div style="font-size:8px;color:${C.gray}">${ENERGY_MEANING[energy]?.split(' ').slice(0,3).join(' ')}...</div>
+              </div>`;
+            }).join("")}
+        </div>
+      </div>
+
+      <!-- ADAPTS stage scores with meaning -->
+      <div style="margin-top:30px;">
+        <div class="label" style="color:${C.gray};margin-bottom:8px">ADAPTS™ STAGE SCORES — WHAT EACH STAGE MEANS</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">
           ${Object.entries(diagnostic.stageScores).map(([stage, score]) => {
-            const color = score >= 70 ? C.green : score >= 50 ? C.purple : score >= 30 ? C.amber : C.red;
-            return `<div style="margin:10px;text-align:center;padding:10px 6px;background:${C.grayLight};border-radius:8px;border-top:3px solid ${color}">
-              <div style="font-size:10px;font-weight:700;color:${C.navy};margin-bottom:4px">${stage}</div>
-              <div style="font-size:20px;font-weight:900;color:${color}">${Math.round(score)}</div>
+            const band = scoreBand(score);
+            return `<div style="padding:10px;background:${C.grayLight};border-radius:8px;border-left:3px solid ${band.color}">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+                <div style="font-size:11px;font-weight:700;color:${C.navy}">${stage}</div>
+                <div style="font-size:14px;font-weight:900;color:${band.color}">${Math.round(score)}</div>
+              </div>
+              <div style="font-size:9px;color:${C.gray};margin-bottom:3px">${STAGE_MEANING[stage] ?? ""}</div>
+              <div style="font-size:9px;font-weight:700;color:${band.color}">${band.label}</div>
             </div>`;
           }).join("")}
         </div>
       </div>
 
-      <div style="margin-top:30px;display:grid;grid-template-columns:repeat(4,1fr);gap:7px">
-        ${Object.entries(diagnostic.roleDistribution).map(([role, count]) => {
-          const color = count === 0 ? C.red : count >= 3 ? C.amber : C.green;
-          return `<div style="text-align:center;padding:10px 6px;background:${count === 0 ? "#FEF2F2" : C.grayLight};border-radius:8px;border-top:3px solid ${color}">
-            <div style="font-size:10px;font-weight:700;color:${C.navy};margin-bottom:3px">${role}</div>
-            <div style="font-size:18px;font-weight:900;color:${color}">${count}</div>
-            <div style="font-size:9px;color:${count === 0 ? C.red : C.gray};font-weight:${count === 0 ? "700" : "400"}">${count === 0 ? "MISSING" : "members"}</div>
-          </div>`;
-        }).join("")}
+      <!-- Role distribution with meaning -->
+      <div style="margin-top:30px;">
+        <div class="label" style="color:${C.gray};margin-bottom:8px">CHANGE GENIUS™ ROLE DISTRIBUTION — WHAT EACH ROLE CONTRIBUTES</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px">
+          ${Object.entries(diagnostic.roleDistribution).map(([role, count]) => {
+            const color = count === 0 ? C.red : count >= 3 ? C.amber : C.green;
+            return `<div style="text-align:center;padding:10px 8px;background:${count === 0 ? "#FEF2F2" : C.grayLight};border-radius:8px;border-top:3px solid ${color}">
+              <div style="font-size:11px;font-weight:700;color:${C.navy};margin-bottom:2px">${role}</div>
+              <div style="font-size:20px;font-weight:900;color:${color};margin-bottom:3px">${count}</div>
+              <div style="font-size:8px;color:${C.gray};line-height:1.4">${ROLE_MEANING[role] ?? ""}</div>
+              <div style="font-size:8px;font-weight:700;color:${color};margin-top:2px">${count === 0 ? "MISSING" : count === 1 ? "1 member" : `${count} members`}</div>
+            </div>`;
+          }).join("")}
+        </div>
       </div>
 
-      <p style="margin-top:30px;font-size:11px;color:${C.gray};text-align:center">Prepared for team development and organisational insight · Change Genius™ · changegeniusai.com</p>
+      <p style="font-size:10px;color:${C.gray};text-align:center">Prepared for team development and organisational insight · Change Genius™ · changegeniusai.com</p>
     </div>
   `);
 }

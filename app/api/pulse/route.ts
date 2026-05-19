@@ -4,6 +4,9 @@ import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { createClient } from '@supabase/supabase-js'
 import { generateTeamFeeds } from '@/lib/generate-team-feeds'
+import { computeTeamDiagnostic, MemberScore } from '@/lib/assessment/team-diagnostic'
+import { normalizeStageName } from '@/lib/assessment/narratives'
+import { AdaptsStage, Energy, Role } from '@/lib/assessment/questions'
 
 const schema = z.object({
   teamId: z.string().uuid(),
@@ -77,6 +80,19 @@ export async function POST(req: NextRequest) {
       alignmentScore,
       executionScore,
     } = parsed.data
+
+    const { data: team } = await supabase
+    .from('teams')
+    .select('id, name, organization, invite_code, owner_id')
+    .eq('id', teamId)
+    .single()
+
+    if(!team) {
+      return NextResponse.json(
+        { error: 'Team not found' },
+        { status: 403 }
+      )
+    }
 
     // Verify membership
     const { data: member } = await supabase
@@ -218,6 +234,62 @@ export async function POST(req: NextRequest) {
     let feeds = []
 
     if (!existingFeed?.length) {
+      const { data: members } = await supabase
+        .from('team_members')
+        .select('user_id, status, assessment_status, primary_role, secondary_role, profiles(full_name, email, change_genius_role, change_genius_role_2)')
+        .eq('team_id', teamId)
+        .eq('assessment_status', 'completed')
+
+      if (!members || members.length < 3) {
+        return NextResponse.json({ error: 'Full report requires 3 completed members' }, { status: 403 })
+      }
+
+      const memberScores: MemberScore[] = []
+      const memberNames: string[] = []
+    
+      for (const m of members) {
+        const p = m.profiles as any
+    
+        const { data: assessment, error: assessmentError } = await supabase
+          .from('assessments')
+          .select('id')
+          .eq('user_id', m.user_id)
+          .eq('team_id', teamId)
+          .eq('status', 'completed')
+          .order('completed_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+    
+        if (!assessment) continue
+    
+        const { data: scores, error: scoresError } = await supabase
+          .from('scores')
+          .select('stage_scores, energy_scores')
+          .eq('assessment_id', assessment.id)
+          .maybeSingle()
+    
+        if (!scores) continue
+    
+        const rawStageScores = scores.stage_scores as Record<string, number>
+        const normalizedStageScores = Object.fromEntries(
+          Object.entries(rawStageScores).map(([stage, score]) => [
+            normalizeStageName(stage),
+            score,
+          ])
+        ) as Record<AdaptsStage, number>
+    
+        memberScores.push({
+          userId:        m.user_id,
+          fullName:      p?.full_name ?? p?.email ?? 'Member',
+          primaryRole:   m.primary_role as Role,
+          secondaryRole: m.secondary_role as Role,
+          stageScores:   normalizedStageScores,
+          energyScores:  scores.energy_scores as Record<Energy, number>,
+        })
+        memberNames.push(p?.full_name ?? p?.email ?? 'Member')
+      }
+    
+      const diagnostic = computeTeamDiagnostic(memberScores)
       feeds = await generateTeamFeeds({
         dialogue: Math.round(dialogueAvg * 20),
         alignment: Math.round(alignmentAvg * 20),
@@ -228,6 +300,8 @@ export async function POST(req: NextRequest) {
         previousExecution,
         previousMomentum,
         weekNumber,
+        teamName: team.name,
+        diagnostic
       })
 
       console.log('[pulse] generated feeds:', feeds)

@@ -28,9 +28,40 @@ interface FeedItem {
   priority: number;
 }
 
-const CURRENT_WEEK = Math.ceil(
-  (Date.now() - new Date("2024-01-01").getTime()) / (7 * 864e5),
-);
+
+function getCurrentWeekDates() {
+  const startDate = new Date("2024-01-01");
+
+  // Current week number
+  const currentWeek = Math.ceil(
+    (Date.now() - startDate.getTime()) / (7 * 864e5)
+  );
+
+  // Start of current week
+  const weekStart = new Date(startDate);
+  weekStart.setDate(startDate.getDate() + (currentWeek - 1) * 7);
+
+  // End of current week
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+
+  const format = (date: Date) =>
+    date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+
+  return {
+    week: currentWeek,
+    start: weekStart,
+    end: weekEnd,
+    startFormatted: weekStart.toISOString().split("T")[0],
+    endFormatted: weekEnd.toISOString().split("T")[0],
+    fullFormatted: `${format(weekStart)} - ${format(weekEnd)}`,
+  };
+}
 
 export default function PulsePage() {
   const { isAuthenticated, loading: authLoading, profile } = useAuth();
@@ -47,6 +78,8 @@ export default function PulsePage() {
   const [alignment, setAlignment] = useState(0);
   const [execution, setExecution] = useState(0);
   const [alreadySubmitted, setAlreadySubmitted] = useState(false);
+
+  const CURRENT_WEEK = getCurrentWeekDates()
 
   // Fetch teams owned by user
   useEffect(() => {
@@ -76,7 +109,7 @@ export default function PulsePage() {
         }) => {
           setWeeks(d.analytics ?? []);
           setFeeds(d.feeds ?? []);
-          setAlreadySubmitted(d.latestPulse?.week_number === CURRENT_WEEK);
+          setAlreadySubmitted(d.latestPulse?.week_number === CURRENT_WEEK.week);
           setLoadingData(false);
         },
       )
@@ -91,7 +124,7 @@ export default function PulsePage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         teamId: selectedTeam,
-        weekNumber: CURRENT_WEEK,
+        weekNumber: CURRENT_WEEK.week,
         dialogueScore: dialogue,
         alignmentScore: alignment,
         executionScore: execution,
@@ -105,7 +138,7 @@ export default function PulsePage() {
       );
       setWeeks(updated.analytics ?? []);
       setFeeds(updated.feeds ?? []);
-      setAlreadySubmitted(updated.latestPulse?.week_number === CURRENT_WEEK);
+      setAlreadySubmitted(updated.latestPulse?.week_number === CURRENT_WEEK.week);
       setTimeout(() => setSubmitted(false), 3000);
     }
     setSubmitting(false);
@@ -183,7 +216,7 @@ export default function PulsePage() {
       <div className="stats-row" style={{ marginBottom: 16 }}>
         <div className="stat-card">
           <div className="stat-label">Current Week</div>
-          <div className="stat-value">{CURRENT_WEEK}</div>
+          <div className="stat-value">{CURRENT_WEEK.fullFormatted}</div>
           <div className="stat-sub">Submit your check-in</div>
         </div>
         <div className="stat-card">
@@ -228,7 +261,7 @@ export default function PulsePage() {
           {/* Submit pulse form */}
           <div className="card">
             <div className="card-header">
-              <span className="card-title">Week {CURRENT_WEEK} Check‑in</span>
+              <span className="card-title">Week {CURRENT_WEEK.fullFormatted} Check‑in</span>
             </div>
             <div className="card-body">
               {teams.length > 1 && (
@@ -275,7 +308,7 @@ export default function PulsePage() {
                     Already submitted
                   </h3>
                   <p style={{ color: "var(--text-3)" }}>
-                    You've checked in for week {CURRENT_WEEK}.<br />
+                    You've checked in for week {CURRENT_WEEK.fullFormatted}.<br />
                     Come back next week to submit again.
                   </p>
                 </div>
@@ -396,7 +429,7 @@ export default function PulsePage() {
                           fontSize: 12,
                         }}
                       >
-                        <span>Week {w.week}</span>
+                        <span>Week: {CURRENT_WEEK.fullFormatted}</span>
                         <span
                           style={{
                             fontWeight: 700,
