@@ -139,67 +139,70 @@ export default function Sidebar({
         </div>
         <div className="brand-sub">Assessment Platform</div>
       </div>
-      <div className="nav">
-        <div className="nav-section">Workspace</div>
-        {navItems.map((item) => (
-          <div
-            key={item.id}
-            className={`nav-item ${activePage === item.id ? "active" : ""}`}
-            onClick={() => handleClick(item)}
-          >
-            <span className="nav-icon">{item.icon()}</span>
-            {item.label}
-          </div>
-        ))}
 
-        <div className="nav-divider"></div>
-
-        {/* Create Team Button */}
-        <div
-          className={`nav-item ${activePage === "build" ? "active" : ""}`}
-          onClick={() => handleClick({ id: "build", href: "/teams/create" })}
-        >
-          <span className="nav-icon">{IconBuild()}</span>Create Team
-        </div>
-
-        {/* My Teams (teams I own) */}
-        <div
-          className={`nav-item ${activePage === "my-teams" ? "active" : ""}`}
-          onClick={() =>
-            handleClick({ id: "my-teams", href: "/teams" })
-          }
-        >
-          <span className="nav-icon">{IconTeams()}</span>
-          My Teams
-        </div>
-
-        {/* Teams I'm In */}
-        <div
-          className={`nav-item ${activePage === "teams-im-in" ? "active" : ""}`}
-          onClick={() =>
-            handleClick({ id: "teams-im-in", href: "/teams/teams-im-in" })
-          }
-        >
-          <span className="nav-icon">{IconUserGroup()}</span>
-          Teams I'm In
-        </div>
-
-        <div className="nav-divider"></div>
-        <div className="nav-section">Account</div>
-        <div className="nav-item" onClick={onSignOut}>
-          <span className="nav-icon">
-            <svg
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
+      {/* Scrollable nav container */}
+      <div className="nav-scrollable">
+        <div className="nav">
+          <div className="nav-section">Workspace</div>
+          {navItems.map((item) => (
+            <div
+              key={item.id}
+              className={`nav-item ${activePage === item.id ? "active" : ""}`}
+              onClick={() => handleClick(item)}
             >
-              <path d="M10 5L12 8L10 11M6 8H12M6 13H3V3H6" />
-            </svg>
-          </span>
-          Sign Out
+              <span className="nav-icon">{item.icon()}</span>
+              {item.label}
+            </div>
+          ))}
+
+          <div className="nav-divider"></div>
+
+          {/* Create Team Button */}
+          <div
+            className={`nav-item ${activePage === "build" ? "active" : ""}`}
+            onClick={() => handleClick({ id: "build", href: "/teams/create" })}
+          >
+            <span className="nav-icon">{IconBuild()}</span>Create Team
+          </div>
+
+          {/* My Teams (teams I own) */}
+          <div
+            className={`nav-item ${activePage === "my-teams" ? "active" : ""}`}
+            onClick={() => handleClick({ id: "my-teams", href: "/teams" })}
+          >
+            <span className="nav-icon">{IconTeams()}</span>
+            My Teams
+          </div>
+
+          {/* Teams I'm In */}
+          <div
+            className={`nav-item ${activePage === "teams-im-in" ? "active" : ""}`}
+            onClick={() =>
+              handleClick({ id: "teams-im-in", href: "/teams/teams-im-in" })
+            }
+          >
+            <span className="nav-icon">{IconUserGroup()}</span>
+            Teams I'm In
+          </div>
+
+          <div className="nav-divider"></div>
+          <div className="nav-section">Account</div>
+          <div className="nav-item" onClick={onSignOut}>
+            <span className="nav-icon">
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path d="M10 5L12 8L10 11M6 8H12M6 13H3V3H6" />
+              </svg>
+            </span>
+            Sign Out
+          </div>
         </div>
       </div>
+
       <div className="nav-bottom">
         <div className="user-row">
           <div className="avatar">{initial}</div>
@@ -209,6 +212,32 @@ export default function Sidebar({
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .nav-scrollable {
+          flex: 1;
+          overflow-y: auto;
+          overflow-x: hidden;
+        }
+
+        /* Custom scrollbar styling */
+        .nav-scrollable::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        .nav-scrollable::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        .nav-scrollable::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 4px;
+        }
+
+        .nav-scrollable::-webkit-scrollbar-thumb:hover {
+          background: rgba(0, 0, 0, 0.3);
+        }
+      `}</style>
     </>
   );
 }
