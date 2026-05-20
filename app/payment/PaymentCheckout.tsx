@@ -369,7 +369,6 @@ export default function PaymentCheckout() {
                 <div>🔒 Encrypted end-to-end</div>
                 <div>⚡ Instant access after payment</div>
                 <div>📄 Lifetime access to your results</div>
-                <div>↩️ 14-day refund policy</div>
               </div>
             </div>
 
