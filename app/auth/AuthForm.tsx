@@ -47,35 +47,61 @@ export default function AuthForm() {
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
+
     setSignupError("");
-    setMessage("")
+    setMessage("");
+
     const parsed = signUpSchema.safeParse({
       full_name: fullName,
       email: signupEmail,
       password: signupPassword,
       confirm_password: confirmPassword,
     });
+
     if (!parsed.success) {
       const firstIssue = parsed.error.issues[0];
-      const errorMessage = firstIssue?.message || "Please check your input";
-      setSignupError(errorMessage);
+
+      setSignupError(
+        firstIssue?.message || "Please check your input"
+      );
+
       return;
     }
+
     setSignupLoading(true);
-    const res = await signUp({
-      full_name: fullName,
-      email: signupEmail,
-      password: signupPassword,
-    });
-    if (res.error) {
-      setSignupError(res.error);
+
+    try {
+      const res = await signUp({
+        full_name: fullName,
+        email: signupEmail,
+        password: signupPassword,
+      });
+
+      if (res.error) {
+        // Supabase duplicate email handling
+        if (
+          res.error.toLowerCase().includes("already registered") ||
+          res.error.toLowerCase().includes("user already registered")
+        ) {
+          setSignupError("An account with this email already exists.");
+        } else {
+          setSignupError(res.error);
+        }
+
+        return;
+      }
+
+      if (returnUrl) {
+        router.replace(returnUrl);
+      } else {
+        setMessage(
+          "Account created! Please check your email to confirm your account."
+        );
+      }
+    } catch (err) {
+      setSignupError("Something went wrong. Please try again.");
+    } finally {
       setSignupLoading(false);
-      return;
-    }
-    if(returnUrl){
-      router.replace(returnUrl)
-    }else{
-      setMessage("Account created! Please check your email to confirm your account.")
     }
   }
 
