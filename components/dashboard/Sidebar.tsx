@@ -208,7 +208,7 @@ export default function Sidebar({
           <div className="avatar">{initial}</div>
           <div>
             <div className="user-name">{displayName}</div>
-            <div className="user-role">{userRole || "Change Leader"}</div>
+            <div className="user-role">{userRole}</div>
           </div>
         </div>
       </div>

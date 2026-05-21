@@ -150,6 +150,135 @@ export interface IndividualReportInput {
   completedAt: string;
 }
 
+export function adaptsOverviewPage(): string {
+  const stages: Array<{
+    letter: string
+    name: string
+    full: string
+    description: string
+    color: string
+  }> = [
+    {
+      letter: 'A',
+      name: 'Alert the System',
+      full: 'A — Alert the System',
+      description:
+        'Recognize signals, risks, opportunities, resistance, pressure points, and the need for change before problems escalate.',
+      color: C.purple,
+    },
+    {
+      letter: 'D',
+      name: 'Diagnose the Gaps',
+      full: 'D — Diagnose the Gaps',
+      description:
+        'Identify root causes, leadership breakdowns, execution barriers, system weaknesses, misalignment, and hidden performance gaps.',
+      color: C.navy,
+    },
+    {
+      letter: 'A',
+      name: 'Assess Readiness',
+      full: 'A — Assess Readiness',
+      description:
+        'Evaluate the people, culture, leadership capacity, emotional readiness, resources, systems, and execution capability required for sustainable change.',
+      color: C.gold,
+    },
+    {
+      letter: 'P',
+      name: 'Participate Through Dialogue',
+      full: 'P — Participate Through Dialogue',
+      description:
+        'Build trust, engagement, ownership, and collaboration through intentional communication, listening, feedback, and healthy conversations.',
+      color: C.green,
+    },
+    {
+      letter: 'T',
+      name: 'Transform Through Alignment',
+      full: 'T — Transform Through Alignment',
+      description:
+        'Execute change by aligning people, systems, priorities, leadership, structure, communication, and accountability toward a shared outcome.',
+      color: C.amber,
+    },
+    {
+      letter: 'S',
+      name: 'Scale and Sustain',
+      full: 'S — Scale and Sustain',
+      description:
+        'Reinforce long-term success through culture, habits, leadership development, learning systems, measurement, consistency, and continuous improvement.',
+      color: C.red,
+    },
+  ]
+
+  return page(`
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <!-- Header -->
+      <div>
+        <div class="label" style="color:${C.purple};margin-bottom:10px">FRAMEWORK OVERVIEW</div>
+        <h1 style="font-size:32px;line-height:1.1;margin-bottom:6px">ADAPTS™ OVERVIEW</h1>
+        <div style="width:48px;height:3px;background:${C.gold};margin-bottom:12px"></div>
+        <p style="font-size:13px;color:${C.gray};font-weight:300;max-width:540px">
+          The ADAPTS™ framework is the six-stage model that powers Change Genius™. It describes how individuals, 
+          teams, and organisations move through change — from early signal recognition through to long-term 
+          sustainability. Understanding where you are in this journey helps leaders make smarter decisions, 
+          reduce friction, and build lasting momentum.
+        </p>
+      </div>
+
+      <!-- Stage cards -->
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${stages.map((s, i) => `
+          <div style="display:flex;align-items:stretch;border-radius:10px;overflow:hidden;border:1px solid ${s.color}22">
+            <!-- Letter badge -->
+            <div style="
+              min-width:52px;
+              background:${s.color};
+              display:flex;
+              flex-direction:column;
+              align-items:center;
+              justify-content:center;
+              padding:12px 0;
+            ">
+              <span style="font-size:26px;font-weight:900;color:white;line-height:1">${s.letter}</span>
+              <span style="font-size:8px;color:rgba(255,255,255,0.6);margin-top:3px;text-transform:uppercase;letter-spacing:.06em">${String(i + 1).padStart(2, '0')}</span>
+            </div>
+            <!-- Content -->
+            <div style="flex:1;padding:12px 16px;background:${s.color}08">
+              <div style="font-size:12px;font-weight:800;color:${s.color};margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">${s.name}</div>
+              <p style="font-size:11px;color:${C.navy};line-height:1.55;margin:0">${s.description}</p>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- Footer note -->
+      <div style="background:${C.navy};border-radius:10px;padding:16px 20px;margin-top:4px">
+        <div class="label" style="color:rgba(255,255,255,0.5);margin-bottom:8px">HOW TO READ YOUR SCORES</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+          <div style="text-align:center">
+            <div style="font-size:18px;font-weight:900;color:${C.green}">70–100</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.5);margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Strong</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:1px">This stage is a natural strength</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:18px;font-weight:900;color:${C.amber}">30–69</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.5);margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Developing</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:1px">Growth opportunity with intentional practice</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:18px;font-weight:900;color:${C.red}">0–29</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.5);margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Critical Gap</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:1px">Requires focused leadership attention</div>
+          </div>
+        </div>
+      </div>
+
+      <p style="font-size:10px;color:${C.gray};text-align:center;margin-top:4px">
+        Change Genius™ · ADAPTS™ Framework · changegeniusai.com
+      </p>
+    </div>
+  `)
+}
+
 export function buildIndividualReportHTML(input: IndividualReportInput): string {
   const { fullName, scores, narrative } = input;
   const name      = fullName ?? "Your";
@@ -259,6 +388,8 @@ export function buildIndividualReportHTML(input: IndividualReportInput): string 
       </p>
     </div>
   `, 1));
+
+  pages.push(adaptsOverviewPage())
 
   // ── Page 3: Results summary ────────────────────────────────
   pages.push(page(`

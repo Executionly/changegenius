@@ -173,7 +173,7 @@ Sort by priority (1 = most urgent). No markdown, no explanation, only the JSON o
 `
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-4o',
+    model: 'gpt-5-mini',
     messages: [
       {
         role: 'system',
@@ -186,7 +186,7 @@ Sort by priority (1 = most urgent). No markdown, no explanation, only the JSON o
       },
     ],
     response_format: { type: 'json_object' },
-    temperature: 0.7,
+    temperature: 1,
   })
 
   const raw    = response.choices[0].message.content || '{}'

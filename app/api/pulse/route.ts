@@ -7,6 +7,7 @@ import { generateTeamFeeds } from '@/lib/generate-team-feeds'
 import { computeTeamDiagnostic, MemberScore } from '@/lib/assessment/team-diagnostic'
 import { normalizeStageName } from '@/lib/assessment/narratives'
 import { AdaptsStage, Energy, Role } from '@/lib/assessment/questions'
+import { generateAdaptsLeadershipInsight } from '@/lib/generate-adapt-insight'
 
 const schema = z.object({
   teamId: z.string().uuid(),
@@ -51,16 +52,12 @@ export async function POST(req: NextRequest) {
   try {
     const supabase = await createSupabase()
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+    const { data, error: authError } = await supabase.auth.getUser()
 
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    if (authError || !data.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    const session = data
 
     const body = await req.json()
 
@@ -290,21 +287,39 @@ export async function POST(req: NextRequest) {
       }
     
       const diagnostic = computeTeamDiagnostic(memberScores)
-      feeds = await generateTeamFeeds({
-        dialogue: Math.round(dialogueAvg * 20),
-        alignment: Math.round(alignmentAvg * 20),
-        execution: Math.round(executionAvg * 20),
-        momentum,
-        previousDialogue,
-        previousAlignment,
-        previousExecution,
-        previousMomentum,
-        weekNumber,
-        teamName: team.name,
-        diagnostic
-      })
+      const [existingFeeds, leadershipInsight] = await Promise.all([
+        generateTeamFeeds({
+          dialogue: Math.round(dialogueAvg * 20),
+          alignment: Math.round(alignmentAvg * 20),
+          execution: Math.round(executionAvg * 20),
+          momentum,
+          previousDialogue,
+          previousAlignment,
+          previousExecution,
+          previousMomentum,
+          weekNumber,
+          teamName: team.name,
+          diagnostic,
+        }),
+        generateAdaptsLeadershipInsight({
+          dialogue: Math.round(dialogueAvg * 20),
+          alignment: Math.round(alignmentAvg * 20),
+          execution: Math.round(executionAvg * 20),
+          momentum,
+          previousDialogue,
+          previousAlignment,
+          previousExecution,
+          previousMomentum,
+          weekNumber,
+          teamName: team.name,
+          diagnostic,
+        }),
+      ])
 
-      console.log('[pulse] generated feeds:', feeds)
+      // Leadership insight is priority 0 — always first in the feed
+      feeds = [leadershipInsight, ...existingFeeds]
+
+      console.log('[pulse] generated feeds:', feeds.length)
 
       if (feeds.length) {
         const { error: feedError } = await adminSupabase.from('team_ai_feeds').insert(
@@ -316,7 +331,10 @@ export async function POST(req: NextRequest) {
             content: feed.content,
             cta: feed.cta,
             tone: feed.tone,
-            metadata: { priority: feed.priority },
+            metadata: {
+              priority: feed.priority,
+              ...(feed.metadata ?? {}),
+            },
           }))
         )
         console.log('[pulse] feed insert error:', feedError)

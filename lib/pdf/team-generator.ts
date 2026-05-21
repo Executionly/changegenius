@@ -1,5 +1,6 @@
 import { Role } from "../assessment/questions";
 import { TeamDiagnostic } from "../assessment/team-diagnostic";
+import { adaptsOverviewPage } from "./generator";
 
 
 export interface TeamReportInput {
@@ -1024,6 +1025,7 @@ export function buildTeamReportHTML(input: TeamReportInput): string {
   let p = 0;
 
   pages.push(coverPage(teamName, memberCount, teamChangeCapacity, date, tierLabel, diagnostic));
+  pages.push(adaptsOverviewPage())
   pages.push(adaptsCoveragePage(stageScores, roleDistribution, energyScores, p++));
   if(tier !== 3){
     pages.push(frictionAndRecommendationsPage(frictionPatterns, rollout90Days, p++, tier));
