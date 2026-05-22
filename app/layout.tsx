@@ -27,6 +27,11 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <link rel="icon" href="/logo.png" sizes="any" />
+        <script
+          src="https://widgets.leadconnectorhq.com/loader.js"
+          data-resources-url="https://widgets.leadconnectorhq.com/chat-widget/loader.js"
+          data-widget-id="6a0ec9315589dae135a45df4"
+        ></script>
       </head>
       <body>
         <AuthProvider>{children}</AuthProvider>

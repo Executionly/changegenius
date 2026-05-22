@@ -3454,6 +3454,13 @@ nav {
   color: #64748b;
   letter-spacing: 0.5px;
 }
+.trusted-logos-container {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
 /* ========== UNDERSTAND YOUR GIFTS SECTION ========== */
 .gifts-section {
   background: linear-gradient(135deg, #0a1628 0%, #0f1a2e 50%, #1a2a4a 100%);
@@ -3660,7 +3667,7 @@ nav {
 }
 
 .trusted-logo-img:hover {
-  opacity: .7;
+  opacity: 0.7;
 }
 
 /* Mobile responsive */
@@ -3668,8 +3675,8 @@ nav {
   .trusted-logos {
     gap: 24px;
   }
-  
+
   .trusted-logo-img {
-    height: 96px;
+    height: 76px;
   }
 }
