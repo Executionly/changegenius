@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, signUp, signInWithGoogle } from "@/lib/auth";
 import { signUpSchema } from "@/lib/schemas";
+import Link from "next/link";
 
 export default function AuthForm() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function AuthForm() {
   const [signinPassword, setSigninPassword] = useState("");
   const [signinError, setSigninError] = useState("");
   const [signinLoading, setSigninLoading] = useState(false);
+  const [showSigninPassword, setShowSigninPassword] = useState(false);
 
   // Sign Up
   const [fullName, setFullName] = useState("");
@@ -27,6 +29,8 @@ export default function AuthForm() {
   const [signupLoading, setSignupLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   async function handleSignin(e: React.FormEvent) {
     e.preventDefault();
@@ -60,9 +64,7 @@ export default function AuthForm() {
     if (!parsed.success) {
       const firstIssue = parsed.error.issues[0];
 
-      setSignupError(
-        firstIssue?.message || "Please check your input"
-      );
+      setSignupError(firstIssue?.message || "Please check your input");
 
       return;
     }
@@ -94,7 +96,7 @@ export default function AuthForm() {
         router.replace(returnUrl);
       } else {
         setMessage(
-          "Account created! Please check your email to confirm your account."
+          "Account created! Please check your email to confirm your account.",
         );
       }
     } catch (err) {
@@ -113,13 +115,48 @@ export default function AuthForm() {
     }
   }
 
+  // Eye icon component
+  const EyeIcon = ({ show }: { show: boolean }) => (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      style={{ cursor: "pointer", color: "#94a3b8" }}
+    >
+      {show ? (
+        // Eye with slash (hidden)
+        <>
+          <path d="M1 1L17 17" strokeLinecap="round" />
+          <path
+            d="M6.5 3.5C4.5 4.5 2.5 7 1 9C2.5 11 5.5 14 9 14C10.5 14 11.5 13.5 13 12.5"
+            strokeLinecap="round"
+          />
+          <path
+            d="M14.5 10.5C15.5 9.5 16.5 8 17 9C15.5 11 12.5 14 9 14"
+            strokeLinecap="round"
+          />
+          <circle cx="9" cy="9" r="3" />
+          <path d="M9 6C11 6 12 7 12 9" strokeLinecap="round" />
+        </>
+      ) : (
+        // Eye (visible)
+        <>
+          <path d="M1 9C2.5 6 5.5 3 9 3C12.5 3 15.5 6 17 9C15.5 12 12.5 15 9 15C5.5 15 2.5 12 1 9Z" />
+          <circle cx="9" cy="9" r="3" />
+        </>
+      )}
+    </svg>
+  );
+
   return (
     <div className="auth-container-new">
       <div className="auth-grid">
         <div className="auth-left">
           <div className="auth-card-new">
             <div className="logo">
-              <div className="logo-icon"></div>
               <span>ChangeGenius™</span>
             </div>
             <h2>
@@ -157,18 +194,49 @@ export default function AuthForm() {
                     required
                   />
                 </div>
-                <div className="input-box">
+                <div className="input-box" style={{ position: "relative" }}>
                   <input
-                    type="password"
+                    type={showSigninPassword ? "text" : "password"}
                     value={signinPassword}
                     onChange={(e) => setSigninPassword(e.target.value)}
                     placeholder="Password"
                     required
+                    style={{ flex: 1 }}
                   />
+                  <span
+                    onClick={() => setShowSigninPassword(!showSigninPassword)}
+                    style={{
+                      position: "absolute",
+                      right: 12,
+                      cursor: "pointer",
+                    }}
+                  >
+                    <EyeIcon show={showSigninPassword} />
+                  </span>
                 </div>
                 <a href="/forgot-password"
                 style={{fontSize: 12, color: 'blue',alignSelf:'end', textAlign:'right', width:'100%'}}>Forgot Password?</a>
                 {signinError && <div className="error-msg">{signinError}</div>}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: 8,
+                  }}
+                >
+                  <div></div>
+                  <Link
+                    href="/forgot-password"
+                    style={{
+                      fontSize: 13,
+                      color: "#4d8ef8",
+                      textDecoration: "none",
+                    }}
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
                 <button type="submit" className="btn" disabled={signinLoading}>
                   {signinLoading ? "Signing in…" : "Continue"}
                 </button>
@@ -195,23 +263,45 @@ export default function AuthForm() {
                     required
                   />
                 </div>
-                <div className="input-box">
+                <div className="input-box" style={{ position: "relative" }}>
                   <input
-                    type="password"
+                    type={showSignupPassword ? "text" : "password"}
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
                     placeholder="Password"
                     required
+                    style={{ flex: 1 }}
                   />
+                  <span
+                    onClick={() => setShowSignupPassword(!showSignupPassword)}
+                    style={{
+                      position: "absolute",
+                      right: 12,
+                      cursor: "pointer",
+                    }}
+                  >
+                    <EyeIcon show={showSignupPassword} />
+                  </span>
                 </div>
-                <div className="input-box">
+                <div className="input-box" style={{ position: "relative" }}>
                   <input
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm Password"
                     required
+                    style={{ flex: 1 }}
                   />
+                  <span
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    style={{
+                      position: "absolute",
+                      right: 12,
+                      cursor: "pointer",
+                    }}
+                  >
+                    <EyeIcon show={showConfirmPassword} />
+                  </span>
                 </div>
                 {signupError && <div className="error-msg">{signupError}</div>}
                 {message && (
@@ -266,8 +356,6 @@ export default function AuthForm() {
                   />
                 </svg>
               </button>
-              {/* <button className="circle black"></button>
-              <button className="circle blue">f</button> */}
             </div>
           </div>
         </div>

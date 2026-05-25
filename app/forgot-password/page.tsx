@@ -1,20 +1,41 @@
 "use client";
+
 import { useState } from "react";
 import Link from "next/link";
-import { forgotPassword } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [sent, setSent] = useState(false);
+  const router = useRouter();
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await forgotPassword(email);
-    setSent(true);
-    setLoading(false);
-  }
+    setError("");
+
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to send reset email");
+      }
+
+      setSent(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (sent) {
     return (
@@ -58,23 +79,40 @@ export default function ForgotPasswordPage() {
           <div className="input-box">
             <input
               type="email"
+              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
-              required
             />
           </div>
+
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary"
-            style={{ width: "100%" }}
+            style={{
+              width: "100%",
+              padding: "12px",
+              background: "#4d8ef8",
+              color: "white",
+              border: "none",
+              borderRadius: 8,
+              fontSize: 16,
+              fontWeight: 600,
+              cursor: "pointer",
+              opacity: loading ? 0.7 : 1,
+            }}
           >
-            {loading ? "Sending…" : "Send Reset Link"}
+            {loading ? "Sending..." : "Send reset link →"}
           </button>
         </form>
-        <div className="auth-footer">
-          <Link href="/login">← Back to login</Link>
+
+        <div style={{ textAlign: "center", marginTop: 24 }}>
+          <Link
+            href="/login"
+            style={{ color: "#64748b", textDecoration: "none", fontSize: 14 }}
+          >
+            ← Back to login
+          </Link>
         </div>
       </div>
     </div>

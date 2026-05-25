@@ -765,12 +765,26 @@ export default function HomePage() {
           >
             Trusted by organizations worldwide
           </h2>
-          <div className="trusted-logos">
-            <img
-              src="/forbes-logo.png"
-              alt="Forbes"
-              className="trusted-logo-img"
-            />
+          <div className="trusted-logos-container">
+            <div className="trusted-logos">
+              <img
+                src="/forbes-logo.png"
+                alt="Forbes-logo"
+                className="trusted-logo-img"
+              />
+            </div>
+            <div className="trusted-logos">
+              <img src="/nbc.png" alt="nbc-logo" className="trusted-logo-img" />
+            </div>
+            <div className="trusted-logos">
+              <img src="/cbs.png" alt="cbs-logo" className="trusted-logo-img" />
+            </div>
+            <div className="trusted-logos">
+              <img src="/abc.png" alt="abc-logo" className="trusted-logo-img" />
+            </div>
+            <div className="trusted-logos">
+              <img src="/fox.jpg" alt="Fox-logo" className="trusted-logo-img" />
+            </div>
           </div>
         </div>
       </section>
