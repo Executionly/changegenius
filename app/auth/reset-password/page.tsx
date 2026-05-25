@@ -32,33 +32,37 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
+    <div className="auth-container-new">
+      <div className="auth-card-new">
         <div className="auth-header">
-          <Link href="/" className="auth-logo">
-            ChangeGenius™
-          </Link>
+          <div className="logo">
+              <div className="logo-icon"></div>
+              <span>ChangeGenius™</span>
+            </div>
           <h1>Set new password</h1>
           <p>Choose a strong password for your account.</p>
         </div>
         {error && <div className="error-message">{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <label>New password</label>
+        <form onSubmit={handleSubmit} className="form"
+        style={{
+          marginTop: '20px'
+        }}>
+          <div className="input-box">
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              placeholder="New Password"
             />
           </div>
-          <div className="input-group">
-            <label>Confirm password</label>
+          <div className="input-box">
             <input
               type="password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               required
+              placeholder="Confirm New Password"
             />
           </div>
           <button

@@ -108,16 +108,7 @@ function LeadershipInsightCard({ feed }: { feed: FeedItem }) {
             Change Genius™ · ADAPTS™ Analysis
           </p>
         </div>
-        <span style={{
-          fontSize: 11,
-          color: '#AFA9EC',
-          background: 'rgba(255,255,255,0.1)',
-          borderRadius: 20,
-          padding: '3px 10px',
-          whiteSpace: 'nowrap',
-        }}>
-          Week {feed.week_number}
-        </span>
+
       </div>
 
       {/* Body */}

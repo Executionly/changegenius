@@ -166,6 +166,8 @@ export default function AuthForm() {
                     required
                   />
                 </div>
+                <a href="/forgot-password"
+                style={{fontSize: 12, color: 'blue',alignSelf:'end', textAlign:'right', width:'100%'}}>Forgot Password?</a>
                 {signinError && <div className="error-msg">{signinError}</div>}
                 <button type="submit" className="btn" disabled={signinLoading}>
                   {signinLoading ? "Signing in…" : "Continue"}

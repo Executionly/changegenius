@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/hooks/useAuth";
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 export const metadata: Metadata = {
   title: "Change Genius™ — Leadership Intelligence",
@@ -30,6 +31,7 @@ export default function RootLayout({
       </head>
       <body>
         <AuthProvider>{children}</AuthProvider>
+        <GoogleAnalytics gaId="G-1DMK43E3LJ" /> 
       </body>
     </html>
   );

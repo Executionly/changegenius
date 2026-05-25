@@ -18,20 +18,25 @@ export default function ForgotPasswordPage() {
 
   if (sent) {
     return (
-      <div className="auth-container">
-        <div className="auth-card">
+      <div className="auth-container-new">
+        <div className="auth-card-new">
           <div className="auth-header">
-            <Link href="/" className="auth-logo">
-              ChangeGenius™
-            </Link>
+            <div className="logo">
+              <div className="logo-icon"></div>
+              <span>ChangeGenius™</span>
+            </div>
             <h1>Check your email</h1>
             <p>
               If an account exists for <strong>{email}</strong>, we sent a
               password reset link.
             </p>
           </div>
-          <div className="auth-footer">
-            <Link href="/login">← Back to login</Link>
+          <div className="auth-footer"
+          style={{
+            marginTop: 24,
+          }}>
+            <Link href="/login"
+            style={{ color: 'blue'}}>← Back to login</Link>
           </div>
         </div>
       </div>
@@ -39,22 +44,23 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
+    <div className="auth-container-new">
+      <div className="auth-card-new">
         <div className="auth-header">
-          <Link href="/" className="auth-logo">
-            ChangeGenius™
-          </Link>
+          <div className="logo">
+              <div className="logo-icon"></div>
+              <span>ChangeGenius™</span>
+            </div>
           <h1>Reset password</h1>
-          <p>Enter your email and we'll send a reset link.</p>
+          <p className="subtitle">Enter your email and we'll send a reset link.</p>
         </div>
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <label>Email</label>
+        <form onSubmit={handleSubmit} className="form">
+          <div className="input-box">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
               required
             />
           </div>
