@@ -154,7 +154,7 @@ const ADAPTS_SVG = ({
       {/* Block A (Alert the System) */}
       <path
         opacity="0.94"
-        d="M49.6719 34.001C53.9563 30.041 53.9602 26.5716 50.7754 20.1963C49.6463 18.2231 49 15.9373 49 13.501C49.0003 6.04536 55.0443 0.000976562 62.5 0.000976562C69.9557 0.000976563 75.9997 6.04536 76 13.501C75.9999 16.3767 75.0999 19.0425 73.5674 21.2324C72.2363 23.5997 68.6459 31.0732 74.5 34.001L125 34.001L125 83.6719C128.96 87.9566 132.429 87.9604 138.805 84.7754C140.778 83.6462 143.064 83 145.5 83C152.956 83 158.999 89.0446 159 96.5C159 103.956 152.956 110 145.5 110C142.624 110 139.959 109.1 137.769 107.567C135.401 106.236 127.928 102.647 125 108.5L125 159.002L0 159.002L0 108.602C2.97579 103.84 9.56578 107.404 11.4727 108.577C11.6295 108.682 11.7882 108.783 11.9492 108.882C11.9821 108.904 12 108.915 12 108.915V108.912C14.1883 110.237 16.755 111.001 19.5 111.001C27.5079 111.001 34 104.509 34 96.501C34 88.493 27.5079 82.0012 19.5 82.001C16.7552 82.001 14.1882 82.7639 12 84.0889V84.083C5.49986 88.0009 0.999854 85.001 0 83.001L0 34.001L49.6719 34.001ZM48 139.501C48 142.246 48.7629 144.813 50.0879 147.001H50.082C53.9999 153.501 51 158.001 49 159.001L74.6006 159.001C69.8388 156.025 73.4026 149.435 74.5762 147.528C74.6806 147.372 74.7824 147.213 74.8809 147.052C74.903 147.019 74.9141 147.001 74.9141 147.001H74.9111C76.2363 144.813 77 142.246 77 139.501C76.9997 131.493 70.508 125.001 62.5 125.001C54.492 125.001 48.0003 131.493 48 139.501Z"
+        d="M49.6719 34.001C53.9563 30.041 53.9602 26.5716 50.7754 20.1963C49.6463 18.2231 49 15.9373 49 13.501C49.0003 6.04536 55.0443 0.000976562 62.5 0.000976562C69.9557 0.000976563 75.9997 6.04536 76 13.501C75.9999 16.3767 75.0999 19.0425 73.5674 21.2324C72.2363 23.5997 68.6459 31.0732 74.5 34.001L125 34.001L125 83.6719C128.96 87.9566 132.429 87.9604 138.805 84.7754C140.778 83.6462 143.064 83 145.5 83C152.956 83 158.999 89.0446 159 96.5C159 103.956 152.956 110 145.5 110C142.624 110 139.959 109.1 137.769 107.567C135.401 106.236 127.928 102.647 125 108.5L125 159.002L0 159.002L0 108.602C2.97579 103.84 9.56578 107.404 11.4727 108.577C11.6295 108.682 11.7882 108.783 11.9492 108.882C11.9821 108.904 12 108.915 12 108.915V108.912C14.1883 110.237 16.755 111.001 19.5 111.001C27.5079 111.001 34 104.509 34 96.501C34 88.493 27.5079 82.0012 19.5 82.001C16.7552 82.001 14.1882 82.7639 12 84.0889V84.083C5.49986 88.0009 0.999853 85.001 0 83.001L0 34.001L49.6719 34.001ZM48 139.501C48 142.246 48.7629 144.813 50.0879 147.001H50.082C53.9999 153.501 51 158.001 49 159.001L74.6006 159.001C69.8388 156.025 73.4026 149.435 74.5762 147.528C74.6806 147.372 74.7824 147.213 74.8809 147.052C74.903 147.019 74.9141 147.001 74.9141 147.001H74.9111C76.2363 144.813 77 142.246 77 139.501C76.9997 131.493 70.508 125.001 62.5 125.001C54.492 125.001 48.0003 131.493 48 139.501Z"
         fill={blockA1}
       />
       {/* Block T (Transform) */}
@@ -362,35 +362,35 @@ export default function ResultsPage({
   const energyProfile = derived.energy_profile;
   const capacityScore = derived.change_capacity_score;
 
-  // Build genius cards from real data
-  const geniusCards = [
+  // Separate genius cards by category
+  const roleGeniusCards = [
     {
-      type: "genius",
+      type: "primary",
       letter: primary?.[0] || "U",
       name: primary,
       desc: `You naturally excel here. You derive real energy and joy from the ${primary} role — it's where you're most alive.`,
     },
     {
-      type: "genius",
+      type: "secondary",
       letter: secondary?.[0] || "A",
       name: secondary,
       desc: `Your secondary genius. You are highly capable here and contribute well without significant strain.`,
     },
-    // Top ADAPTS stages → competency
-    ...topStages.map((stage) => ({
-      type: "competency",
-      letter: ADAPTS_LABELS[stage]?.[0] || stage[0],
-      name: ADAPTS_LABELS[stage] || stage,
-      desc: `A natural strength. You thrive in the "${ADAPTS_LABELS[stage] || stage}" phase of change — this is one of your highest-scoring ADAPTS stages (${stageScores[stage as keyof typeof stageScores]}).`,
-    })),
-    // Bottom ADAPTS stages → frustration
-    ...bottomStages.map((stage) => ({
-      type: "frustration",
-      letter: ADAPTS_LABELS[stage]?.[0] || stage[0],
-      name: ADAPTS_LABELS[stage] || stage,
-      desc: `An area of strain. Extended time in the "${ADAPTS_LABELS[stage] || stage}" phase can drain your energy. Your score here is ${stageScores[stage as keyof typeof stageScores]} — consider partnering with others who thrive here.`,
-    })),
   ];
+
+  const topStageCards = topStages.map((stage) => ({
+    type: "competency",
+    letter: ADAPTS_LABELS[stage]?.[0] || stage[0],
+    name: ADAPTS_LABELS[stage] || stage,
+    desc: `A natural strength. You thrive in the "${ADAPTS_LABELS[stage] || stage}" phase of change — this is one of your highest-scoring ADAPTS stages (${stageScores[stage as keyof typeof stageScores]}).`,
+  }));
+
+  const bottomStageCards = bottomStages.map((stage) => ({
+    type: "frustration",
+    letter: ADAPTS_LABELS[stage]?.[0] || stage[0],
+    name: ADAPTS_LABELS[stage] || stage,
+    desc: `An area of strain. Extended time in the "${ADAPTS_LABELS[stage] || stage}" phase can drain your energy. Your score here is ${stageScores[stage as keyof typeof stageScores]} — consider partnering with others who thrive here.`,
+  }));
 
   const normalizedStageScores = Object.fromEntries(
     Object.entries(stageScores).map(([k, v]) => [normalizeStageName(k), v]),
@@ -768,27 +768,134 @@ export default function ResultsPage({
         </div>
       </div>
 
-      {/* Genius cards grid */}
-      <div className="results-grid">
-        {geniusCards.map((card, idx) => (
-          <div key={idx} className="genius-card">
-            <div className={`genius-header ${card.type}`}>
-              <div>
-                <div className={`genius-type ${card.type}`}>
-                  {card.type === "genius"
-                    ? "Change Genius"
-                    : card.type === "competency"
-                      ? "Change Competency"
-                      : "Change Frustration"}
+      {/* Your Genius Roles Section */}
+      <div className="results-section">
+        <div className="results-section-header">
+          <h3 className="results-section-title">Your Genius Roles</h3>
+          <p className="results-section-subtitle">
+            These are your natural change genius roles — where you're naturally
+            gifted
+          </p>
+        </div>
+        <div className="results-grid">
+          {roleGeniusCards.map((card, idx) => (
+            <div key={idx} className="genius-card">
+              <div
+                className={`genius-header ${card.type === "primary" ? "genius" : "secondary-genius"}`}
+              >
+                <div>
+                  <div
+                    className={`genius-type ${card.type === "primary" ? "genius" : "secondary"}`}
+                  >
+                    {card.type === "primary"
+                      ? "Primary Genius"
+                      : "Secondary Genius"}
+                  </div>
+                  <div className="genius-name">{card.name}</div>
                 </div>
-                <div className="genius-name">{card.name}</div>
+                <div
+                  className={`genius-letter ${card.type === "primary" ? "genius" : "secondary"}`}
+                >
+                  {card.letter}
+                </div>
               </div>
-              <div className={`genius-letter ${card.type}`}>{card.letter}</div>
+              <div className="genius-body">{card.desc}</div>
             </div>
-            <div className="genius-body">{card.desc}</div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
+
+      {/* Top ADAPTS Stages Section */}
+      {topStageCards.length > 0 && (
+        <div className="results-section">
+          <div className="results-section-header">
+            <h3 className="results-section-title">Your Change Competencies</h3>
+            <p className="results-section-subtitle">
+              These ADAPTS stages are your natural strengths — you thrive here
+            </p>
+          </div>
+          <div className="results-grid">
+            {topStageCards.map((card, idx) => (
+              <div key={idx} className="genius-card">
+                <div className="genius-header competency">
+                  <div>
+                    <div className="genius-type competency">
+                      Change Competency
+                    </div>
+                    <div className="genius-name">{card.name}</div>
+                  </div>
+                  <div className="genius-letter competency">{card.letter}</div>
+                </div>
+                <div className="genius-body">{card.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Bottom ADAPTS Stages Section */}
+      {bottomStageCards.length > 0 && (
+        <div className="results-section">
+          <div className="results-section-header">
+            <h3 className="results-section-title">Your Change Frustrations</h3>
+            <p className="results-section-subtitle">
+              These ADAPTS stages may drain your energy — consider partnering
+              with others who thrive here
+            </p>
+          </div>
+          <div className="results-grid">
+            {bottomStageCards.map((card, idx) => (
+              <div key={idx} className="genius-card">
+                <div className="genius-header frustration">
+                  <div>
+                    <div className="genius-type frustration">
+                      Change Frustration
+                    </div>
+                    <div className="genius-name">{card.name}</div>
+                  </div>
+                  <div className="genius-letter frustration">{card.letter}</div>
+                </div>
+                <div className="genius-body">{card.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        .results-section {
+          margin-bottom: 24px;
+        }
+        .results-section-header {
+          margin-bottom: 16px;
+        }
+        .results-section-title {
+          font-size: 18px;
+          font-weight: 700;
+          color: var(--text);
+          margin-bottom: 4px;
+        }
+        .results-section-subtitle {
+          font-size: 13px;
+          color: var(--muted);
+        }
+        .results-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 16px;
+        }
+        .genius-header.secondary-genius {
+          background: #e0e7ff;
+          border-bottom: 1px solid #bfdbfe;
+        }
+        .genius-type.secondary {
+          color: #1d4ed8;
+        }
+        .genius-letter.secondary {
+          background: #1d4ed8;
+          color: white;
+        }
+      `}</style>
     </>
   );
 }
