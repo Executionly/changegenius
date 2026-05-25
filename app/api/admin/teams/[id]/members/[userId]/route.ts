@@ -3,13 +3,13 @@ import { requireAdmin, isAdminSession, adminDb, audit } from '@/lib/admin'
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string; userId: string } }
+  { params }: { params: Promise<{ id: string,userId: string }> }
 ) {
   const session = await requireAdmin(req, ['admin', 'super_admin'])
   if (!isAdminSession(session)) return session
 
   try {
-    const { id: teamId, userId } = params
+    const { id: teamId, userId } = await params
 
     const { error } = await adminDb
       .from('team_members')

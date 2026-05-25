@@ -6,13 +6,13 @@ import {
 // ── GET /api/admin/users/[id] 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await requireAdmin(req, ['support', 'admin', 'super_admin'])
   if (!isAdminSession(session)) return session
 
   try {
-    const { id } = params
+    const { id } = await params
 
     // Profile
     const { data: profile, error: profileError } = await adminDb

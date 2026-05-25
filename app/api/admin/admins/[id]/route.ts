@@ -4,13 +4,13 @@ import { requireAdmin, isAdminSession, adminDb, audit } from '@/lib/admin'
 // ── PATCH /api/admin/admins/[id] 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await requireAdmin(req, ['super_admin'])
   if (!isAdminSession(session)) return session
 
   try {
-    const { id }  = params
+    const { id }  = await params
     const body    = await req.json()
     const allowed = ['role', 'is_active', 'full_name'] as const
     const updates: Record<string, unknown> = {}
