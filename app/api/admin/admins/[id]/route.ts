@@ -52,13 +52,13 @@ export async function PATCH(
 // ── DELETE /api/admin/admins/[id] 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await requireAdmin(req, ['super_admin'])
   if (!isAdminSession(session)) return session
 
   try {
-    const { id } = params
+    const { id } = await params
 
     if (id === session.adminId) {
       return NextResponse.json(
