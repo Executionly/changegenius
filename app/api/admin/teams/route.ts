@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       .select(
         `id, name, organization, invite_code, created_at,
          owner:profiles!owner_id(id, email, full_name),
-         team_reports(member_count, risk_score, last_updated)`,
+         team_members(count)`,
         { count: 'exact' }
       )
 
@@ -37,8 +37,15 @@ export async function GET(req: NextRequest) {
 
     if (error) throw error
 
+    // Transform data to include total_members count
+    const transformedData = (data ?? []).map((team: any) => ({
+      ...team,
+      total_members: team.team_members?.length ?? 0,
+      team_members: undefined // Remove the raw team_members data
+    }))
+
     // Apply risk filter in memory (it lives on team_reports join)
-    let filtered = data ?? []
+    let filtered = transformedData
     if (minRisk || maxRisk) {
       filtered = filtered.filter((t: any) => {
         const risk = t.team_reports?.[0]?.risk_score ?? null
