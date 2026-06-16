@@ -6,13 +6,13 @@ import {
 // ── GET /api/admin/users/[id] 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await requireAdmin(req, ['support', 'admin', 'super_admin'])
   if (!isAdminSession(session)) return session
 
   try {
-    const { id } = params
+    const { id } = await params
 
     // Profile
     const { data: profile, error: profileError } = await adminDb
@@ -76,14 +76,14 @@ export async function GET(
 // Allowed fields: has_paid, role
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await requireAdmin(req, ['admin', 'super_admin'])
   if (!isAdminSession(session)) return session
 
   try {
-    const { id }   = params
-    const body     = await req.json()
+    const { id } =await params
+    const body = await req.json()
     const allowed  = ['has_paid', 'role'] as const
     const updates: Record<string, unknown> = {}
 
@@ -117,13 +117,13 @@ export async function PATCH(
 // super_admin only — deletes auth user which cascades to all tables
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await requireAdmin(req, ['super_admin'])
   if (!isAdminSession(session)) return session
 
   try {
-    const { id } = params
+    const { id } = await params
 
     // Grab email before deletion for the audit log
     const { data: profile } = await adminDb

@@ -16,14 +16,29 @@ export async function GET(req: NextRequest) {
     const country      = params.get('country')
     const search       = params.get('search')
 
+    // First, get all admin user IDs to exclude
+    const { data: adminUsers, error: adminError } = await adminDb
+      .from('admin_users')
+      .select('user_id')
+
+    if (adminError) throw adminError
+
+    // Extract admin user IDs into an array
+    const adminUserIds = adminUsers?.map(admin => admin.user_id) ?? []
+
     let query = adminDb
       .from('profiles')
       .select(
-        `id, email, full_name, organization, role_level, country, role,
+        `id, email, full_name, bottom_adapts_stages, role,
          change_genius_role, change_genius_role_2, role_pair_title,
          primary_energy, has_paid, onboarded, created_at`,
         { count: 'exact' }
       )
+
+    // Exclude admin users - only if there are admin users to exclude
+    if (adminUserIds.length > 0) {
+      query = query.not('id', 'in', `(${adminUserIds.join(',')})`)
+    }
 
     if (hasPaid === 'true')  query = query.eq('has_paid', true)
     if (hasPaid === 'false') query = query.eq('has_paid', false)

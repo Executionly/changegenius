@@ -4,13 +4,13 @@ import { requireAdmin, isAdminSession, adminDb, audit } from '@/lib/admin'
 // ── GET /api/admin/teams/[id] 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await requireAdmin(req, ['support', 'admin', 'super_admin'])
   if (!isAdminSession(session)) return session
 
   try {
-    const { id } = params
+    const { id } = await params
 
     // Team core
     const { data: team, error: teamError } = await adminDb
@@ -91,13 +91,13 @@ export async function GET(
 // ── DELETE /api/admin/teams/[id] 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await requireAdmin(req, ['super_admin'])
   if (!isAdminSession(session)) return session
 
   try {
-    const { id } = params
+    const { id } = await params
 
     const { data: team } = await adminDb
       .from('teams')
