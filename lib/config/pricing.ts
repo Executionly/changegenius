@@ -1,7 +1,7 @@
 // lib/config/pricing.ts
 export const PRICING = {
-  INDIVIDUAL: 27, // USD
-  TEAM_PER_PERSON: 27, // USD per person
+  INDIVIDUAL: 17, // USD
+  TEAM_PER_PERSON: 17, // USD per person
   TEAM_MIN_MEMBERS: 3,
   TEAM_UNLOCK_THRESHOLD: 3, // Basic insights
   TEAM_FULL_UNLOCK_THRESHOLD: 5, // Full diagnostic

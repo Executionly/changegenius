@@ -598,15 +598,14 @@ export default function HomePage() {
             </div>
 
             <h1 className="hero-headline">
-              Understand how you
-              <br />
-              <span className="highlight-text">lead through change</span>
+              Discover Your Change Genius™
+              {/*<br />*/}
+              <span className="highlight-text"></span>
             </h1>
 
             <p className="hero-description">
-              The evidence-based assessment that reveals your natural change
-              genius and gives you the playbook to scale it across your
-              organization.
+              Unlock the natural strengths that drive your performance,
+              leadership, growth, and ability to create lasting results.
             </p>
 
             <button className="btn-hero-primary" onClick={handleStart}>
